@@ -5,9 +5,14 @@
 # Session Data files
 .RData
 .RDataTmp
+.DS_Store
 
 # User-specific files
 .Ruserdata
+
+# Unnecessary files
+_book/
+_main_files/
 
 # Example code in package build process
 *-Ex.R

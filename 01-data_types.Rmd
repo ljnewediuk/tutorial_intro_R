@@ -1,0 +1,53 @@
+# Introduction to data types 
+
+Today we are going to start with some of the most basic units we will deal with in R and work our way up to some of the most complex. The most basic unit we will deal with are *data types*. Note that there are many data types in R, but we will mostly deal with four: **characters**, **numerics**, **integers**, and **logicals**.
+
+A **character** data type is used to store text.
+
+```{r}
+'Hello, World'
+```
+
+You have just created a character data type.
+
+We can use the `class` function to get the data type or data structure. More
+about functions later! For now, you should know that you can ask R about the
+data type by enclosing it in parentheses after the word `class`.
+
+```{r, eval = T}
+class('Hello, World')
+```
+
+You will notice R tells you the class is **"character"**.
+
+A **numeric** data type is used to store real numbers.
+
+```{r}
+4.78
+class(4.78)
+```
+
+An **integer** is a special subset of the numeric data type used to store integers. When we want to tell R we want a number as an integer, we type an "L" after the number.
+
+```{r}
+4L
+class(4L)
+```
+
+A **logical** type takes two possible values: "TRUE" or "FALSE". Note these values are always capitalized. R also recognizes shortforms for logicals "T" and "F".
+
+```{r}
+TRUE
+class(TRUE)
+class(F)
+```
+
+### Question 1: What are the data types of (a) 500L, (b) 1e-14, (c) "1"? (be specific as possible!)
+
+We can also ask R whether a data type is of a specific type using the **"is"** set of functions. We use this function by typing is.DATATYPE() and enclosing the data type we aren't sure about in the parentheses. For example `is.numeric(3L)` asks R whether 3L is numeric and returns a logical datatype specifying whether the statement is TRUE (yes, it's a numeric) or FALSE (no, it's not a numeric). Here are some examples. Before running the code, try to predict what classes R will return. You should also try some others yourself!
+
+```{r}
+is.character(TRUE)
+is.logical(TRUE)
+is.character('TRUE')
+```
