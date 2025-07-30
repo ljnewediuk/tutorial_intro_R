@@ -1,0 +1,304 @@
+# Visualizing data using summary statistics and Tidyverse
+
+Summary statistics (e.g., means, max, min, se) are one of the most basic ways to visualize and explore data. Although these functions are less useful in deterministic modelling, we will still need to summarize data at times, especially when we use stochastic models. The `summary()` function, when applied to a data frame like `iris`, is one of the simplest ways to find summary statistics for all the data types.
+
+```{r, echo = F}
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+```{r}
+# Load the iris data
+data(iris)
+```
+
+```{r, eval = F}
+# Load the Tidyverse package
+library(tidyverse)
+```
+
+## Summarizing data frames
+
+```{r}
+summary(iris)
+```
+
+In the output, we see the min, median, mean, max, and the interquartile range for all numeric columns. We also see a summary of the numbers of each species in the Species column, which is a factor.
+
+We can also use functions for `mean()`, `median()`, `min()`, `max()` individually to summarize each separate statistic for each column.
+
+```{r}
+mean(iris$Petal.Length)
+max(iris$Petal.Length)
+min(iris$Petal.Length)
+```
+
+Try yourself to find the `median()` petal length and standard deviation of petal length, for which you can use the function `sd()`.
+
+One problem is that these summary statistics apply to *all* species. If we wanted to obtain summary stats for each species, we would need a different method.
+
+The `summarize()` and `group_by()` functions are two of the most useful Tidyverse functions for calculating summary statistics. You can pair them together to make quick summaries of structured data.
+
+The summarize function is equivalent to finding the mean of each column as we did before.
+
+```{r, eval = F}
+# This is an example of summarizing the column x in the
+# data frame df using the function fn()
+summarize(df, fn(x))
+
+# This is equivalent to
+fn(df$x)
+```
+
+When we apply `summarize()` with the `group_by()` function, we can summarize by groups of values or factors in another column. For example, we can calculate the mean petal length for *each* species in iris.
+
+```{r}
+# First, we create a new data frame grouped by the factor Species
+iris_species_groups <- group_by(iris, Species)
+
+# Then, we can summarize by petal length using the grouped data frame
+summarize(iris_species_groups, MeanPetalLength = mean(Petal.Length))
+```
+
+Note how your printout is a "tibble". This is a version of data frame unique to the Tidyverse.
+
+## Combining functions to calculate more complex summaries
+
+We can also find other useful summary statistics. For example, by using some functions like `mean()`, `sd()`, and the square root function `sqrt()` and with R's functionality as a calculator, we can calculate more complex statistics like standard error that don't have a special function in R.
+
+```{r}
+summarize(iris_species_groups, 
+          PLSE = sd(Petal.Length) / sqrt(length(Petal.Length)) )
+```
+
+Notice how `summarize()` strips all columns from the resulting data frame except the group column and the new summary statistics. In some cases we might want to calculate summary statistics while preserving the original columns. We can instead add a summary column to our data frame, for example group means, using `group_by()` with `mutate()`. 
+
+```{r}
+mutate(iris_species_groups, MeanPetalLength = mean(Petal.Length))
+```
+
+The mean petal lengths appear for each row, corresponding to the species to which the observation belongs.
+
+## Piping
+
+Another convenient element of the Tidyverse is called **piping**. The pipe "%>%" is a special operator used to chain functions together for complex operations performed on data frames. The pipe essentially passes a data frame to the next function. For example, the following code is equivalent to the previous example where we created a new column for mean petal length. The data frame 'iris_species_groups' is  passed to the mutate function on the next line using the pipe.
+
+```{r}
+iris_species_means <- iris_species_groups %>%
+  mutate(MeanPetalLength = mean(Petal.Length))
+```
+
+This might not seem like it would save you space while coding. However, the real benefit of pipes comes from their ability to chain functions together. Beginning with the original data frame, we can use pipes to chain together several functions to first filter out the *I. versicolor* species, group by species, then summarize with mean petal length:
+
+```{r}
+iris %>%
+  filter(Species != 'versicolor') %>%
+  group_by(Species) %>%
+  summarize(MeanPetalLength = mean(Petal.Length))
+```
+
+## Introduction to ggplot2
+
+ggplot2 is an R package used to create highly visually appealing graphs in R. It comes as part of the Tidyverse and is the current standard for publication. Despite its popularity and importance, ggplot2 can be somewhat tricky to learn because it uses an unconventional "layering" method to construct plots, which differs from anything you learned in R already. We will go over the basics of ggplot2. I would encourage you to explore the ggplot2 book on your own time if you would like to improve your plotting skills and your ability to customize your own plots (https://ggplot2-book.org/).
+
+In ggplot2, we *build* plots by adding a series of components together. We we will only be learning a few basic components: layers, scales, and themes. There are several more components you can read about in the ggplot2 book.
+
+**Layers** are the pieces of data displayed on a graph, like points, lines, bars, etc. If you are familiar with MS Excel, adding a layer to a plot in ggplot2 is equivalent to adding a data series to a graph in Excel. We can add multiple layers of  different types, and each layer can come from the same data frame or different data frames.
+
+**Scales** are the link between the data in your graph and its "aesthetic". They take your data and turn it into something that you can see, like size, colour, position or shape. Scales also control data element displays, like how many "breaks" appear on your axes and which elements appear in the legend.
+
+**Themes** control the non-data elements of your plot. For example, you can control the size of the text along the axes, the plot background shading, where the legend appears relative to your plot, etc. There are many aspects of your theme that you can fine-tune to create beautiful plots. I encourage you to read more about themes if you are interested and especially in preparation for your final projects. We will only briefly cover some basic theme elements.
+
+Every ggplot2 plot has three key components:
+
+* **data**;
+* a set of **aesthetic** mappings between variables in the data and visual properties;
+* and, at least one **geom** layer which describes how to render the data observation.
+
+## Histograms
+
+First, we are going to learn how to construct one of the most simple plots with layers, scales, and a simple theme using the iris data frame. **Histograms** help us visualize the distributions of quantitative data (e.g., numeric and integer data types in R or interval,  ratio, or discrete data in a a statistical sense). Histograms provide one of the simplest forms of data exploration. For example, we might want to look at the distribution of parameter values after simulating a stochastic model. Values in the data are displayed along the x-axis, and the counts of data points within a range of values are displayed in bars.
+
+We are going to create a histogram of petal lengths. The data and the aesthetics (aes) go within the parentheses of the `ggplot()` function. `aes()` is itself a function within the `ggplot()` function. This simple plot tells ggplot2 to use the data from the iris data frame to create a ggplot object with Petal.Length along the x-axis.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length))
+```
+
+The plot is blank, other than the series for petal lengths along the axis, because we have not yet added a `geom()`. We want a histogram, so we are going to add a `geom_histogram()` function, which tells ggplot2 to render the data into a histogram. We can include arguments within the `geom_histogram()` function, but for now we don't need to. Note how we use the '+' operator and NOT piping to add ggplot2 components together.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram()
+```
+
+### Adjusting bin widths
+
+You will see a message from R when you print the plot: "`stat_bin() using bins = 30. Pick better value with binwidth`." The binwidth is something we can customize within the `geom_histogram()` function. "Bins" essentially describe how wide a range of data are included within each bar of the histogram. R has given us a default of 30 bins. We can calculate the binwidth based on those 30 bins by dividing the range of values in the Petal.Length column by 30.
+
+```{r, eval = T}
+(max(iris$Petal.Length) - min(iris$Petal.Length)) / 30
+```
+
+So, each bin has a width of approximately 0.2. We can make more bins each containing less data by specifying a narrower binwidth:
+
+```{r, eval = T}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram(binwidth = 0.1)
+```
+
+Or fewer bins containing more data by specifying a wider binwidth:
+
+```{r, eval = T}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram(binwidth = 0.3)
+```
+
+### Colouring geoms by group
+
+You probably also noticed the petal length data are "bimodal". I.e., there are two distinct peaks in the data. This often indicates some group structure within the data. In the iris data, we are looking at petal lengths of three species, and it is possible each species has a different distribution of petal lengths. We can add a grouping to the aesthetic to visualize the three species.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species)) +
+  geom_histogram(binwidth = 0.3)
+```
+
+For some types of geoms like lines, adding a group aesthetic will separate the data into different lines so groups are easier to visualize. However, since all of our bins are identical, we need to add different aesthetics to visualize the species differences. Some aesthetics we can add are "colour", "fill", and "size". Let's add a fill aesthetic, which will fill the histogram bars with different colours for different species.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species, fill = Species)) +
+  geom_histogram(binwidth = 0.3)
+```
+
+Great! Now we can see the different species. Notice, however, that *Iris versicolor* and *I. virginica* still overlap. We can tell ggplot to make the bars distinct by adding a "position" argument to the `geom_histogram()` function, telling ggplot2 to make the bars of the histogram "dodge" one another.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species, fill = Species)) +
+  geom_histogram(binwidth = 0.3, position = 'dodge')
+```
+
+### Adjusting plot aesthetics
+
+Finally, let's fine-tune the plot appearance. We are not going to go into much detail about scales and themes, but I will give you a few tools to start with and you can explore more on your own. First, we might want to adjust the colours of the species in our histogram. If we do not specify a group structure in our histogram, we can simply specify "fill = 'colour'" as an argument in the `geom_histogram()` function.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram(binwidth = 0.3, fill = 'red')
+```
+
+However, doing so with a group structure will override the separate group colours we specified with the fill aesthetic. To change the group colours, we need to add a *manual* **scale** function. In this case we are using `scale_fill_manual()` because the aesthetic we changed is a fill. The "values = " argument within the function specifies the three different colours we want to fill the bars with. Other functions like `scale_colour_manual()`, `scale_size_manual()`, etc. are also possible. Try them if you want to!
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species, fill = Species)) +
+  geom_histogram(binwidth = 0.3, position = 'dodge') +
+  scale_fill_manual(values = c('pink', 'red', 'darkred'))
+```
+
+Note that we need to specify *exactly* as many fill colours as there are groups in Species -- specifying too few or too many will result in an error. R interprets some character values like "pink", "red", etc. as the actual colours, which you can see above. You can also specify your own custom colours using hex codes, which are 6-digit strings of letters and numbers preceded by a #, in place of characters. E.g., "red" is equivalent to "#FF0000". You can find millions of hex codes to customize your plots at [color-hex.com](https://www.color-hex.com/).
+
+We can also change some other aesthetics. For example, the legend is currently outside the plot on the right, but we might want it inside the plot. This is something we can do with the addition of the `theme()` function. The theme function is a container for *many* characteristics related to plot appearance, from text sizes, to fonts, to plot shading colours. You can explore the many options on your own (visit [the ggplot2 book website](https://ggplot2-book.org/) for more resources). For now, we are just going to specify a legend position. We first need to specify that the legend should appear within the plot using the argument "legend.position = 'inside'", then we will specify the location of the legend using a 2-value numeric vector with values between 0 and 1 using the "legend.position.inside" argument.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species, fill = Species)) +
+  geom_histogram(binwidth = 0.3, position = 'dodge') +
+  scale_fill_manual(values = c('pink', 'red', 'darkred')) +
+  theme(legend.position = 'inside',
+        legend.position.inside = c(.8, .8))
+```
+
+The numeric values in legend.position.inside are proportional to the plot boundaries, so 'c(.8, .8)', for example, is 20% of the distance from the top and right edges of the plot. Try adjusting the values in the vector, between 0 and 1, on your own to see how the legend position changes.
+
+Finally, we are going to change the axis labels. The labels "count" and "Petal.Length" are not very informative. We can change them with the `labs()` function. Arguments 'x' and 'y' within the `labs()` function specify new names for the x and y axes.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, group = Species, fill = Species)) +
+  geom_histogram(binwidth = 0.3, position = 'dodge') +
+  scale_fill_manual(values = c('pink', 'red', 'darkred')) +
+  theme(legend.position = 'inside',
+        legend.position.inside = c(.8, .8)) +
+  labs(x = 'Petal length (cm)', y = 'Number of observations')
+```
+
+We're finished! This histogram looks great, and you can save or copy it using the "Export" drop-down just above the plot within your RStudio console.
+
+## Scatterplots
+
+Next, we are going to create a more complex plot. **Scatterplots** use points to show the relationship between two numeric or sometimes integer variables. Using scatterplots, we can visually assess statistical hypotheses. For example, imagine we were interested in whether petal length scales with sepal length in Iris flowers. If it does, we would predict a linear relationship between petal and sepal length; plants with longer petals should also have longer sepals.
+
+Let's create a scatterplot of petal length on the x axis and sepal length on the y axis. To start, we need to add a "y =" argument (for the second variable) to the `aes()` function in our ggplot object.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, y = Sepal.Length))
+```
+
+Notice that our plot is blank, like before, because we haven't specified any geoms. However, we can now see sepal lengths along the y axis. Let's add a new point geom to render the data into points.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point()
+```
+
+We are also going to add a smoothed line to the plot using the geom_smooth() function. This is essentially a "trendline" that helps us see relationships in the data. We are specifying "method = 'lm'" to tell ggplot we would like a straight line through the data. We will also include the argument "se = TRUE", which helps us visualize the confidence intervals around the trendline. Let's also change the colour of our trendline using a hex code.
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = TRUE, colour = '#228B22')
+```
+
+We can see there is a linear relationship between petal and sepal lengths. However, there is a clump of points near the origin (0, 0) for which this relationship doesn't seem to hold. It's likely that sepal lengths and petal lengths are not proportional for at least one species. Let's colour the points by species to visualize the relationships by species. This time, we are going to add a new `aes()` function directly to the `geom_point()` function instead of 
+to the `ggplot()` function. This will prevent ggplot2 from making separate lines with distinct colours for each species. 
+
+```{r}
+ggplot(data = iris, aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point(aes(colour = Species)) +
+  geom_smooth(method = 'lm', se = TRUE, colour = '#228B22')
+```
+
+Now we can which points correspond to which species. Within each species, the relationship between petal and sepal length is not completely proportional. The "slopes" of some of the relationships are much steeper. You can visualize this even better if you move the "colour = Species" argument to the `aes()` function within `ggplot()`. This will draw separate lines for each species as well as colouring the points.
+
+## Line plots
+
+Histograms and scatterplots are great when our parameters have some variation. However, we will often fit models where we know the exact parameter values we want to simulate. **Line plots** are the best type of plot for this purpose. To show you why, let's fit a simple exponential population growth model, using a precise growth rate (*r*), and plot the growth of the population's size (*N*) over time.
+
+First, we'll simulate a simple exponential population model and store the results in a data frame. Let's simulate the population over 20 time steps, with an initial population size of 5, and a growth rate of 0.3.
+
+```{r}
+# Create a numeric vector for time
+t <- 0:20
+
+# Specify a growth rate, r
+r <- 0.3
+
+# Specify an initial population size, N0
+N0 <- 5
+
+# Calculate the population size after t time steps
+Nt <- N0 * exp(r*t)
+
+# Now, combine the vectors t and Nt into a data frame
+exp_pop_growth <- data.frame(
+  time = t,
+  N = Nt
+)
+
+# Preview the data frame
+head(exp_pop_growth)
+
+```
+
+Now we will plot our simulated data using the `geom_point()` function.
+
+```{r}
+ggplot(data = exp_pop_growth, aes(x = t, y = Nt)) +
+  geom_point() +
+  labs(x = 'Time', y = 'Population size')
+```
+
+We can see the pattern, but the points look artificial because there is no variation in the data. Because we specified the growth rate, we can determine exactly what the population size will be at each time step. A line graph is more appropriate. We can specify this graph type with the `geom_line()` function.
+
+```{r}
+ggplot(data = exp_pop_growth, aes(x = t, y = Nt)) +
+  geom_line() +
+  labs(x = 'Time', y = 'Population size')
+```
+

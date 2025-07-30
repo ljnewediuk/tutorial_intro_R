@@ -1,0 +1,105 @@
+# Operators
+
+Basic arithmetic is one of the most simple ways we will work with data in R. R can act as a basic calculator. Here are the arithmetic operators we will use most often:
+
+* Addition: + (e.g., 4 + 4)
+* Subtraction: - (e.g., 10 - 4)
+* Multiplication: * (e.g., 2 * 19)
+* Division: / (e.g., 12 / 3)
+* Exponentiation: ^ (e.g., 8 ^ 16)
+
+Some of these arithmetic operators have equivalent functions that can be applied to a vector of numbers. We can use these to make things simpler if we don't want to type out the operator each time. E.g.:
+
+```{r, eval = T}
+# 'prod()' function for multiplication
+5 * 10 * 3 * 1 * 9
+prod(c(5, 10, 3, 1, 9))
+
+# 'sum()' function for addition
+5 + 10 + 3 + 1 + 9
+sum(c(5, 10, 3, 1, 9))
+```
+
+## The asssignment operator
+
+The **assignment operator** is a special operator that turns data types, data structures, etc. into *objects* by assigning them names. We can assign names to data frames, vectors, lists, and other objects by placing the *name* on the *left* side of the operator and the *object* we want to assign on the *right*. Either "=" or "<-" work as assignment operators. For example:
+
+```{r}
+# Either version of the assignment operator works here
+myNumericVector <- c(3, 4, 5, 6, 7)
+myNumericVector = c(3, 4, 5, 6, 7)
+# Or here
+myCharacterVector <- c('banana', 'kiwi', 'pomegranate')
+```
+
+Notice how these new objects show up in the "global environment" in the right panel of your RStudio interface as soon as you assign them. Objects in the  global environment can be *called* when we want to use them for analyses. We can also call the object and R will print it in the console.
+
+```{r, echo = F, eval = T}
+# Either version of the assignment operator works here
+myNumericVector <- c(3, 4, 5, 6, 7)
+myNumericVector = c(3, 4, 5, 6, 7)
+# Or here
+myCharacterVector <- c('banana', 'kiwi', 'pomegranate')
+```
+
+```{r, eval = T}
+myNumericVector
+myCharacterVector
+```
+
+## Comparison operators
+
+**Comparison operators** help us compare two objects. We are essentially asking R a question about the two objects. When using comparison operators, we put the names of the objects we want to compare on either side of the operator. R will return a logical indicating whether the answer to our question is yes (TRUE) or no (FALSE).
+
+```{r}
+# First, let's assign some numbers to x and y
+x <- 9
+y <- 5
+
+# '==': Are x and y equal?
+x == y
+
+# '<': is x less than y?
+x < y
+
+# '>': is x greater than y?
+x > y
+
+# '<=': is x less than or equal to y?
+x <= y
+
+# '>=': is x greater than or equal to y?
+x >= y
+
+# '!=': is x NOT equal to y?
+x != y
+```
+
+The trick also works with larger objects containing multiple elements including vectors and data frames. In these cases, R will tell us which elements match, do not match, etc. between the two objects.
+
+```{r, eval = T}
+# Here is an example of a comparison argument between two vectors
+vecx <- c(8, 9, 9, 9, 3, 6, 7)
+vecy <- c(8, 9, 9, 8, 3, 6, 7)
+vecx == vecy
+
+# And two data frames
+dfx <- data.frame(fruit = c('banana', 'grape', 'persimmon'), 
+                  count =  c(8, 25, 1))
+dfy <- data.frame(fruit = c('banana', 'apple', 'persimmon'), 
+                  count = c(8, 3, 1))
+dfx == dfy
+```
+
+## The %in% operator
+
+Instead of asking which elements are different between two vectors, we might want to know whether specific elements are contained in a vector. To ask this question, we use the special operator **%in%**, with the elements we are looking for on the left and the object on the right.
+
+```{r}
+# Is one element contained within a vector?
+7 %in% 1:10
+'apple' %in% c('banana', 'pear', 'grapefruit', 'breadfruit')
+
+# Which elements of vector 1 are in vector 2?
+c('apple', 'banana') %in% c('banana', 'pear', 'grapefruit', 'breadfruit')
+```

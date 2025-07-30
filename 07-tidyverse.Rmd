@@ -1,0 +1,107 @@
+# Introduction to Tidyverse
+
+This lesson covers some of the most basic Tidyverse functions. We talked about installing the **Tidyverse** package back in Section 1.7 [Installing packages]. Tidyverse functions are equivalent to some of the operations you learned about in earlier lessons. We are going to perform these functions using the `iris` dataset, which comes with base R. 
+
+Load the `iris` dataset:
+
+```{r}
+data(iris)
+```
+
+We will also need to load the Tidyverse library:
+
+```{r, eval = F}
+library(tidyverse)
+```
+
+## The `filter` function
+
+This function removes data frame **rows** based on the values in one or more of the data frame columns.
+
+```{r, eval = F}
+# This is an example of filtering, where "x" is some 
+# criteria based on a comparison operator, and "df" is a data frame
+filter(df, x)
+
+# The filter function above is equivalent to indexing the data frame, using 
+# the which() function for the comparison criteria
+df[which(x), , drop = FALSE]
+
+# E.g., keep only sepal lengths > 6
+#   ...using indexing
+iris_long_sepals_indexing <- iris[which(iris$Sepal.Length > 6), , drop = F]
+#   ...using the filter() function in Tidyverse
+iris_long_sepals_tidyverse <- filter(iris, Sepal.Length > 6)
+
+# E.g., keep only 'versicolor' species
+#   ...using indexing
+iris_versicolor_indexing <- iris[which(iris$Species == 
+                                         'versicolor'), , drop = F]
+#   OR
+iris_not_versicolor_indexing <- iris[which(iris$Species != 
+                                             'versicolor'), , drop = F]
+#   ...using the filter() function in Tidyverse
+iris_versicolor_tidyverse <- filter(iris, Species == 'versicolor')
+#   OR
+iris_not_versicolor_tidyverse <- filter(iris, Species != 'versicolor')
+```
+
+## The `select` function
+
+This function removes specified data frame **columns**.
+
+```{r, eval = F}
+# This is an example of selecting only the columns x and y from the 
+# data frame df
+select(df, x, y)
+
+#  This is an example of the same operation using vector indexing
+df[c("x", "y")] 
+
+# E.g., keep only Species and Petal.Width
+#   ...using indexing
+iris_species_petals_indexing <- iris[c('Petal.Width', 'Species')]
+#   ...using the select() function in Tidyverse
+iris_species_petals_tidyverse <- select(iris, Petal.Width, Species)
+```
+
+## The `rename` function
+
+This function renames columns in your data frame.
+
+```{r, eval = F}
+# This is an example of renaming the column x in data frame 
+# df with a new name, y
+rename(df, y = x)
+# This is an example of the same operation using vector indices
+names(df)[names(df) == "x"] <- "y"
+
+# E.g., rename 'Petal.Width' to 'PetalWidth_cm'
+#   ...using indexing
+iris_rename_indexing <- iris
+names(iris_rename_indexing)[names(iris_rename_indexing) == 
+                              'Petal.Width'] <- 'PetalWidth_cm'
+#   ...using the rename() function in Tidyverse
+iris_rename_tidyverse <- rename(iris, 'PetalWidth_cm' = 'Petal.Width')
+```
+
+## The `mutate` function
+
+The mutate function **adds columns** to a data frame by performing operations on one or more existing columns in the data frame.
+
+```{r, eval = F}
+# This creates a new column, z, which is the product of values in each row
+# of columns x and y
+mutate(df, z = x * y)
+
+# This is the equivalent operation in base R
+df$z <- df$x * df$y
+
+# E.g., add new column for petal area
+#   ...using indexing
+iris_petal_area_indexing <- iris
+iris_petal_area_indexing$PetalArea <- iris$Petal.Length * iris$Petal.Width
+#   ...using the mutate() function in Tidyverse
+iris_petal_area_tidyverse <- mutate(iris, PetalArea = 
+                                      Petal.Length * Petal.Width)
+```

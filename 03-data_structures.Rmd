@@ -1,0 +1,87 @@
+# Introduction to data structures
+
+We will work with three main data structures in R. Data structures are all composed of their simpler data type components.
+
+## Vectors
+
+A **vector** is a simple data structure composed of two or more elements of the four data types we introduced earlier. For example, we can make a character vector, a numeric vector, an integer vector, or a logical vector. To create our vector, we use another function with parentheses: `c()`, which is the concatenate (or combine) function.
+
+```{r}
+# A character vector
+c('Hello', 'World')
+
+# A numeric vector
+c(4.7, 4.8, 4.9, 5.0, 5.1)
+
+# An integer vector
+c(4L, 7L, 8L)
+
+# A logical vector
+c(TRUE, FALSE)
+```
+
+Try enclosing each of the example vectors in the parentheses of the `class()` function to check their data types. Are they what you expected?
+
+There are two special shortcut vectors we can create from constant sequences of letters and numbers. First, we can create a sequence of numbers with the syntax 'first number : last number'. For example:
+
+```{r}
+1:10
+1:100
+```
+
+We can also create sequences of letters from the arabic alphabet. To do so, we type 'LETTERS' (or 'letters' for lowercase), followed by a numeric sequence in *square* brackets. The numeric sequence tells R how many letters to include from the alphabet.
+
+```{r}
+letters[1:13]
+LETTERS[14:26]
+```
+
+A vector can only include a SINGLE type of data. If we try to include more than one data type in a vector, R will usually not protest, but it will turn distinct data types into a single type. For example, when we include integers and characters in the same vector, the integers are converted to characters and we end up with a character vector.
+
+```{r, eval = T}
+c(1L, 2L, 'Hello', 'World')
+class(c(1L, 2L, 'Hello', 'World'))
+```
+
+A vector can also be a **factor.** A factor helps us work with *categorical* (statistical) data, for any variable that has a fixed and known set of values. Later we will learn why factors might be preferable to character vectors when performing some types of analyses. We can factor any type of vector, not just character vectors. To make a  vector into a factor, we enclose it in the `factor()` function.
+
+Make a factor vector out of a vector containing the following values: "cats", "dogs", "cats", "dogs", "dogs", "dogs", then check its class. Notice how the factor has "levels", and there are two levels, corresponding to each of the distinct elements in the vector (cats and dogs).
+
+Vectors can include any number of individual data type elements. We can check the number of elements in a vector with the `length()` function:
+
+```{r}
+length(c(44, 2, 3, 90, 34, 6, 71))
+```
+
+## Data frames
+
+**Data frames** are the data structures we will be working with most often. A data frame is essentially a series of vectors in a tabular format. Each vector makes up a different column in the data frame. Data frames resemble the Excel workbook sheets you might be used to working with in MS Office. The special thing about a data frame is that each column can contain a different data type. For example, we can make a data frame with a column for fruit names (character), their colours (character), and an ID or item number (factor). Each of these columns is equivalent to one vector.
+
+```{r}
+data.frame(item = factor(c(1, 2, 3, 4, 5)),
+           fruit = c('banana', 'kiwi', 'pomegranate', 'watermelon', 'peach'),
+           colour = c('yellow', 'green', 'red', 'pink', 'orange'))
+```
+
+We can enclose the data frame in the function `str()` (short for "structure") to find the data types of each of the individual vectors:
+
+```{r, eval = T}
+str(
+  data.frame(item = factor(c(1, 2, 3, 4, 5)),
+           fruit = c('banana', 'kiwi', 'pomegranate', 'watermelon', 'peach'),
+           colour = c('yellow', 'green', 'red', 'pink', 'orange'))
+)
+```
+
+## Lists
+
+A **list** is similar to a vector with multiple elements, but these elements can themselves be different data types or structures, even other lists! Unlike vectors, lists preserve the data types of their elements. For example, listing 4.78 and 4L creates a list with one element being a numeric and the other an integer. Try creating the following list. Note how the structure of the list automatically prints in your console with abbreviated data types following a '$' above each item. You can also use the `str()` function for lists.
+
+```{r}
+list(df = data.frame(item = c(1, 2),
+                     fruit = c('banana', 'kiwi')),
+     vec = letters[1:5],
+     char = 'green',
+     lst = list(4.78, 4L)
+)
+```

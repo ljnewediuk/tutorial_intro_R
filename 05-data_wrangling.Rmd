@@ -1,0 +1,151 @@
+# Basic data wrangling
+
+*Data wrangling* is a term programmers use to describe actions that change, combine, and organize objects. This is one of the most important skills you can learn, as you will almost always need to *manipulate* objects to make models. We'll build on our data wrangling skills throughout the course, starting with some very basic tools.
+
+## Combining elements into data structures
+
+Since we now know how to assign objects, we can start to build more complex objects simply. For example, we can assign vectors by calling single character or numeric objects, then combine them into data frames or lists by calling the names of the vectors.
+
+```{r}
+# This is an example of combining objects into a vector
+fruit1 <- 'banana'
+fruit2 <- 'kiwi'
+fruit3 <- 'kumquat'
+fruit4 <- 'papaya'
+fruits <- c(fruit1, fruit2, fruit3, fruit4)
+
+# Now, try calling the name of the new vector (fruits)!
+
+# Let's create a vector for fruit weights
+weightkg <- c(0.1, 0.07, 0.01, 0.8)
+
+# And create a new data frame by combining the vectors
+fruitdf <- data.frame(fruits = fruits, weightkg = weightkg)
+
+# Now, try calling the data frame!
+```
+
+If you entered the data and completed the task as written, you should have seen your first of *many* errors you will see while working in R. Perhaps you already suspected something was strange about the carnivore data and you solved the problem. If you look carefully, you will see there is a missing value in one of your vectors -- one vector is shorter than the others (hint: earlier we talked about a function for finding the lengths of vectors).
+
+The reason for this error is that R cannot create a data frame with differing numbers of values in the vectors. However, R can deal with "missing" data. The code R uses for missing data is NA (note the lack of quotes -- NA is a special object, not a character).
+
+If you replace the missing value with NA and recreate the data frame, you should see something like this:
+
+```{r, echo = FALSE, eval= TRUE}
+names <- c('Canis lupus', 'Canis latrans', 'Vulpes vulpes',
+           'Pekania pennanti', 'Gulo gulo')
+pawLengths <- c(12.8, 7.8, 6.4, 10, 14.5)
+shoulderHeights <- c(76.2, 58.4, 40.6, NA, 45.7)
+carnivores <- data.frame(names, pawLengths, shoulderHeights)
+
+carnivores
+
+```
+
+## Indexing vectors, data frames, and lists
+
+We can easily find errors or missing values in our objects when the data structures are small (e.g., the carnivores data frame). However, it's difficult to keep track of values in large objects. Often our vectors will have many elements and our data frames many rows and columns. We need to know learn about a process called **indexing** to find elements in larger objects.
+
+You already saw how we can use the `str()` function to observe the makeup of our data. When objects are large, we can also use the `head()` and `tail()` functions to look at the first and last few elements in the object. For example, `head(OBJECT, 1)` prints the first element or row of an object, head(OBJECT, 2) prints the first two, `head(OBJECT, 3)` prints the first three, etc. By default, the `head()` function prints the first 5 elements if we only include the object in the parentheses without a number or comma.
+
+We can also find very specific elements in objects with indexing. When indexing, we include square brackets '[]' after the object, with numbers inside the square brackets referring to the *position* of the element in the vector, the *row* or *column* of the data frame, etc.
+
+```{r}
+# This is an example of indexing a vector
+myVector <- c(3, 1, 50, 81, 14, 22, 90, 4, 4)
+# Element 5
+myVector[5]
+
+# When indexing a data frame, we include commas for rows and columns
+# Creating an example data frame
+myDataFrame <- data.frame(
+  rowname = 1:12,
+  value = c('P', 'U', 'E', 'V', 'N', 'Q', 'Q', 'A', 'B', 'A', 'F', 'S')
+)
+# Commas are needed after the position number when indexing rows
+# Row 5
+myDataFrame[5,]
+# An added set of square brackets refers to an element in the row
+# Row 5, element 2 
+myDataFrame[5,][2]
+# Commas before the position number index columns
+# Column 1
+myDataFrame[,1]
+# Column 1, element 9
+myDataFrame[,1][9]
+
+# We can also index lists
+# Creating an example list
+myList <- list(
+  number = 1:12,
+  value = c('P', 'U', 'E', 'V', 'N', 'Q', 'Q', 'A', 'B', 'A', 'F', 'S')
+)
+# We need double brackets to index elements in the list
+# Element 2 of myList
+myList[[2]]
+# An additional set of square brackets after the first index refers to positions in the object within the list
+# Element 2, position 5
+myList[[2]][5]
+
+```
+
+Note that we can also index data frames using the '$' operator, which allows us to refer to specific named columns. 
+
+```{r}
+
+# In 'myDataFrame', for example
+myDataFrame[,1]
+# ...is equivalent to...
+myDataFrame$rowname
+# If we want to index a specific row in a column using the $ operator, we need to index the row before the '$' operator.
+myDataFrame[4,]$rowname
+# Or we can index an element in the vector by placing the index at the end.
+myDataFrame$rowname[4]
+
+```
+
+## Subsetting and removing data
+
+In *subsetting*, we remove elements from a vector, rows from a data frame, etc. We can subset using either indexing syntax or with the `subset()` function. When indexing, we include the name of the vector (or data frame), and the row of the data frame (or vector) in square brackets. Then, we use the comparison operators to tell R which elements we want to include. Alternatively, we can also tell R which elements to *remove* using a new special operator '!'.
+
+```{r}
+# Subset only paw lengths greater than 10 in carnivores
+carnivores[carnivores$pawLengths > 10 ,]
+# Equivalently, excluding paw lengths less than or equal to 10
+carnivores[! carnivores$pawLengths <= 10 ,]
+# Using the subset function
+subset(carnivores, pawLengths > 10)
+
+# Removing two species from the 'names' vector
+names[! names %in% c('Gulo gulo', 'Pekania pennanti')]
+```
+
+## Renaming data frame columns
+
+We will also often need to *rename* columns in data frames. To rename columns, we use the 'colnames()' function, placing the data frame object in the parentheses. This function will also print the column names. To rename, we use the assign operator, with the colnames() function on the left and the new column names on the right.
+
+```{r}
+# Renaming all columns in the carnivores data frame
+colnames(carnivores) <- c('names', 'pawLengthsCm', 'shoulderHeightsCm')
+# Renaming only the first column
+colnames(carnivores)[1] <- 'speciesNames'
+
+```
+
+You might have already noticed R is very case sensitive and doesn't deal well with some characters. Sometimes you might want to change the elements in a data frame or vector if there are spaces, spelling errors, or some ambiguous characters. For example, when characters have spaces or some uppercase letters, we might replace them with underscores and convert them to  lowercase to make the characters easier to deal with. We can perform both of these tasks with the 'gsub()' function. In the parentheses, we include the string we would like to replace in the vector or data frame column, the string we would like to replace it with, and then the call of the vector or column.
+
+```{r}
+# Replacing spaces in species names with underscores
+carnivores$speciesNames <- gsub(' ', '_', carnivores$speciesNames)
+
+```
+
+We can also add columns to existing data frames. To do so, we assign a new column using the '$' operator.
+
+```{r}
+# Adding a column 'newColumn' to an existing data frame
+myDataFrame$newColumn <- letters[1:12]
+
+```
+
+
