@@ -1,23 +1,26 @@
 ---
-title: "Untitled"
-author: "YOUR NAME HERE"
-date: "2025-12-28"
-output: html_document
+title: Introduction to R
+author: BIOL 3401 Mount Royal University
+date: Week 1, Fall 2025
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Getting started in R
+## 1 - Getting started in R
 
 This course is your introduction to programming in R. The exercises we complete together in this course will also serve as a resource in your future if you choose to continue developing your skills in coding and R.
 
-## What is R?
+### What is R?
 
 R is a programming language and software environment designed specifically for working with data. Unlike Excel, which is a "point-and-click" software, R lets you write simple commands that tell your computer exactly how to clean, analyze, and visualize your data while keeping notes on your process. This makes your analyses flexible, fully reproducible, and better suited for working with large or complex biological datasets than Excel.
 
-## Why use R?
+### Why use R?
 
 There are several reasons why we want to teach you to use R instead of Excel.
 
@@ -27,7 +30,7 @@ There are several reasons why we want to teach you to use R instead of Excel.
 * **It makes beautiful data visualizations.** R allows you to clearly communicate biological patterns in visually stunning ways. You have full control over how data are visualized, not just preset chart options.
 * **Learning R will make you more employable.** Even if you don’t become a researcher, using R develops skills that employers value, including problem-solving, data literacy, and the ability to automate repetitive tasks. These skills apply across biology, environmental science, health, etc., and many other fields.
 
-## What will you learn in this course?
+### What will you learn in this course?
 
 We are going to start with some basic tasks to get everyone up to speed with coding before we transition to coding using real data. By the end of this course, you will feel comfortable:
 
@@ -44,25 +47,25 @@ Always remember that there are *limitless* ways to do almost everything in R. I 
 2. If it runs, you get the output you expect, and you can explain your process, your code is correct.
 
 
-## Setting up your workspace
+## 2 - Setting up your workspace
 
 First, we want to make sure you have the most recent versions installed of **R** (the software interface to your computer written in the R language) and **RStudio** (a graphical user interface to the R software). If you don't have both programs installed, or you're not sure if you have the most recent versions, please visit the [The Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) to download or update them.
 
-## Installing or updating R
+### Installing or updating R
 
 On the top of the CRAN website, you will see links to download R for macOS and Windows. 
 
-### Windows
+#### Windows
 
 Click on the link to install R for Windows, then click on the *"base"* link. The first link on the next page will be *"Download R-X.X.X for Windows"* (replace "X.X.X" with numbers indicating the most recent version of R). Clicking this link will install the most recent version of R for Windows. Run the program and installation wizard with the default settings. 
 
 If you previously installed an older version of R, downloading the most recent version will overwrite and update it.
 
-### macOS
+#### macOS
 
 Click on the link to install R for macOS, then click on the *"base"* link. There will be two links ending in *".pkg"*. Click on the link corresponding to your mac type (Intel or silicon) to download. Open the installer and install R using the default settings.
 
-## Installing RStudio
+### Installing RStudio
 
 We are going to use RStudio in this course as an interface to the program, R, which you just downloaded. If you have used R in the past, you might have written your code in R without using RStudio. We will use RStudio because it make things much easier for you as the programmer. RStudio is a graphical user interface (GUI)---it behaves more like the point-and-click programs you are used to (e.g., Excel). In RStudio, you can save your code in files, which you will need to submit to complete your assignments. RStudio also allows you to preview your code output while you are working on it.
 
@@ -70,42 +73,42 @@ Download RStudio from [https://posit.co/download/rstudio-desktop/](the Posit web
 
 When you open RStudio on your computer, it will automatically load with your most recently installed version of R.
 
-## Using R Studio
+## 3 - Using R Studio
 
 When you first open RStudio, you will see a screen something like this:
 
-```{r echo = FALSE, fig.cap = "Opening RStudio for the first time"}
-# knitr::include_graphics("imgs/rstudio_files_tab.png")
+```{r echo = FALSE, fig.cap = "<center>*Opening RStudio for the first time*</center>"}
+knitr::include_graphics("imgs/rstudio_files_tab.png")
 ```
 
-There are three panes. The largest pane is a console window (note that I'm using RStudio in *dark mode*---your RStudio background will likely be white with dark text). The console (left panel) is where you’ll run your R code and see results, and it is what you would see if you just opened the program R without RStudio. The top right panel is your environment, where *objects* will store temporarily in R's memory after you run code. The bottom right panel contains several tabs that we will use throughout the course. You will mostly use the *"Files"* and *"Viewer"* tabs. 
+There are three panes. The largest pane is the **console** window (note that I'm using RStudio in *dark mode*---your RStudio background will likely be white with dark text). The console (left panel) is where you’ll run your R code and see results, and it is what you would see if you just opened the program R without RStudio. The top right panel is your **environment**, where *objects* will store temporarily in R's memory after you run code. The bottom right panel contains several tabs that we will use throughout the course. You will mostly use the **"Files"** and **"Viewer"** tabs. 
 
 The Files tab allows you to interface with the file system on your computer to open files you previously saved in R or downloaded from D2L. You can open a file by finding its location on your computer and clicking on the file. In this course we will be using mostly *scripts* (.R extension) and *R Markdown files* (.Rmd extension). 
 
-## Creating a new file in R
+### Creating a new file in R
 
 In this course, you will need to create scripts and markdown files. To create a file, click on the white box with a green (+) in the upper left corner of the console. A dropdown menu will appear. Choose *"R Script"* to create a new script and *"R Markdown"* to create a new markdown file.
 
-```{r echo = FALSE, fig.cap = "Creating a new script file in RStudio"}
-# knitr::include_graphics("imgs/rstudio_create_script.png")
+```{r echo = FALSE, fig.cap = "<center>*Creating a new script file in RStudio*</center>"}
+knitr::include_graphics("imgs/rstudio_create_script.png")
 ```
 
 When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your takehome challenges and project.
 
-## Running basic code
+### Running basic code
 
 Running code executes the set of instructions in the code you wrote. There are two basic ways to "run" code: 
 
 * Type code directly into your console, directly after the ">" symbol, and press return or enter on your keyboard (note that in this approach, your code will execute then disappear)
 * If you are running code from a file, type the code, and use the "Run" icon in the upper-right corner of your file while hovering on the line of code (this approach allows you to save your code in your script or R Markdown file to run again in the future)
 
-```{r echo = FALSE, fig.cap = "Running code in an R Script"}
-# knitr::include_graphics("imgs/rstudio_run_code.png")
+```{r echo = FALSE, fig.cap = "<center>*Running code in an R Script*</center>"}
+knitr::include_graphics("imgs/rstudio_run_code.png")
 ```
 
 You can also highlight several lines of code in a script or R Markdown file and "Run" to run multiple lines of code at once. After running code in a file, you will see it appear in your console.
 
-## Installing packages
+### Installing packages
 
 R comes with some existing *functions* that help you run code more efficiently. There are *many* functions you can add to R by installing what are called *"packages"*. Packages are containers for functions and other tools that other R users have developed for other R users to use. We will be installing some basic packages to gain access to  functions written by others.
 
@@ -115,37 +118,55 @@ Everyone will need to use packages in this course. To install the package, write
 install.packages('rmarkdown', dependencies = T)
 ```
 
-The first package we will install is called *"rmarkdown"*. You will need this package to read, edit, and preview your *R Markdown* files. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using R Markdown.
+The first package we will install is called *"rmarkdown"*. You will need this package to read, edit, and preview your *R Markdown* files. R Markdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using R Markdown.
 
-You will see a long read-out of information in the console as the package installs. Once installed, you can load the package by typing and running this code:
+You will see a long read-out of information in the console as the package installs. Once installed, you can "attach" the package by typing and running this code:
 
 ```{r, eval = F}
 library(rmarkdown)
 ```
 
-Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without loading them. In order to use the package's functions, you must first load it.
+Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without attaching them. In order to use the package's functions, you must first attach it.
 
-## Differences between scripts and R Markdown files
+## 4 - Scripts versus R Markdown files
 
-You are going to complete your assignments in *markdown* files using *Rmarkdown*. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using Rmarkdown.
+### R Markdown
 
-R Markdown files you receive will include a combination of code and plain text. Hash tags tell Rmarkdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an Rmarkdown file:
+R Markdown files you receive will include a combination of code and plain text. Hash tags tell R Markdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an R Markdown file:
 
-```{r echo = FALSE, fig.cap = "An MS Word document rendered from an Rmarkdown file"}
+```{r echo = FALSE, fig.cap = "<center>*An MS Word document rendered from an Rmarkdown file*</center>"}
 knitr::include_graphics("imgs/rmarkdown_word_doc.png")
 ```
 
-The result is an MS Word document. You can see some headings and a table with some data. This table was printed using a code chunk. 
+In this case, the result is an MS Word document. You can see some headings and a table with some data. The table was printed using a code chunk. 
 
-As you work on your assignment, you can preview your progress by *"knitting"* it. We are going to knit our assignments in MS Word. To knit your document, click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your .Rmd file. In the drop-down menu, select "Knit to Word". An MS Word document will open, displaying your rendered document. When you are happy with your assignment, you can save the word document and submit it.
+As you work on your R Markdown, you can preview your progress by *"knitting"* it. We are going to knit our most of our documents in MS Word. To knit your document, we will need to install a new package called *"knitr"*:
 
-```{r echo = FALSE, fig.cap = "Knitting an Rmarkdown file"}
-# knitr::include_graphics("imgs/rmarkdown_render.png")
+```{r, eval = F}
+install.packages('knitr', dependencies = T)
 ```
 
-## Loading datasets in R
+After you have installed knitr, load the package. Then click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your file. In the drop-down menu, select "Knit to Word". A Word document will open, displaying your rendered document. When you are happy with your R Markdown document, you can save the word document.
 
-The data structure we will be primarily working with is the data frame. You will learn more about data frames in lesson 3, but for now let's practice accessing data from outside of R. Base R has several existing data frames you can load and use for practice. One of these data frames is called 'iris'. It contains 50 observations of flower characteristics from three species. These data were first used in a famous 1936 paper by Ronald Fisher.
+```{r echo = FALSE, fig.cap = "<center>*Knitting an Rmarkdown file*</center>"}
+knitr::include_graphics("imgs/rmarkdown_render.png")
+```
+
+You can also run code using the arrows at the top right of the code chunk. The grey downward arrow runs everything previous up to the current code chunk. The green arrow pointing to your right runs the code within the current code chunk only.
+
+```{r echo = FALSE, fig.cap = "<center>*Running code chunks*</center>"}
+knitr::include_graphics("imgs/rmarkdown_run_chunk.png")
+```
+
+### R scripts
+
+R script files are different from R Markdown files. Anything you type in an R Markdown file is not considered code unless it is located inside a code chunk. Hashtags before text specify headings in the rendered R Markdown document. In a script, hashtags specify *comments*, which are lines that R will disregard when you run your code. Comments allow you to make notes about the code you are writing. They also allow you to bypass code you are still working on and might not want to run. When you insert a hashtag for commenting, the line will also turn a different colour.
+
+## 5 - Loading and saving datasets in R
+
+You will be primarily working with familiar spreadsheet-like data in R. You will learn more about data types in lesson 3, but for now let's practice accessing data from outside of R. Base R has several existing datasets you can load and use for practice. One of these datasets is called 'iris', containing 50 observations of flower characteristics from three plant species. These data were first used in a famous 1936 paper by Ronald Fisher.
+
+### Loading data from within R
 
 To load pre-existing data in base R, we use the `data()` function.
 
@@ -153,18 +174,22 @@ To load pre-existing data in base R, we use the `data()` function.
 data(iris)
 ```
 
-You will see 'iris' appears as a 'Promise' in your environment. As soon as you use the data frame or begin to type its name in your console it will become a real object. If you click on the new object in your environment, it will appear as a new tab. The file looks similar to something you might see in MS Excel.
+You will see 'iris' appears as a 'Promise' in your environment. As soon as you use the data, begin to type its name in your console, or click on it in the environment, it will become a real object. If you click on the new object in your environment, it will appear as a new tab. The file looks similar to something you might see in Excel.
 
-External data frames need to be loaded into your global environment using a different set of functions (i.e., not `data()`). Before you load data, however, you need to locate the data file path on your local computer. You can either set your *"working directory"* to the folder containing your data files, or you can copy the path of the file itself when you load the data.
+### Loading external data
 
-Try loading a dataset from your computer. The file should be in a *csv* format, with the file extension ".csv", which stands for "comma separated values". Each value in the data frame is separated by a comma in basic text outside a program like R. You can open this file type in MS Excel and it will look identical to a spreadsheet, since Excel reads the commas as column separators. However, because the .csv is not a Microsoft file, R can also read this file type and understands that each comma-separated set of values represents a column in a data frame. You can open a basic MS Excel file and export it as a csv file to make it readable in R. 
+External datasets (such as those you will download from D2L) need to be loaded into your global environment using a different set of functions (i.e., not `data()`). Before you load data, however, you need to locate the data file path on your local computer. You can either set your *"working directory"* to the folder containing your data files, or you can copy the path of the file itself when you load the data.
 
-The function we will use to load the .csv file is `read.csv()`. First, we need to identify the location of the file on your computer.
+Try loading a dataset from your computer. The file should be in a *csv* format, with the file extension ".csv", which stands for "comma separated values". Each value in the dataset is separated by a comma in basic text outside a program like R. You can open this file type Excel and it will look identical to a spreadsheet, since Excel reads the commas as column separators. However, because the .csv is not a proprietary Microsoft file, R can also read this file type and understands that each comma-separated set of values represents a column in the "spreadsheet". You can also open any basic Excel file and export it as a csv file to make it readable in R. 
+
+The function we will use to load the .csv file is `read.csv()`. First, we need to identify the location of the file on your computer. For now, the file might be in your Downloads folder. We will talk more about data organization in the next lesson!
 
 To copy a file path:
 
  * **Windows:** Click the Start button and then click Computer. Click to open the location of the desired file/folder, hold down the Shift key and right-click the file/folder. Then select 'Copy as path'.
 * **Mac:** Navigate to the desired file/folder in the Finder app. Right-click on the file/folder, and while in the right-click menu, hold down the Option key. Then, select 'Copy as Pathname'
+
+### Setting a working directory
 
 If you wish, you can use the `setwd()` function to set your directory to the folder containing your files for this assignment (note: replace the file path within the parentheses below with your own file path!):
 
@@ -172,13 +197,15 @@ If you wish, you can use the `setwd()` function to set your directory to the fol
 setwd("Users/user....") 
 ```
 
-Then, you can use the `read.csv()` function to load the data from within that folder. Remember to change "data" to the name of the file. Also remember to assign the data frame using "<-" or R will only print it out (see Lesson 4.1 [The asssignment operator])!
+Your current working directory appears in the top right corner of your console.
+
+Once you have set a working directory, you can use the `read.csv()` function to load the data from within your working directory. Remember to change "data" to the name of the file. You will also need to assign the dataset a name ("data") using "<-", as shown below, or R will only print it out in your console. We will talk more about this in lesson 3.
 
 ```{r, eval = F}
 data <- read.csv('.../data.csv')
 ```
 
-If you end up setting your working directory to the wrong folder or you would like to change directories, you can always move up to your root directory (one folder at a time) with '..' in the `setwd()` function:
+If you end up setting your working directory to the wrong folder, or you would like to change directories, you can always move up to your root directory (one folder at a time) with '..' in the `setwd()` function:
 
 ```{r, eval = F}
 setwd('..')
@@ -190,20 +217,22 @@ Or, without setting the working directly, you can copy the full file path into t
 data <- read.csv('Users/user ..../data.csv')
 ```
 
-Equally important is knowing how to save your data frame when you want to move it **out** of R or between scripts after working with it. There are two important functions for doing so: `write.csv()` and `saveRDS()`. The `write.csv()` function saves the data as a comma-separated file. The `saveRDS()` function saves it as an "R data serialization" file, which is a file type native to R. This file type  is useful for moving data frames between scripts because it is much **smaller** than a comma-separated file, and because it **preserves the data types in your data frame**.
+### Saving your data
+
+Equally important is knowing how to save your dataset when you want to move it **out** of R or between scripts after working with it. There are two important functions for doing so: `write.csv()` and `saveRDS()`. The `write.csv()` function saves the data as a comma-separated file. The `saveRDS()` function saves it as an "R data serialization" file, which is a file type native to R. This file type  is useful for moving datasets between scripts because it is much **smaller** than a comma-separated file, and because it **preserves the data types in your dataset so R can recognize them**.
 
 ```{r, eval = F}
 write.csv(data, 'data_updated.csv')
 saveRDS(data, 'data_updated.rds')
 ```
 
-See how each function first takes the name of the data frame, followed by a comma, then the name (and optionally, folder path) you want to use for the saved file. Note that the file will automatically save to the location of your current working directory. If you would like it to save to a different location, you will need to add a path before the file name. Or, if you have already set your working directory, it will save there.
+See how each function first takes the name of the dataset, followed by a comma, then the name (and optionally, folder path) you want to use for the saved file. Note that the file will automatically save to the location of your current working directory. If you would like it to save to a different location, you will need to add a path before the file name. Or, if you have already set your working directory, it will save there.
 
 ```{r, eval = F}
 saveRDS(data, 'Users/user ..../NewDirectoryLocation/data_updated.rds')
 ```
 
-Remember that file paths are relative to your current working directory. If you have already set a working directory, specifying a full file path for saving might return an error because you are essentially asking R to look for that file path starting from within the current working directory.
+Remember that file paths are relative to your current working directory. If you have already set a working directory, specifying a full file path for saving *might* return an error because you are essentially asking R to look for that file path starting from within the current working directory.
 
 After saving as an RDS file, you will need the `readRDS()` function to load it again.
 
