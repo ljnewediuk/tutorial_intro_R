@@ -105,8 +105,6 @@ Running code executes the set of instructions in the code you wrote. There are t
 
 You can also highlight several lines of code in a script or R Markdown file and "Run" to run multiple lines of code at once. After running code in a file, you will see it appear in your console.
 
-## Differences between scripts and R Markdown files
-
 ## Installing packages
 
 R comes with some existing *functions* that help you run code more efficiently. There are *many* functions you can add to R by installing what are called *"packages"*. Packages are containers for functions and other tools that other R users have developed for other R users to use. We will be installing some basic packages to gain access to  functions written by others.
@@ -117,7 +115,7 @@ Everyone will need to use packages in this course. To install the package, write
 install.packages('rmarkdown', dependencies = T)
 ```
 
-The first is called *"rmarkdown"* You will need this package to read, edit, and preview your *R Markdown* files. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. You are going to complete your assignments as *rmarkdown* files. For example, the webpage you are reading now---i.e., this book---was rendered using Rmarkdown.
+The first package we will install is called *"rmarkdown"*. You will need this package to read, edit, and preview your *R Markdown* files. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using R Markdown.
 
 You will see a long read-out of information in the console as the package installs. Once installed, you can load the package by typing and running this code:
 
@@ -125,16 +123,16 @@ You will see a long read-out of information in the console as the package instal
 library(rmarkdown)
 ```
 
-Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without loading them. In order to use the package's functions, you musst first load it.
+Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without loading them. In order to use the package's functions, you must first load it.
 
-## Knitting markdown files
+## Differences between scripts and R Markdown files
 
-You are going to complete your assignments in *markdown* files using *Rmarkdown*. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now---i.e., this book---was rendered using Rmarkdown.
+You are going to complete your assignments in *markdown* files using *Rmarkdown*. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using Rmarkdown.
 
-Your assignment files will include a combination of code and plain text. Hash tags tell Rmarkdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an Rmarkdown file:
+R Markdown files you receive will include a combination of code and plain text. Hash tags tell Rmarkdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an Rmarkdown file:
 
 ```{r echo = FALSE, fig.cap = "An MS Word document rendered from an Rmarkdown file"}
-# knitr::include_graphics("imgs/rmarkdown_word_doc.png")
+knitr::include_graphics("imgs/rmarkdown_word_doc.png")
 ```
 
 The result is an MS Word document. You can see some headings and a table with some data. This table was printed using a code chunk. 
