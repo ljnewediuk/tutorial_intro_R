@@ -1,30 +1,52 @@
---- 
-title: "Ecologist's Introduction to Coding in R"
-author: "Levi Newediuk"
-date: "`r Sys.Date()`"
-site: bookdown::bookdown_site
-documentclass: book
-bibliography:
-- book.bib
-- packages.bib
-description: |
-  ,
-link-citations: true
-github-repo: "rstudio/bookdown-demo"
 ---
+title: "Untitled"
+author: "YOUR NAME HERE"
+date: "2025-12-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 # Getting started in R
 
-This book is your introduction to programming in R. It's also a resource you can go back to throughout the course. We are going to start with some basic tasks to get everyone up to speed before we start learning how to program ecological models.
+This course is your introduction to programming in R. The exercises we complete together in this course will also serve as a resource in your future if you choose to continue developing your skills in coding and R.
 
-Always remember that there are *many* ways to do almost everything in R. I will show you some approaches I like, but *many* other online resources can teach you different approaches. Learning the approaches you like will only improve your programming skills in R, so I encourage you to seek out other resources and use them. There are only two basic rules we will follow regarding programming:
+## What is R?
 
-1. If it runs, and you get the output you expect, your code is correct.
-2. Always leave detailed notes so I know (and you remember) why you chose the approach you did.
+R is a programming language and software environment designed specifically for working with data. Unlike Excel, which is a "point-and-click" software, R lets you write simple commands that tell your computer exactly how to clean, analyze, and visualize your data while keeping notes on your process. This makes your analyses flexible, fully reproducible, and better suited for working with large or complex biological datasets than Excel.
+
+## Why use R?
+
+There are several reasons why we want to teach you to use R instead of Excel.
+
+* **It is widely used by biologists.** Many of the papers you read include analyses and visualizations created in R. Learning R helps you understand how these results were generated and prepares you to generate your own.
+* **It is more powerful than Excel.** Real biological datasets are messy, contain missing values, and often very large. Excel doesn't deal well with imperfections and big datasets, but R gives you full control.
+* **It makes your work reproducible.** In Excel, it is far too easy to overwrite your existing work or to forget how you did something and have to do it over again. I will show you how to "save" your work so you can easily recreate it when you need to. This also allows others to rerun your analyses and get the same results.
+* **It makes beautiful data visualizations.** R allows you to clearly communicate biological patterns in visually stunning ways. You have full control over how data are visualized, not just preset chart options.
+* **Learning R will make you more employable.** Even if you don’t become a researcher, using R develops skills that employers value, including problem-solving, data literacy, and the ability to automate repetitive tasks. These skills apply across biology, environmental science, health, etc., and many other fields.
+
+## What will you learn in this course?
+
+We are going to start with some basic tasks to get everyone up to speed with coding before we transition to coding using real data. By the end of this course, you will feel comfortable:
+
+* Identifying the best practices in experimental design & data analyses
+* Addressing biological questions with appropriate statistical methodology
+* Creating visualizations to display informative patterns in biological datasets
+* Analyzing and interpreting biological datasets from open-source repositories
+* Interpreting and communicating the results of your analyses
+* Manipulating, visualizing, and implementing statistical approaches in R
+
+Always remember that there are *limitless* ways to do almost everything in R. I will show you some approaches I like; other resources can teach you different approaches. Learning the approaches you like will only improve your programming skills in R, so I encourage you to seek out other resources and use them. There are only two basic rules we will follow regarding programming:
+
+1. Always leave detailed notes so I know (and you remember) why you chose the approach you did.
+2. If it runs, you get the output you expect, and you can explain your process, your code is correct.
+
 
 ## Setting up your workspace
 
-First, we want to make sure you have the most recent versions installed of **R** (an interface to your computer written in the R language) and **RStudio** (a graphical user interface to R). If you don't have both programs installed, or you're not sure if you have the most recent versions, please visit the [The Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) to download or update them.
+First, we want to make sure you have the most recent versions installed of **R** (the software interface to your computer written in the R language) and **RStudio** (a graphical user interface to the R software). If you don't have both programs installed, or you're not sure if you have the most recent versions, please visit the [The Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) to download or update them.
 
 ## Installing or updating R
 
@@ -42,7 +64,7 @@ Click on the link to install R for macOS, then click on the *"base"* link. There
 
 ## Installing RStudio
 
-We are going to use RStudio in this course as an interface to the program, R, which you just downloaded. In the past, you might have written your code in R without using RStudio. We will use RStudio because it make things much easier for you as the programmer. RStudio is a graphical user interface (GUI)---it behaves more like the programs you are used to (e.g., MS Office products). In RStudio, you can save your code in files, which you will need to submit to complete your assignments. RStudio also allows you to preview your code output while you are working on it.
+We are going to use RStudio in this course as an interface to the program, R, which you just downloaded. If you have used R in the past, you might have written your code in R without using RStudio. We will use RStudio because it make things much easier for you as the programmer. RStudio is a graphical user interface (GUI)---it behaves more like the point-and-click programs you are used to (e.g., Excel). In RStudio, you can save your code in files, which you will need to submit to complete your assignments. RStudio also allows you to preview your code output while you are working on it.
 
 Download RStudio from [https://posit.co/download/rstudio-desktop/](the Posit website). You will see a link to *"Download RStudio Desktop"* for mac or PC. If you scroll further down the page, you will also see links to install RStudio for macOS and Windows. Install RStudio as you did with the program R. If you need to update RStudio, download the new version, and delete the old version if necessary.
 
@@ -53,54 +75,57 @@ When you open RStudio on your computer, it will automatically load with your mos
 When you first open RStudio, you will see a screen something like this:
 
 ```{r echo = FALSE, fig.cap = "Opening RStudio for the first time"}
-knitr::include_graphics("imgs/rstudio_files_tab.png")
+# knitr::include_graphics("imgs/rstudio_files_tab.png")
 ```
 
 There are three panes. The largest pane is a console window (note that I'm using RStudio in *dark mode*---your RStudio background will likely be white with dark text). The console (left panel) is where you’ll run your R code and see results, and it is what you would see if you just opened the program R without RStudio. The top right panel is your environment, where *objects* will store temporarily in R's memory after you run code. The bottom right panel contains several tabs that we will use throughout the course. You will mostly use the *"Files"* and *"Viewer"* tabs. 
 
-You will view The Files tab allows you to interface with the file system on your computer to open files you previously saved in R. You can open a file by finding its location on your computer and clicking on the file. In this course we will be using mostly *scripts* (.R extension) and *markdown files* (.Rmd extension). 
+The Files tab allows you to interface with the file system on your computer to open files you previously saved in R or downloaded from D2L. You can open a file by finding its location on your computer and clicking on the file. In this course we will be using mostly *scripts* (.R extension) and *R Markdown files* (.Rmd extension). 
 
 ## Creating a new file in R
 
 In this course, you will need to create scripts and markdown files. To create a file, click on the white box with a green (+) in the upper left corner of the console. A dropdown menu will appear. Choose *"R Script"* to create a new script and *"R Markdown"* to create a new markdown file.
 
 ```{r echo = FALSE, fig.cap = "Creating a new script file in RStudio"}
-knitr::include_graphics("imgs/rstudio_create_script.png")
+# knitr::include_graphics("imgs/rstudio_create_script.png")
 ```
 
-When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your assignments.
+When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your takehome challenges and project.
 
-## Running code
+## Running basic code
 
 Running code executes the set of instructions in the code you wrote. There are two basic ways to "run" code: 
 
-* Type code directly into your console, directly after the ">" symbol, and press return or enter on your keyboard
-* If you are running code from a file, type the code, and use the "Run" icon in the upper-right corner of your file while hovering on the line of code
+* Type code directly into your console, directly after the ">" symbol, and press return or enter on your keyboard (note that in this approach, your code will execute then disappear)
+* If you are running code from a file, type the code, and use the "Run" icon in the upper-right corner of your file while hovering on the line of code (this approach allows you to save your code in your script or R Markdown file to run again in the future)
 
 ```{r echo = FALSE, fig.cap = "Running code in an R Script"}
-knitr::include_graphics("imgs/rstudio_run_code.png")
+# knitr::include_graphics("imgs/rstudio_run_code.png")
 ```
 
-You can also highlight several lines of code and "Run" to run multiple lines of code at once. After running code in a file, you will see it appear in your console.
+You can also highlight several lines of code in a script or R Markdown file and "Run" to run multiple lines of code at once. After running code in a file, you will see it appear in your console.
+
+## Differences between scripts and R Markdown files
 
 ## Installing packages
 
 R comes with some existing *functions* that help you run code more efficiently. There are *many* functions you can add to R by installing what are called *"packages"*. Packages are containers for functions and other tools that other R users have developed for other R users to use. We will be installing some basic packages to gain access to  functions written by others.
 
-Everyone will need two packages in this course. The first is called *"Tidyverse"*. This is actually a group of useful packages with functions that make it easier for you to plot and manipulate data. The second function you are going to install is called *"Rmarkdown"*. You will need this package to read, edit, and preview your assignments, which will be *markdown* files. To install the packages, write the following code in your console and run it:
+Everyone will need to use packages in this course. To install the package, write the following code in your console and run it:
 
 ```{r, eval = F}
-install.packages('tidyverse', dependencies = T)
 install.packages('rmarkdown', dependencies = T)
 ```
+
+The first is called *"rmarkdown"* You will need this package to read, edit, and preview your *R Markdown* files. Rmarkdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. You are going to complete your assignments as *rmarkdown* files. For example, the webpage you are reading now---i.e., this book---was rendered using Rmarkdown.
 
 You will see a long read-out of information in the console as the package installs. Once installed, you can load the package by typing and running this code:
 
 ```{r, eval = F}
-library(tidyverse)
+library(rmarkdown)
 ```
 
-Again, you will see a shorter read-out as Tidyverse loads. This read-out is telling you which packages are a part of the Tidyverse set of packages (dplyr, readr, etc.) and will warn you of "conflicts". These conflicts are not a problem here, and you can ignore them. However, for your future reference, conflicts warn you of functions from loaded packages that share names with functions from the package you just loaded. These conflicting functions may not work as expected because R will not know which package it should use for the function you are calling. If you have conflicts,  you can tell R which package you want to use a function from by running `packageName::function()` (replacing the names of the package and function with the ones you are trying to use).
+Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without loading them. In order to use the package's functions, you musst first load it.
 
 ## Knitting markdown files
 
@@ -109,7 +134,7 @@ You are going to complete your assignments in *markdown* files using *Rmarkdown*
 Your assignment files will include a combination of code and plain text. Hash tags tell Rmarkdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an Rmarkdown file:
 
 ```{r echo = FALSE, fig.cap = "An MS Word document rendered from an Rmarkdown file"}
-knitr::include_graphics("imgs/rmarkdown_word_doc.png")
+# knitr::include_graphics("imgs/rmarkdown_word_doc.png")
 ```
 
 The result is an MS Word document. You can see some headings and a table with some data. This table was printed using a code chunk. 
@@ -117,7 +142,7 @@ The result is an MS Word document. You can see some headings and a table with so
 As you work on your assignment, you can preview your progress by *"knitting"* it. We are going to knit our assignments in MS Word. To knit your document, click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your .Rmd file. In the drop-down menu, select "Knit to Word". An MS Word document will open, displaying your rendered document. When you are happy with your assignment, you can save the word document and submit it.
 
 ```{r echo = FALSE, fig.cap = "Knitting an Rmarkdown file"}
-knitr::include_graphics("imgs/rmarkdown_render.png")
+# knitr::include_graphics("imgs/rmarkdown_render.png")
 ```
 
 ## Loading datasets in R
@@ -174,7 +199,7 @@ write.csv(data, 'data_updated.csv')
 saveRDS(data, 'data_updated.rds')
 ```
 
-See how each function first takes the name of the data frame, followed by a column, then the name (and optionally, folder path) you want to use for the saved file. Note that the file will automatically save to the location of your current working directory. If you would like it to save to a different location, you will need to add a path before the file name. Or, if you have already set your working directory, it will save there.
+See how each function first takes the name of the data frame, followed by a comma, then the name (and optionally, folder path) you want to use for the saved file. Note that the file will automatically save to the location of your current working directory. If you would like it to save to a different location, you will need to add a path before the file name. Or, if you have already set your working directory, it will save there.
 
 ```{r, eval = F}
 saveRDS(data, 'Users/user ..../NewDirectoryLocation/data_updated.rds')
