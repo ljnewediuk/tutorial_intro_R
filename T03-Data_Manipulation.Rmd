@@ -1,0 +1,255 @@
+---
+title: Basic Data Manipulation in R
+author: BIOL 3401 Mount Royal University
+date: Week 3, Fall 2025
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+## 1 - Introduction to data types
+
+### Vectors
+
+Let's start by making one of the simplest R objects, a *vector* of numbers. A **numeric** data type is used to store real numbers.
+
+```{r}
+vec1 <- c(1, 2, 3, 4, 5)
+```
+
+`vec1` is an *object* that we created by using the `<-` operator.
+
+vec1 now contains the output of the *function* `c(1, 2, 3, 4, 5)`, where the `c()` function (c, for **c**ombine) combines elements (1, 2, 3, 4, 5) into a vector.
+
+When you create an object (also called a variable), you'll notice that your environment pane is no longer empty. Just like your dataset showed up when you loaded data, your object `vec1` is now listed as a value in the environment. There is some information about what this vector contains:
+
+-   "num" to state that it is numerical data
+-   "[1:5]" to show that there are five elements in the vector
+-   the contents of the vector (1 2 3 4 5)
+
+If we made a vector too large for the environment pane, we could view the whole vector in the console pane using `print()`
+
+```{r}
+print(vec1)
+```
+
+or you can type the name of the object in the console (or run it from a script) to display the object
+
+```{r}
+vec1
+```
+
+We can use the `class` function to get the data type or data structure.
+
+```{r, eval = T}
+class(vec1)
+```
+
+Let's make a few more objects:
+
+```{r}
+x <- 10
+y <- 11
+letters <- c("a", "b", "c", "d")
+```
+
+With the last variable `letters`, we had to use `""` to specify that we want to create a *character* vector. A **character** data type is used to store text.
+
+### *Mini Challenge 1:*
+1. What message do you get from R when you run this code chunk below that doesn't have `""` around the letters?
+
+```{r, eval = FALSE}
+letters <- c(a, b, c, d)
+```
+
+2. What do you think the message means? Or rather, why do you think you received that message? 
+
+Write your answers below! 
+
+
+
+#-------------------------------------------------
+
+
+
+
+
+
+
+## 2 - Troubleshooting your code
+
+### Getting help in RStudio
+
+What if the error message we get from a function doesn't make sense at first glance, or what if you want to use a new function that you've never seen before?
+R has a help function directly built-in and very good documentation to describe functions.
+To get help for a particular function, you use `?` followed by the function name e.g., `?c` or `?mean`.
+
+If you want to do something in R that you conceptually understand, but don't know what the function is called in R, you can perform a search with `??` e.g., `??mean`
+
+RStudio also has the help search built in to the pane, in the **Files/Plots/Packages/Help/Viewer** pane.
+
+If R is telling you there is an error, you should trust it. R will only know to do exactly what you tell it to do, which means you might be telling it to do something that you didn't intend. When it comes to the letters vector we just tried to make, R thinks that 'a' is the name for an object because you didn't specify it as a character in quotes. There is no variable called 'a' in our environment, so R throws an error.
+
+### Getting help from AI
+
+ChatGPT cannot teach you to code without some prior understanding of what you are doing. It also frequently makes mistakes. However, it is quite good at correcting errors when you're stuck, explaining where you went wrong, and suggesting how you might correct the problem.
+
+Let's imagine we presented ChatGPT with our previous error where we forgot to put '""' around our letters.
+
+```{r echo = FALSE, fig.cap = "<center>*Prompting ChatGPT to explain our vector error*</center>"}
+knitr::include_graphics("imgs/GPT_error_prompt.png")
+```
+
+Here is ChatGPT's response.
+
+```{r echo = FALSE, fig.cap = "<center>*ChatGPT explains what the error means, why it happened, and what we can do to fix it*</center>"}
+knitr::include_graphics("imgs/GPT_error_explanation.png")
+```
+
+## 3 - Performing simple operations in R
+
+Back to things that *do* exist in our environment!
+
+We can manipulate and change objects as if we're using a calculator:
+
+```{r}
+x + 5
+x * 2
+x
+```
+
+An important thing to note here is that while `x + 5` returns 15 as the output, the value of `x` is unchanged as the stored value.
+
+That's because we didn't store the output as a new variable, or update our existing variable.
+If we want to update `x`, we need to reassign it.
+
+```{r}
+x <- x + 5
+x
+
+x <- 10 
+xplusfive <- x + 5 
+```
+
+An important note about best practices here - you can imagine how easy it would be to overwrite a variable you've been updating and performing functions on, and some functions on large data sets can take a while to run.
+
+The last thing you want to do is overwrite all your work by accident!
+
+Best practice to avoid this: create new variables as you apply functions to your data.
+
+R can also handle *vector math* for us without any extra coding on our part!
+
+```{r}
+vec1
+vec1 * x
+vec2 <- vec1 * x
+vec2
+```
+
+### **Mini Challenge 3: Vectors**
+
+1.  Create a new vector called `nums` that contains any 5 numbers you'd like.
+
+2.  Create a new vector called `squares` that contains the elements of `nums` squared (hint: 2^2 = 2 squared).
+
+Use this code block to code your answers!
+
+```{r}
+
+```
+
+
+
+#-------------------------------------------------
+
+
+
+
+
+## 4 - Data frames
+
+So far, we've been talking about atomic vectors, which only contain a single data type (e.g., every element is  character or numeric).
+
+We'll mostly focus on data frames and tibbles (the tidyverse version of a data frame), particularly as we get into the `tidyverse` way of working in R. A data frame is a collection of vectors, which can be (but don't have to be) different types, but all have to have the same length.
+
+You'll be looking for data and using data in spreadsheets (which is just a data frame!) and then we'll be loading your spreadsheet into R to explore, create figures, and analyse. Before we can *load* your spreadsheet into R, we need to make sure R has all the necessary *functions* loaded for us to use. Lots of basic functions are included in your download of R, but there are a lot of useful functions that people have developed to make R even more powerful and useful. Functions that are not downloaded automatically in R are bundled in *packages* that we can install from R. 
+
+```{r, eval = F}
+# install.packages("tidyverse")
+```
+
+Once you install a package, you don't have to install it again (unless you update your version of R).
+
+You do need to tell R which functions you want to use at the start of every new session of R. We do this by *loading* the package with the `library()` function.  
+
+```{r}
+library(tidyverse)
+```
+
+And while it doesn't matter for this example, the *order* that you load packages in matters, especially if there are functions with the same name in different packages.
+
+Let's load a data set to play with in R so we can understand how data frames look in R.
+
+```{r}
+# ants <- read_delim("ants.csv")
+```
+
+We get lots of information about our data frame just from loading it! But if we ever forget, or want a *summary* of our data, we can use the `summary()` function. 
+
+```{r}
+# summary(ants)
+```
+
+We can use the function `head()` to look at part of a data frame (or any R object).
+This can be very useful if you have a very large or long data frame.
+You also can control how many lines of the data frame you view with `n = #` (the default is 6).
+
+```{r}
+# head(ants)
+# head(ants, n = 2)
+# head(ants, n = 10)
+```
+
+We can also *read in* (a.k.a. load) lots of different file formats for tabular (spreadsheet) data e.g., CSVs, TSVs, Excel Spreadsheets. 
+
+```{r}
+# bus <- read_delim("bus.tsv")
+```
+
+We can load TSVs and CSVs (and other 'text-based' files) with `read_delim()` but we will need a different function to read in Excel formats.
+
+```{r, eval = F}
+# install.packages("readxl")
+```
+
+```{r}
+# library(readxl)
+# iris <- read_excel("iris.xlsx")
+```
+
+That worked just fine! By default, `read_excel()` only reads in one sheet of the spreadsheet. What if we have two sheets? 
+
+```{r}
+# iris2 <- read_excel("iris_twoSheets.xlsx")
+```
+
+... that's not what we want! We need to change the *arguments* in the `read_excel()` function to tell R which sheet to load. 
+
+### **Mini Challenge 4: Getting Help**
+
+1. Look up the `read_excel()` function in the Help pane to figure out which argument determines the sheet you load.
+
+2. Try loading the `iris_twoSheets.xlsx` file so that the data is loaded, but not the metadata. 
+
+
+Use this code block to code your answers!
+
+```{r}
+
+```
+
+
+
+#-------------------------------------------------
+
