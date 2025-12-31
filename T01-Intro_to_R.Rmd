@@ -1,15 +1,17 @@
 ---
-title: Introduction to R
-author: BIOL 3401 Mount Royal University
-date: Week 1, Fall 2025
-output: 
+title: "Introduction to R"
+author: "BIOL 3401 Mount Royal University"
+date: "Week 1, Fall 2025"
+output:
   html_document:
-    toc: yes
-    toc_float: yes
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, out.width = "70%", fig.align = "center")
 ```
 
 ## 1 - Getting started in R
