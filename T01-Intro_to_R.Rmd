@@ -85,15 +85,37 @@ There are three panes. The largest pane is the **console** window (note that I'm
 
 The Files tab allows you to interface with the file system on your computer to open files you previously saved in R or downloaded from D2L. You can open a file by finding its location on your computer and clicking on the file. In this course we will be using mostly *scripts* (.R extension) and *R Markdown files* (.Rmd extension). 
 
+### Loading files in R
+
+Up to this point, you have been following along in an R Markdown file previously rendered into a webpage (or pdf) format. At this point, you will need to open the R Markdown file itself.
+
+### **Mini Challenge 1: Open an R Markdown file**
+
+1.  Download the *T01-Intro_to_R.Rmd* file from the Week 1 content on D2L and save it somewhere on your computer.
+
+2.  Locate the directory where you saved the file in the lower right panel of RStudio and click on the file to open it.
+
+
+#-------------------------------------------------
+
 ### Creating a new file in R
 
-In this course, you will need to create scripts and markdown files. To create a file, click on the white box with a green (+) in the upper left corner of the console. A dropdown menu will appear. Choose *"R Script"* to create a new script and *"R Markdown"* to create a new markdown file.
+In this course, you will need to create scripts and R Markdown files. To create a file, click on the white box with a green (+) in the upper left corner of the console. A dropdown menu will appear. Choose *"R Script"* to create a new script and *"R Markdown"* to create a new R Markdown file.
 
 ```{r echo = FALSE, fig.cap = "<center>*Creating a new script file in RStudio*</center>"}
 knitr::include_graphics("imgs/rstudio_create_script.png")
 ```
 
 When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your takehome challenges and project.
+
+### **Mini Challenge 2: Create and save an R script file**
+
+1.  Create a new script file from within R.
+
+2.  Save the file with the name "BIOL_3401_YOUR_NAME_Test.R" somewhere on your computer.
+
+
+#-------------------------------------------------
 
 ### Running basic code
 
@@ -110,43 +132,59 @@ You can also highlight several lines of code in a script or R Markdown file and 
 
 ### Installing packages
 
-R comes with some existing *functions* that help you run code more efficiently. There are *many* functions you can add to R by installing what are called *"packages"*. Packages are containers for functions and other tools that other R users have developed for other R users to use. We will be installing some basic packages to gain access to  functions written by others.
+R comes with some existing *functions* that help you run code more efficiently. There are *many* functions you can add to R by installing what are called *"packages"*. Packages are containers for functions and other tools that other R users have developed for other R users to use. We will be installing some basic packages to gain access to functions written by others.
 
-Everyone will need to use packages in this course. To install the package, write the following code in your console and run it:
+Everyone in this course will need to use a package called *"rmarkdown*". To install the package, write the following code in your console and run it:
 
 ```{r, eval = F}
 install.packages('rmarkdown', dependencies = T)
 ```
 
-The first package we will install is called *"rmarkdown"*. You will need this package to read, edit, and preview your *R Markdown* files. R Markdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using R Markdown.
+The rmarkdown package is used to read, edit, and preview *R Markdown* files. R Markdown is another interface to R that "renders" text and code you've written into familiar file types like MS Word documents, PDF files, and even webpages. For example, the webpage you are reading now was rendered using R Markdown.
 
-You will see a long read-out of information in the console as the package installs. Once installed, you can "attach" the package by typing and running this code:
+You will see a long read-out of information in the console as the package installs. Once installed, you need to *"attach"* the package by typing and running this code:
 
 ```{r, eval = F}
 library(rmarkdown)
 ```
 
-Again, you will see a shorter read-out as the package loads. Many students make the mistake of installing packages without attaching them. In order to use the package's functions, you must first attach it.
+Many students make the mistake of installing packages without attaching them. Except for packages that attach automatically when you open RStudio, you must first attach it a package to use its functions. Again, you will see a shorter read-out as the package attaches.
 
 ## 4 - Scripts versus R Markdown files
 
 ### R Markdown
 
-R Markdown files you receive will include a combination of code and plain text. Hash tags tell R Markdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your assignment. Depending on the code chunk, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of what you might see after rendering an R Markdown file:
+R Markdown files include a combination of code and plain text. These files also start with something called a YAML header, which you can find at the very beginning of the document surrounded  by dashes. This R Markdown file includes a title, author, and date, which appear at the top of the document when rendered. The rest of the YAML header are rendering instructions.
+
+Any plain text you type appears as regular text in a rendered document. Hashtags tell R Markdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your mini challenges and take-home challenges. Depending on the code chunk, when your document renders, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of something you might see after rendering an R Markdown file:
 
 ```{r echo = FALSE, fig.cap = "<center>*An MS Word document rendered from an Rmarkdown file*</center>"}
 knitr::include_graphics("imgs/rmarkdown_word_doc.png")
 ```
 
-In this case, the result is an MS Word document. You can see some headings and a table with some data. The table was printed using a code chunk. 
+In this case, the result is an MS Word document. You can see some headings (from the YAML header), some subheadings (created with hashtagss) and a table with some data. The table was printed using a code chunk. 
 
-As you work on your R Markdown, you can preview your progress by *"knitting"* it. We are going to knit our most of our documents in MS Word. To knit your document, we will need to install a new package called *"knitr"*:
+You can preview your progress while working on an R Markdown file by *"knitting"* it. We are going to knit our most of our documents in MS Word. To knit documents, we will need to install a new package called *"knitr"*.
+
+### **Mini Challenge 3: Install the knitr package**
+
+Install the package "knitr" and then attach it.
+
+Use this code block to code your answers!
+
+```{r}
+
+```
+
+
+
+#-------------------------------------------------
 
 ```{r, eval = F}
 install.packages('knitr', dependencies = T)
 ```
 
-After you have installed knitr, load the package. Then click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your file. In the drop-down menu, select "Knit to Word". A Word document will open, displaying your rendered document. When you are happy with your R Markdown document, you can save the word document.
+After you have installed knitr and attached the package, you can use it. Click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your file. In the drop-down menu, select "Knit to Word". A Word document will open, displaying your rendered document. When you are happy with your document, you can save it.
 
 ```{r echo = FALSE, fig.cap = "<center>*Knitting an Rmarkdown file*</center>"}
 knitr::include_graphics("imgs/rmarkdown_render.png")
@@ -160,7 +198,9 @@ knitr::include_graphics("imgs/rmarkdown_run_chunk.png")
 
 ### R scripts
 
-R script files are different from R Markdown files. Anything you type in an R Markdown file is not considered code unless it is located inside a code chunk. Hashtags before text specify headings in the rendered R Markdown document. In a script, hashtags specify *comments*, which are lines that R will disregard when you run your code. Comments allow you to make notes about the code you are writing. They also allow you to bypass code you are still working on and might not want to run. When you insert a hashtag for commenting, the line will also turn a different colour.
+R script files are different from R Markdown files. Anything you type in an R Markdown file is not considered code unless it is located inside a code chunk. In a script, anything you write is considered code and must be written properly to avoid *errors*. 
+
+Hashtags mean something different in a script. Hashtags before text specify headings in the rendered R Markdown document. In a script, hashtags specify *comments*, which are lines that R will disregard when you run your code. Comments allow you to make notes about the code you are writing. They also allow you to bypass code you are still working on and might not want to run. When you insert a hashtag for commenting, the line will also turn a different colour. These comments are extremely important for organization and documentation—we will talk more about this in lesson 2.
 
 ## 5 - Loading and saving datasets in R
 
@@ -191,7 +231,7 @@ To copy a file path:
 
 ### Setting a working directory
 
-If you wish, you can use the `setwd()` function to set your directory to the folder containing your files for this assignment (note: replace the file path within the parentheses below with your own file path!):
+You can use the `setwd()` function to set your directory to the folder containing your files (note: replace the file path within the parentheses below with your own file path!):
 
 ```{r, eval = F}
 setwd("Users/user....") 
@@ -217,6 +257,24 @@ Or, without setting the working directly, you can copy the full file path into t
 data <- read.csv('Users/user ..../data.csv')
 ```
 
+### **Mini Challenge 4: Load external data**
+
+1.  Download the *dinosaurs.csv* file from the Week 1 content on D2L and save it somewhere on your computer.
+
+2.  Load the the *dinosaurs.csv* dataset by copying the filepath.
+
+3.  Set your working directory to the location of the *dinosaurs.csv* dataset then load the dataset from there, calling the dataset "dino_data".
+
+Use this code block to code your answers!
+
+```{r}
+
+```
+
+
+
+#-------------------------------------------------
+
 ### Saving your data
 
 Equally important is knowing how to save your dataset when you want to move it **out** of R or between scripts after working with it. There are two important functions for doing so: `write.csv()` and `saveRDS()`. The `write.csv()` function saves the data as a comma-separated file. The `saveRDS()` function saves it as an "R data serialization" file, which is a file type native to R. This file type  is useful for moving datasets between scripts because it is much **smaller** than a comma-separated file, and because it **preserves the data types in your dataset so R can recognize them**.
@@ -240,4 +298,21 @@ After saving as an RDS file, you will need the `readRDS()` function to load it a
 updated_data <- readRDS('data_updated.rds')
 ```
 
+### **Mini Challenge 5: Save the dinosaurs data to a different location**
+
+1.  On your computer, within your current working directory, create a new folder called "data".
+
+2.  Save the *dinosaurs* dataset to the new "data" folder as an Rds file.
+
+Use this code block to code your answers!
+
+```{r}
+
+```
+
+
+
+#-------------------------------------------------
+
 You should practice on your own to get comfortable loading and saving data using different approaches!
+
