@@ -3,11 +3,11 @@ title: "Introduction to R"
 author: "BIOL 3401 Mount Royal University"
 date: "Week 1, Fall 2025"
 output:
+  pdf_document:
+    toc: true
   html_document:
     toc: true
     toc_float: true
-  pdf_document:
-    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -108,7 +108,7 @@ In this course, you will need to create scripts and R Markdown files. To create 
 knitr::include_graphics("imgs/rstudio_create_script.png")
 ```
 
-When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your takehome challenges and project.
+When you create a new file, it will appear as a new panel in the upper-left of your RStudio console. You can save the new file by clicking on the "Save" icon in the upper-left corner of the new file---save often! You will need to submit saved files to complete your take-home challenges and project.
 
 ### **Mini Challenge 2: Create and save an R script file**
 
@@ -150,7 +150,7 @@ You will see a long read-out of information in the console as the package instal
 library(rmarkdown)
 ```
 
-Many students make the mistake of installing packages without attaching them. Except for packages that attach automatically when you open RStudio, you must first attach it a package to use its functions. Again, you will see a shorter read-out as the package attaches.
+Many students make the mistake of installing packages without attaching them. Except for packages that attach automatically when you open RStudio, you must normally first attach it a package to use its functions. `rmarkdown` is actually one of the exceptions to this rule---it will automatically interface with RStudio after you've installed it. We *did not* need to attach the package, but it's useful as a demonstration. *Later, we will install packages that MUST be attached when we want to use their functions.*
 
 ## 4 - Scripts versus R Markdown files
 
@@ -158,13 +158,17 @@ Many students make the mistake of installing packages without attaching them. Ex
 
 R Markdown files include a combination of code and plain text. These files also start with something called a YAML header, which you can find at the very beginning of the document surrounded  by dashes. This R Markdown file includes a title, author, and date, which appear at the top of the document when rendered. The rest of the YAML header are rendering instructions.
 
-Any plain text you type appears as regular text in a rendered document. Hashtags tell R Markdown to create a heading. Asterisks are used to make text bold and italic. Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your mini challenges and take-home challenges. Depending on the code chunk, when your document renders, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of something you might see after rendering an R Markdown file:
+Any plain text you type appears as regular text in a rendered document. Hashtags tell R Markdown to create a heading. The more hashtags, the smaller the heading becomes. This allows you to create titles, subtitles, etc. 
+
+Asterisks are used to make plain text **bold** and *italic*. 
+
+Special regions called *"code chunks"* allow you to write and execute your code within the rendered document---you will edit these chunks to complete your mini challenges and take-home challenges. Depending on the code chunk, when your document renders, you will see the code itself, the result of executing the code (e.g., a graph), or both. This is an example of something you might see after rendering an R Markdown file:
 
 ```{r echo = FALSE, fig.cap = "<center>*An MS Word document rendered from an Rmarkdown file*</center>"}
 knitr::include_graphics("imgs/rmarkdown_word_doc.png")
 ```
 
-In this case, the result is an MS Word document. You can see some headings (from the YAML header), some subheadings (created with hashtagss) and a table with some data. The table was printed using a code chunk. 
+In this case, the result is an MS Word document. You will be knitting your assignments to HTML (i.e., webpage format) and downloading them as PDFs. You can see some headings (from the YAML header), some subheadings (created with hashtags) and a table with some data. The table was printed using a code chunk. 
 
 You can preview your progress while working on an R Markdown file by *"knitting"* it. We are going to knit our most of our documents in MS Word. To knit documents, we will need to install a new package called *"knitr"*.
 
@@ -186,13 +190,13 @@ Use this code block to code your answers!
 install.packages('knitr', dependencies = T)
 ```
 
-After you have installed knitr and attached the package, you can use it. Click the down-arrow beside the knit button, which looks like a ball of yarn with a knitting needle, at the top of your file. In the drop-down menu, select "Knit to Word". A Word document will open, displaying your rendered document. When you are happy with your document, you can save it.
+After you have installed `knitr` and attached the package, you can use it. Click the down-arrow beside the Knit button, which looks like a ball of yarn with a knitting needle, at the top of your script pane. In the drop-down menu, select "Knit to HTML". An HTML document will open in your web browser, displaying your rendered document. When you are happy with your document, you can save it by 'printing' the document from your browser and saving it as a PDF. That PDF (along with your completed Rmd files) are what you'll normally need to submit to complete your assignments. 
 
 ```{r echo = FALSE, fig.cap = "<center>*Knitting an Rmarkdown file*</center>"}
 knitr::include_graphics("imgs/rmarkdown_render.png")
 ```
 
-You can also run code using the arrows at the top right of the code chunk. The grey downward arrow runs everything previous up to the current code chunk. The green arrow pointing to your right runs the code within the current code chunk only.
+You can also run code using the arrows at the top right of the code chunk. The grey downward arrow runs everything previous up to the current code chunk. The green arrow pointing to your right runs the code within the current code chunk only. These functions allow you to check how your code is running before you render the entire document.
 
 ```{r echo = FALSE, fig.cap = "<center>*Running code chunks*</center>"}
 knitr::include_graphics("imgs/rmarkdown_run_chunk.png")
@@ -200,13 +204,13 @@ knitr::include_graphics("imgs/rmarkdown_run_chunk.png")
 
 ### R scripts
 
-R script files are different from R Markdown files. Anything you type in an R Markdown file is not considered code unless it is located inside a code chunk. In a script, anything you write is considered code and must be written properly to avoid *errors*. 
+R script files are different from R Markdown files. Anything you type in an R Markdown file is *not* considered code unless it is located inside a code chunk. In a script, *anything you write is considered code* and must be written properly to avoid *errors*. 
 
-Hashtags mean something different in a script. Hashtags before text specify headings in the rendered R Markdown document. In a script, hashtags specify *comments*, which are lines that R will disregard when you run your code. Comments allow you to make notes about the code you are writing. They also allow you to bypass code you are still working on and might not want to run. When you insert a hashtag for commenting, the line will also turn a different colour. These comments are extremely important for organization and documentation—we will talk more about this in lesson 2.
+Hashtags mean something different in a script. Hashtags before text specify headings in the rendered R Markdown document. In a script, hashtags specify *comments*, which are lines that R will disregard when you run your code. Comments allow you to make notes about the code you are writing. They also allow you to bypass code you are still working on and might not want to run. When you insert a hashtag for commenting, the line will also turn a different colour. These comments are extremely important for organization and documentation---we will talk more about this in lesson 2.
 
 ## 5 - Loading and saving datasets in R
 
-You will be primarily working with familiar spreadsheet-like data in R. You will learn more about data types in lesson 3, but for now let's practice accessing data from outside of R. Base R has several existing datasets you can load and use for practice. One of these datasets is called 'iris', containing 50 observations of flower characteristics from three plant species. These data were first used in a famous 1936 paper by Ronald Fisher.
+You will work primarily with familiar spreadsheet-like data in R. You will learn more about data types in lesson 3, but for now let's practice accessing data from outside of R. Base R has several existing datasets you can load and use for practice. One of these datasets is called 'iris', containing 50 observations of flower characteristics from three plant species. These data were first used in a famous 1936 paper by Ronald Fisher.
 
 ### Loading data from within R
 
