@@ -8,3 +8,5 @@ number_vec <- c(1, 2 , 3, 4, 5)
 letters_vec <- c('A', 'B', 'C', 'D', 'E')
 
 new_character <- 'H'
+
+next_character <- 'K'
