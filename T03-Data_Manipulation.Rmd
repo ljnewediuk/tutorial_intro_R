@@ -3,11 +3,11 @@ title: "Basic Data Manipulation in R"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 3, Winter 2026"
 output:
-  pdf_document:
-    toc: true
   html_document:
     toc: true
     toc_float: true
+  pdf_document:
+    toc: true
 ---
 
 # Review
@@ -295,7 +295,7 @@ sheep_parasites <- read_excel("datasets/sheep_parasites.xlsx")
 Use this code block to code your answers!
 
 ```{r}
-sheep_parasites <- read_excel("datasets/sheep_parasites.xlsx", sheet = 2)
+
 ```
 
 
