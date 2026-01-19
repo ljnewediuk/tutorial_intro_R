@@ -1,0 +1,470 @@
+---
+title: "Tidyverse"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 4, Winter 2026"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy=TRUE)
+```
+
+# **Learning Objectives**
+
+Tidyverse is a group of packages with functions for organizing tabular data (data frames/spreadsheet-like data). Many of the functions are equivalent to operations you performed previously in base R. The whole point of the Tidyverse is to make your code "cleaner" and easier for humans to understand, especially those of us with minimal programming experience. It's important for you to know and understand some basic R functionality, but after today, it's unlikely you will want to go back to using base R!
+
+After completing this topic, you should feel comfortable:
+
+1.  Describing the basic format of of a `tidyverse` function
+2.  Using some of the key `tidyverse` functions
+3.  Applying the 'pipe' (%>%) operator in `tidyverse`
+4.  Planning a basic data wrangling task
+4.  Performing a basic data wrangling task using `tidyverse`
+
+#### Step 1a: Set up your R session for the day
+
+Make sure we're setting our working directory!
+
+```{r, eval = F}
+# Set your working directory, then remove "eval = F"!
+setwd()
+```
+
+#### Step 1b: Load packages
+
+```{r, message = F}
+# Install the tidyverse package
+
+# Load it
+library(tidyverse) 
+```
+
+Now that we have some useful packages loaded, we can start to play with data.
+
+#### Step 1c: Load your data!
+
+We're going to use a new dataset to explore a number of the `tidyverse` functions.
+
+Whenever we work with a new dataset, we need to familiarize ourselves with what it contains. Let's pretend we don't have metadata for this dataset, but we do have some idea about what it contains: body measurements from a population of elephants measured from 1966--1968 and again in 2005--2013.
+
+```{r}
+# Load the dataset
+tusks <- read_csv("datasets/elephant_tusks.csv")
+
+# Summarize the dataset
+summary(tusks)
+```
+
+Notice that instead of `read.csv`, we've switched to `read_csv` to load our dataset, which is a tidyverse dataset. It is useful because it makes what's called a *tibble*, which is a modern style of tidyverse data frame with some special properties. You'll see that it's given us a message about the number of rows, columns, the delimiter (comma-separated, i.e., csv), and its assumptions about the data type of each column. If you type the name of the object (tusks) in your R will print out only the first 10 rows of the tibble, instead of all 780 rows as it would for a basic data frame.
+
+We can check out the class of the tusks tibble:
+
+```{r}
+# Check the object class
+class(tusks)
+```
+
+R tells us it's a "spec_tbl_df", "tbl_df/tbl", and "data.frame". This means it has a class both as a data frame in base R and as a tibble for more modern functions.
+
+Here we have: 
+- `ObsTime`, the length of observation (decimal hours)
+- `Sex`, the sex of the bird (male or female)
+- `Age`, the age of non-breeding group members (adult or yearling)
+- `Relatedness`, the pedigree-based relatedness to the brood (0.5 first order, 0.25 second order, or 0 distant)
+- `ChickAge`, the age of the brood (days)
+- `BroodSize`, the size of the brood (count)
+- `UnitSize`, the number of individuals in the unit (count)
+- `FeedingRate`, the daily individual feeding rates (feeds per hour)
+
+
+# **Functions**
+
+We're going to to verb by verb through some of the more helpful `tidyr` & `dplyr` functions (which are two packages that are automatically loaded when you load `tidyverse`).
+
+## **Rename - change column names**
+
+To make our coding lives easier, let's rename the columns so we don't have to deal with annoying capital letters. 
+
+The *syntax* of using `rename()` is `new name = old name`.
+
+```{r}
+#1 - by renaming the columns with a pipe (%>%)
+birds.clean <- birds %>%
+  rename(obs = ObsTime, sex = Sex, age = Age, rel = Relatedness, chick.age = ChickAge, brood = BroodSize, unit = UnitSize, feed.rate = FeedingRate)
+
+#2 - by renaming the columns without a pipe
+rename(birds, obs = ObsTime, sex = Sex, age = Age, rel = Relatedness, chick.age = ChickAge, brood = BroodSize, unit = UnitSize, feed.rate = FeedingRate)
+```
+
+One of the major new things in how we coded the above block is the pipe operator (`%>%`). Remember, the pipe passes the *output* on the left hand side of the pipe as the *input* expected in the tidyverse function on the next line of code.
+
+This is the basic structure:
+
+```{r, eval = FALSE}
+# A tidyverse function without piping
+output <- function(input, arguments)
+  
+# The same task using piping
+output <- input %>%
+  function(arguments)
+```
+
+This might not seem very useful at the moment, but we will soon see how useful it can be!
+
+## **Select - choose columns**
+
+If we want to *select* specific columns to keep in our data, or *de-select* columns, we can use the `select()` function.
+
+`select()` is the `tidyverse` way of sub-setting data frames, allowing us to grab as many columns as we want into a new variable. It's equivalent to removing columns by index or name, like we did in the previous topic.
+
+```{r, results = F}
+# 1 - by selecting the columns you want
+birds.clean %>%
+  select(age, sex, rel)
+
+# 2 - using a single verb without piping to do the same thing
+select(birds.clean, age, sex, rel)
+```
+
+We can also use `select()` to get rid of columns.
+
+```{r, results = F}
+birds.clean %>%
+  select(!obs)
+
+# ... we can also do the de-selection without piping
+select(birds.clean, !obs)
+```
+
+
+## **Filter - choose rows**
+
+What if we want a certain type of data from the `birds.clean` data, but from all the columns?
+
+We can provide a set of criteria to the `filter()` function that will go through your data set and only keep observations (a.k.a. rows) that meet the specified criteria.
+
+Let's say we want to get data for only adult birds
+
+```{r}
+birds.adult <- birds.clean %>%
+  filter(age == "adult")
+
+# ... and without the pipe
+filter(birds.clean, age == "adult")
+```
+
+We can also set more than one criterion that need to be fulfilled in order to keep the row in the data set.
+
+What if we wanted to know all the adults that are first-order relatives?
+
+```{r}
+birds.adult.first <- birds.clean %>%
+  filter(age == "adult", rel == 0.5)
+
+# ... and you can combine filters without the pipe as well 
+filter(birds.clean, age == "adult", rel == 0.5)
+
+# You can also use '&' instead of ',' when combining filters
+birds.clean %>%
+  filter(age == "adult" & rel == 0.5)
+
+filter(birds.clean, age == "adult" & rel == 0.5)
+```
+
+We can also use the logical "OR" operand, |, to filter observations that fulfill either one or the other of criteria you've specified
+
+```{r}
+birds.first.second <- birds.clean %>%
+  filter(rel == 0.5 | rel == 0.25)
+```
+
+Some other helpful logical operands:
+
+-   x > y (x is greater than y)
+-   x < y (x is less than y)
+-   x == y (x is equal to y)
+-   x != y (x is not equal to y)
+
+### **Mini Challenge 1**
+
+1.  Subset `birds.clean` for yearlings with `feed.rate` greater than 4.
+
+```{r}
+
+```
+
+
+2.  Subset `birds.clean` for individuals that are _not_ distant relatives i.e., `relatedness` not equal 0
+
+```{r}
+
+```
+
+
+3.  Subset `birds.clean` using the conditions of both #1 and #2 above, and save it as a new object called `birds_year_feed4_rel`.
+
+Use the below code block to code your answers!
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+#-------------------------------------------------
+
+
+
+## **Interlude: Why is the pipe useful?**
+
+We've covered only three verbs in data wrangling so far: `rename()`, `select()`, and `filter()`.
+
+Even with these three functions, you can see how data wrangling can stack up as you manipulate your data more and more.
+
+Let's say we wanted to know the `chick.age` and `brood` of the five male adult birds with a `feed.rate` over 3, and we wanted cleaned up column names.
+
+We could do that as a piped set of functions, where the output of one function is automatically taken as the input to the next function, like so:
+
+```{r}
+piped.birds <- birds %>%
+  rename(sex = Sex, age = Age, chick.age = ChickAge, brood = BroodSize, feed.rate = FeedingRate) %>%
+  select(sex, age, chick.age, brood, feed.rate) %>%
+  filter(feed.rate > 3 & age == "adult" & sex == "m") %>%
+  head(n = 5)
+```
+
+Or we could do it without pipes by creating new objects:
+
+```{r}
+clean.birds <- rename(birds, sex = Sex, age = Age, chick.age = ChickAge, brood = BroodSize, feed.rate = FeedingRate)
+clean.birds.small <- select(clean.birds, sex, age, chick.age, brood, feed.rate)
+clean.birds.small.filt <- filter(clean.birds.small, feed.rate > 3 & age == "adult" & sex == "m") 
+clean.birds.small.filt.top <- head(clean.birds.small.filt, n = 5)
+```
+
+If we think about keeping things as clean as possible, multiple intermediate objects that you don't need can make your environment really cluttered and your object names tend to get a bit nonsensical after lots of cleaning - we only did four manipulations and each step added a new object to sort through!
+
+Or we could do it as a set of nested functions:
+
+```{r}
+nest.birds <- head(filter(select(rename(birds, sex = Sex, age = Age, chick.age = ChickAge, brood = BroodSize, feed.rate = FeedingRate), sex, age, chick.age, brood, feed.rate), feed.rate > 3 & age == "adult" & sex == "m"), n = 5)
+```
+
+Nesting functions can be quick for approx. 2 functions but as soon as you get above 3-4, it gets really hard to even read what the function is doing!
+
+Not to mention debugging if an error is thrown.
+
+On top of that, since we read English left to right, we read a set of nested functions from the *last* function to the *first* function, and have to skip past the function names to find the input data, and past the input data to find the function parameters.
+
+An important note here is that we use code to get an output, but we also use code as part of our scientific writing and data sharing now.
+
+Annotating and writing legible code is key!
+
+Reviewers, collaborators, supervisors, etc. need to be able to understand your code by reading it without even doing it themselves (just like when someone reads your paper, they need to understand how you conducted your science without actually running the experiment before they can understand what happened).
+
+Back to verbs! 
+
+
+
+## **Arrange - sorting data**
+
+A quick & easy way to sort your data by a variable of interest.
+
+```{r}
+# let's sort our data by the lowest feeding rate
+low.rate <- birds.clean %>%
+  arrange(feed.rate)
+
+# NB: you can use all these verbs without piping the output in the same way as the examples show. To avoid cluttering our environments with duplicated objects, I'm going to only demonstrate the piped version of these verbs from here out
+
+# Let's flip it around and sort by highest feeding rate
+high.rate <- birds.clean %>%
+  arrange(desc(feed.rate))
+ 
+```
+
+**Q:** `View()` the `birds.clean` data set.
+- What is the largest brood size?
+- The smallest?
+
+### **Mini challenge 2**
+
+1.  How would you code this to get the answer to the **Q**uestion above, instead of just looking and trying to pick out which decimal is smaller or larger than everything else?
+
+Use the code block below to code your answer!
+
+```{r}
+
+```
+
+
+
+
+
+
+#-------------------------------------------------
+
+
+Let's go back to our ants data set that we used in T03 for a few more manipulations. 
+
+### **Mini Challenge 3**
+
+1. Load the `ants.csv` data set as an object called `ants`.
+
+2. Rename the column names to be `site`, `rich`, `hab`, `lat`, and `elev` and save this clean data set as `ants.clean`.
+
+3. Summarize the `ants.clean` data set to make sure your column renaming worked. 
+
+
+Use the below code block to code your answers!
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------
+
+
+## **Distinct - unique values**
+
+We didn't get a lot of information about `hab` from our `summary()` function. 
+
+```{r}
+ants.clean %>%
+  distinct(hab)
+```
+
+
+### **Mini Challenge 4**
+
+1.  Run the above code chunk - what did it do? Write your answer below. 
+
+
+
+#-------------------------------------------------
+
+
+
+
+## **Mutate - make new columns**
+
+Mutate can create new columns in your object either by performing functions on your existing data, or by a given rule. 
+
+We're going to take a subset of your `ants` data from a single site - it's saved in `ants_singleSite.csv`. This abundance data allows us to calculate the Shannon-Weiner Index. 
+
+Remember how we did the SWI all by hand in Biol 2213? What if I told you we could do it in R way quicker using a bunch of `mutate()` functions? 
+
+Note: the total number of ants in this data set is 100 i.e., N = 100
+
+```{r}
+ants.abund <- read_delim("ants_singleSite.csv")
+
+ants.calc <- ants.abund %>%
+  rename(spp = "Ant Species", n = "# collected") %>%
+  mutate(pi = n/100,
+         lnpi = log(pi),
+         pilnpi = pi * lnpi,
+         negpilnpi = -pilnpi)
+```
+
+To go from this to the SWI, we can just add the `negpilnpi` column up: 
+```{r}
+ants.swi <- ants.calc %>%
+  select(negpilnpi) %>%
+  sum()
+```
+
+Now that we've done all this work on our SWI calculations, you may want to save them on your computer so you can use the data in other programs or you can copy & paste the numbers into a table for a Word doc, etc. We can **save** our R object by "writing it out". 
+
+A note on terminology: we *read* data in (load into R) and we *write* data out (save to our computer).
+
+```{r}
+write_delim(ants.swi.calc, "ants.swiCalc.csv", delim = ',')
+write_delim(ants.swi.calc, "ants.swiCalc.tsv", delim = '\t')
+```
+
+Note that R has a hard time with spaces in file names and variables (without going into more complicated regular expression coding), so to make your coding life easier, your working directory path and file names should have underscores or dashes rather than spaces in the directory and file names.
+
+Same goes for column names in your data files - it won't break R when you load it but it will potentially make your life harder when you're trying to wrangle your data.
+
+******#### GET THEM TO USE CASE_WHEN TO UPDATE A COLUMN WITH DIFFERENTLY FORMATTED ENTRIES
+
+
+## **Separate**
+
+Again, let's practice loading data correctly by bringing in a housing price data set to play with our last verb `separate()`.
+
+```{r}
+housing <- read_delim("housing_clean.tsv", delim = "\t")
+```
+
+A quick look at this data and you can tell it's messier than other data sets we've loaded.
+That's because this is a real data set on the local housing index in a number of cities across the US at different periods of time.
+
+We have lots of NAs (values not present), the YYYY-MM-DD date is all in one column, and the locations are in one column as well.
+
+When we having _missing data_, it can really mess up our downstream analyses. You might not _always_ want to get rid of NAs in your data set without a good reason, because it eliminates the entire row of data wherever an NA exists. For today, we can get rid of the NAs all at once. 
+
+```{r}
+housing_tidy <- housing %>%
+  na.omit()
+```
+
+
+We then want to use `separate()` to fix our location variable.
+
+```{r}
+housing_tidy <- housing %>%
+  na.omit() %>% 
+  separate(col= location, 
+           into = c("state", "city"), 
+           extra = "merge")
+```
+
+### **Mini Challenge 5**
+
+1.  How would you use `separate()` to bring out the year and month of the date, while getting rid of the day, but keeping the original Date column?
+
+Copy the code in the above block to the empty code block below, then add another line of code that will answer #1.
+
+Save your cleaned data set to a variable called `housing_tidy`.
+
+Hint: search the `separate()` function in the Help panel if you want to see all of the options you can use for different arguments.
+
+Use the code block below to code your answer!
+
+```{r}
+
+```
+
+## **Group and Summarize - **
+
+They have a dataset where they need to know the average/sum by groups.
+
+## **Pivoting - **
+
+They have a data frame with several columns they need to turn into a factor for their analysis
+
+## **Joins - ** LEAVE TO NEXT TIME/LATER
+
+They have two data frames they need to join. Make it small enough so they can see what is happening when they do a right, left, and full join. Get them to think about the number of columns added with each task and why.
+
