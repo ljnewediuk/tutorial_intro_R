@@ -1,0 +1,7 @@
+﻿patient_id,age,sex,chronic_condition,smoker,height_cm
+P101,34,F,asthma,no,165
+P102,29,Female,none,No,170
+P103,NA,M,diabetes,yes,180
+P104,42,F,NA,no,160
+P105,37,male,none,FALSE,175
+P105,37,male,none,FALSE,175

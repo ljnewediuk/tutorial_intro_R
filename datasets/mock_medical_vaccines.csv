@@ -1,0 +1,8 @@
+﻿visit_id,patient_id,visit_date,vaccine,dose,temperature,notes
+V001,P101,2023-01-05,Flu,1,37.2,none
+V002,P102,2001-12-23,flu,1,36.8,mild headache
+V003,P103,2023-01-18,COVID,2,38.1,NA
+V004,P101,2023-02-02,COVID,2nd,37.0 C,follow-up
+V004,P101,2023-02-02,COVID,2nd,37.0 C,follow-up
+V005,P104,NA,Flu,1,37,anxious
+V006,P105,2023-02-20,covid,1,36.5,
