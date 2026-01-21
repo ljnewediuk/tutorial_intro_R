@@ -16,7 +16,7 @@ tusks <- read_csv('datasets/elephant_tusks.csv')
 
 # Remove the NAs (use verb "any_of" to remove only NAs related to tusks)
 tusks_no_na <- tusks %>%
-  drop_na(any_of(c('tusk_length', 'tusk_circumference')))
+  drop_na(any_of(c('tusk_length', 'tusk_circumference', 'estimated_age')))
 
 # They will check which rows are duplicates (I duplicated three rows)
 elephant_dups <- tusks_no_na %>%
@@ -42,16 +42,17 @@ tusks_with_age_class <- tusks_distinct %>%
   mutate(age_class = case_when(sex == 'f' & estimated_age >= 12 ~ 'ADULT',
                                sex == 'f' & estimated_age < 12 ~ 'JUVENILE',
                                sex == 'm' & estimated_age >= 10 ~ 'ADULT',
-                               sex == 'm' & estimated_age < 10 ~ 'JUVENILE'))
+                               sex == 'm' & estimated_age < 10 ~ 'JUVENILE')) %>%
+  mutate(age_class_f = factor(age_class))
 
 # They need to filter only the adults
 tusks_adults <- tusks_with_age_class %>%
-  filter(age_class == 'ADULT')
+  filter(age_class_f == 'ADULT')
 
 # Select out shoulder heights and estimated ages; at this point we have our final
 # cleaned dataset
 tusks_cleaned <- tusks_adults %>%
-  select(! c(estimated_age, shoulder_height, age_class))
+  select(! c(estimated_age, shoulder_height, age_class, age_class_f))
 
 # Pivot longer (We will go through the parts of the pivot)
 tusks_long <- tusks_cleaned %>%
