@@ -179,7 +179,7 @@ We can clearly see the missing data (NA). If we run `summary(tusks)`, we can als
 
 ### Drop the missing observations
 
-The first thing we are going to do is drop the missing observations using the function `drop_na()`. We are also going to use the helper function `any_of()` to tell R which columns we want to remove the missing observations from: `tusk_length` and `tusk_circumference`. This is because we need to summarize these two columns, and missing values will get in our way. Specifying the columns isn't really necessary in this case, but it's good to get into the habit of specifying the columns; `drop_na()` removes *all* missing values by default, and sometimes you might remove rows you need for your analysis just because there are missing values in another column you don't really care about.
+The first thing we are going to do is drop the missing observations using the function `drop_na()`. We are also going to use the helper function `any_of()` to tell R which columns we want to remove the missing observations from: `tusk_length`, `tusk_circumference`, and `estimated_age`. This is because we need these columns for our summary, and missing values will get in our way. Specifying the columns isn't always necessary, but it's good to get into the habit of specifying the columns; `drop_na()` removes *all* missing values by default, and sometimes you might remove rows you need for your analysis just because there are missing values in another column you don't really care about. In our case, there is one missing value in the `shoulder_height` column, which we don't really care about, but will remove an observation with all the other data we *do* care about if we don't specify.
 
 ```{r}
 # Remove NAs, using helper function any_of() to specify only missing tusk measurements
@@ -191,9 +191,9 @@ tusks_no_na <- tusks_rename %>%
 
 #### **STOP and check your work**
 
-We need to check in frequently to ensure our intermediate data wrangling steps make sense. We just removed the missing observations from the data. At this point, we should run the `summary()` function again to make sure that we have a dataset with *fewer rows and no NAs in the tusk_length_cm or tusk_circumference columns*.
+We need to check in frequently to ensure our intermediate data wrangling steps make sense. We just removed the missing observations from the data. At this point, we should run the `summary()` function again to make sure that we have a dataset with *fewer rows and no NAs in the tusk_length_cm, tusk_circumference, or estimated_age columns*.
 
-You should now have a dataset with 599 rows and no NA in either of the tusk measurement columns.
+You should now have a dataset with 597 rows and no NA in either of the tusk measurement columns.
 
 ### Try to find the duplicates
 
@@ -245,7 +245,7 @@ The new dataset `tusks_dups` has six rows. We can clearly see that these 6 rows 
 
 Now that we've assessed the issue, we can remove the duplicates using the `distinct()` function. This function's job is to keep only the rows that are "distinct" from other rows in the data, i.e., filter out the duplicates. It has no arguments other than the dataset name. If used with a pipe, it can be added on behind the pipe without any arguments.
 
-### **Mini Challenge3**
+### **Mini Challenge 3**
 
 1. Use `distinct()` to remove the duplicate rows from `tusks_arrange`.
 2. Call the new dataset `tusks_distinct`.
@@ -258,13 +258,80 @@ Use the code block below to code your answers!
 
 #### **STOP and check your work**
 
-We just removed three duplicate rows from the data. This means our new dataset should have 596 rows.
+We just removed three duplicate rows from the data. This means our new dataset should have 594 rows.
 
-## Step 3c: **Add an age class column**
+## Step 3c: **Enriching the data: Add an age class column**
 
 Functions we will use in this step:
 
 * `mutate()`
+* `case_when()`
+
+We only want a summary of the adult tusk measurements. Next, we need to remove the juveniles from the data. We don't have a column for age class, so we need to make one using the `mutate()` function.
+
+The *syntax* for `mutate()` is `new column = operator, criteria`. This is a simple mutate we might do if, for example, we wanted to add a column for tusk length in millimeters (10 mm in 1 cm):
+
+```{r, eval = FALSE}
+# Make a new column for tusk length in millimeters
+mutate(tusks_distinct, tusk_length_mm = tusk_length_cm * 10)
+```
+
+We are going to use relational operators to ask R whether the elephant in each row is an adult or juvenile, and insert a value in the new age class column depending on the answer. In fact, we are going to see how we can give the function multiple relational operators at once. We can string two relational operators together with two new operators, `|` and `&`. `|` between two criteria means "or". It says, "find whether the elephant meets *either* of these criteria. `&` between two criteria means "and". It says, "find whether the elephant meets *both* of these criteria.
+
+In our case, we want "and" because we first need to know whether an elephant is male or female to know whether it would be classified as a juvenile or adult based on its age (female adult elephants are ≥ 12 years and male adult elephants are ≥ 10 years).
+
+The `case_when()` function allows us to specify multiple criteria for a single column. The syntax is `if criteria 1 matches ~ insert value 1, if criteria 2 matches ~ insert value 2, ... if criteria n matches, insert value n`. We can specify as many criteria as we want. 
+
+Here is an example of how we might separate tall elephants with shoulder heights ≥ 150 cm from short elephants < 150 cm, then convert the column to a factor:
+
+```{r}
+# Add new column for two heights
+tusks_distinct %>%
+  mutate(split_height = case_when(shoulder_height_cm >= 150 ~ "tall",
+                                  shoulder_height_cm < 150 ~ "short")) %>%
+  mutate(split_height_f = factor(split_height))
+```
+
+### **Mini Challenge 4**
+
+We need to make a new column with the following criteria to separate juveniles from adults:
+
+* If sex is female and age is ≥ 12, "ADULT"
+* If sex is female and age is < 12, "JUVENILE"
+* If sex is male and age is ≥ 10, "ADULT"
+* If sex is female and age is < 10, "JUVENILE"
+
+1. Create a new column in the `tusks_distinct` dataset called `age_class`.
+2. Name the two age classes "ADULT" and "JUVENILE".
+3. Create an additional column, `age_class_f`, with the age classes as factors.
+4. Call the new dataset `tusks_with_age_class`.
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+#### **STOP and check your work**
+
+We just added a column with our two age classes as a factor. Our dataset should have two categories in the `age_class_f` column, with 350 adults and 244 juveniles.
+
+
+### FILTER OUT THE JUVENILES
+
+### SELECT OUT THE COLUMNS WE DON'T NEED
+
+### PIVOT LONGER
+
+### SUMMARIZE
+
+
+
+
+
 
 
 
