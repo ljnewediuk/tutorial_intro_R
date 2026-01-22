@@ -54,7 +54,7 @@ We're going to use a new dataset to explore a number of the `tidyverse` function
 
 Whenever we work with a new dataset, we need to familiarize ourselves with what it contains. Let's pretend we don't have metadata for this dataset (you actually don't), but we *do* have some idea about what it contains: body measurements from a population of elephants measured from 1966--1968 and again in 2005--2013.
 
-```{r, eval = F}
+```{r}
 # Load the dataset
 tusks <- read_csv("datasets/elephant_tusks.csv")
 
@@ -66,7 +66,7 @@ Notice that instead of `read.csv`, we've switched to `read_csv` to load our data
 
 We can check out the class of the tusks tibble:
 
-```{r, eval = F}
+```{r}
 # Check the object class
 class(tusks)
 ```
@@ -126,7 +126,7 @@ Right now, the measurement units in our data are unclear. Let's first rename the
 
 The *syntax* of using `rename()` is `new name = old name`.
 
-```{r, eval = F}
+```{r}
 #1 - by renaming the columns with a pipe (%>%)
 tusks_rename <- tusks %>%
   rename(estimated_age_cm = estimated_age, shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
@@ -181,7 +181,7 @@ We can clearly see the missing data (NA). If we run `summary(tusks)`, we can als
 
 The first thing we are going to do is drop the missing observations using the function `drop_na()`. We are also going to use the helper function `any_of()` to tell R which columns we want to remove the missing observations from: `tusk_length`, `tusk_circumference`, and `estimated_age`. This is because we need these columns for our summary, and missing values will get in our way. Specifying the columns isn't always necessary, but it's good to get into the habit of specifying the columns; `drop_na()` removes *all* missing values by default, and sometimes you might remove rows you need for your analysis just because there are missing values in another column you don't really care about. In our case, there is one missing value in the `shoulder_height` column, which we don't really care about, but will remove an observation with all the other data we *do* care about if we don't specify.
 
-```{r, eval = F}
+```{r}
 # Remove NAs, using helper function any_of() to specify only missing tusk measurements
 tusks_no_na <- tusks_rename %>%
   drop_na(any_of(
@@ -227,7 +227,7 @@ Another way we can look for duplicates is by grouping the elephants by *all* col
 2. The `filter()` function uses relational operators to *remove* or *keep* rows that meet our criteria. The *syntax* is `column name(or other identifier), relational operator, criteria`.
 3. The `n()` function is a helper function to count the number of rows in each group (most useful when used with `group_by()`). This function does not need arguments within the parentheses when used within another `tidyverse` function.
 
-```{r, eval = F}
+```{r}
 # Make a new dataset "tusks_dups" with all duplicate rows to we can see the problem
 tusks_dups <- tusks_arrange %>%
   # Group by all columns in the dataset to pick out 100% identical rows
@@ -308,7 +308,7 @@ We need to make a new column with the following criteria to separate juveniles f
 
 Use the code block below to code your answers!
 
-```{r}
+```{r, eval = F}
 
 ```
 
@@ -414,7 +414,7 @@ We are also going to include another argument in this case:
 
 Here is what the pivot looks like:
 
-```{r, eval = F}
+```{r}
 tusks_long <- tusks_select %>%
   pivot_longer(
     # Specifying the columns to pivot
