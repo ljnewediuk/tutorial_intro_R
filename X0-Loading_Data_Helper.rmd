@@ -1,0 +1,96 @@
+---
+title: "Loading your data in R"
+output: html_document
+date: "2026-01-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Don't worry, this is the hardest part!
+
+Loading and saving data is likely one of the most challenging things you will need to do in R. The good news is that once you figure out how to do it, you will have a process you can use each time.
+
+### Loading data
+
+Before you load data from outside R, you need to *locate the data file path on your local computer.* After locating your data, you can either:
+
+* Copy the file path directly to the data, including the file name and extension.
+* Set your *"working directory"* to the folder containing your data files, which will allow you to load the data using *only* the file name and extension.
+
+Of course, I would recommend organizing your files either in one folder on your computer that you use only for this class, or even better, adding subfolders within that folder for your data, Rmd files, etc. How you choose to manage and organize your data is up to you. As long as it works!
+
+#### Setting your working directory
+
+The first thing you should do before setting your working directory is to find out the current location of your working directory. This might save you some time. To locate your working directory, run the following code:
+
+```{r, eval = F}
+getwd()
+```
+
+This is the location where R will currently look for files. It can't "see" anything else on your computer unless you tell it where to look.
+
+Use the `setwd()` function to set your directory to a different location (i.e., the folder containing your files). To set a working directory, you need to know the *"root directory"* where you want R to look. Finding that depends on whether you are using a mac or PC.
+
+* **Windows:** Click the Start button and then click Computer. Click to open the location of the desired file/folder, hold down the Shift key and right-click the file/folder. Then select 'Copy as path'.
+* **Mac:** Navigate to the desired file/folder in the Finder app. Right-click on the file/folder, and while in the right-click menu, hold down the Option key. Then, select 'Copy as Pathname'
+
+Now you can set your working directory. This is the code to do so. You need to paste your own working directory file path within the quotes. **MAKE SURE THERE IS A SLASH AT THE END OF THE FILE PATH even if "copy path" did not give you a slash.**
+
+```{r, eval = F}
+setwd("PASTE YOUR COPIED PATH HERE (MAKE SURE YOU USE QUOTES)") 
+
+# Example, from the copied file path C:\Users\YourName\Documents:
+setwd("C:\Users\YourName\Documents\")
+```
+
+Your current working directory appears in the top right corner of your console. You can verify this is the correct location.
+
+#### Some problems you might encounter
+
+Every computer is different, and sometimes even if you copy the pathname directly, R will tell you it can't find the directory. This is common on PCs. Let's say your pathname looks something like this, and R gives you an error that it can't find the directory.
+
+```{r, eval = F}
+setwd("C:\Users\YourName\Documents\")
+```
+
+There are some common fixes:
+
+* Reverse the direction of the slashes (i.e., "C:/Users/YourName/Documents/Data.csv")
+* Reverse and add an extra slash  (i.e., "C://Users//YourName//Documents//Data.csv")
+
+One final note: **PAY ATTENTION TO SPACES AND CASES!** Remember, R is very literal and will do exactly as you tell it to. If you add an extra space somewhere, put a capital letter where a lower-case letter should be, misspell a folder name, etc., R will give you an error. You need to be very precise.
+
+#### Loading data
+
+After setting your working directory, you will need to load your data. You can also load your data directly without setting a working directory.
+
+If you have already set your working directory, you should have immediate access to your file. You can load your file as follows:
+
+```{r, eval = F}
+data <- read.csv("my_data.csv")
+```
+
+If you have *not* set your working directory, you can load your file directly by following the steps above to copy the pathname of the actual file, not just the folder. The steps are the same: right click on the file and copy its pathname. Your code would look something like this:
+
+```{r, eval = F}
+data <- read.csv("C:\Users\YourName\Documents\my_data.csv")
+```
+
+#### Saving data
+
+Equally important is knowing how to save your dataset when you want to move it **out** of R or between scripts after working with it. We used the `read.csv()` function to load our data. We are going to use the `write.csv()` function to save it. 
+
+```{r, eval = F}
+write.csv(data, 'data_updated.csv')
+```
+
+We only needed one argument in `read.csv()`, but now we need two. The first argument specifies the dataset we want to save. The second argument specifies what we want as the name of the saved file. Note the filename extension (.csv). 
+
+Please note that **The file will automatically save to the location of your current working directory**. If you have not set a working directory, that location might be somewhere in the root directory on your computer. This is why it's best to set a working directory.
+
+#### A note about file extensions
+
+You'll note that the examples in this tutorial use comma-separated values files with the extension .csv. Remember that you **MUST** include the correct file extension at the end of your file, and it must match the file type. For example, if you try to load an .xlsx file using the extension .csv, you will most likely get an error. You must also use the correct function to load the file. `read.csv()` loads only .csv files. `read_excel()` loads only .xlsx files.
+
