@@ -54,11 +54,11 @@ Your supervisor has asked you some very specific questions about the data and yo
 
 3. **(1 pt)** List the data *types* of the five columns:
 
-* `individual_id`: 
-* `species`: 
-* `temperature_C`:
-* `metabolic_rate_ml02_g_hr`: 
-* `sprint_speed_cm_s`: 
+* `individual_id`: ______________
+* `species`: ______________
+* `temperature_C`: ______________
+* `metabolic_rate_ml02_g_hr`: ______________
+* `sprint_speed_cm_s`: ______________
 
 4. **(1.5 pts)** Print the first 11 rows of the data using the `head()` function.
 
