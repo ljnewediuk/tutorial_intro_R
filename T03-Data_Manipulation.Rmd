@@ -400,7 +400,7 @@ Use this code block to code your answers!
 We can also set multiple criteria for subsets using the "&" symbol. For example, if we wanted all female (F) adult sheep, we could use the following code.
 
 ```{r}
-female_adults <- sheep_parasites[sheep_parasites$AgeCat == "adult" & sheep_parasites$Sex == "F" ,]
+female_adults <- sheep_parasites[sheep_parasites$AgeCat == "Adult" & sheep_parasites$Sex == "F" ,]
 ```
 
 ### Combining data 
