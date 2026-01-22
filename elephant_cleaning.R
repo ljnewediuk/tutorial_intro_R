@@ -56,19 +56,18 @@ tusks_cleaned <- tusks_adults %>%
 
 # Pivot longer (We will go through the parts of the pivot)
 tusks_long <- tusks_cleaned %>%
-  pivot_longer(cols = c('tusk_length', 'tusk_circumference'),
+  pivot_longer(cols = c(tusk_length, tusk_circumference),
                names_prefix = 'tusk_',
-               names_to = 'tusk_measurement',
-               values_to = 'cm')
+               names_to = 'tusk_dimension',
+               values_to = 'measurement')
+
+# Turn the tusk_dimension column into a factor
+tusks_long_factor <- tusks_long %>%
+  mutate(tusk_dimension = factor(tusk_dimension))
 
 # Next we will group by and summarize the mean and sd
-tusks_long %>%
-  group_by(sample_period, sex, tusk_measurement) %>%
-  summarize(mean_cm = mean(cm),
-            sd_cm = sd(cm))
+tusks_long_factor %>%
+  group_by(sample_period, sex, tusk_dimension) %>%
+  summarize(mean_measurement = mean(measurement),
+            sd_measurement = sd(measurement))
 
-# ALSO NEED TO ADD:
-#   RENAME
-#   ARRANGE
-
-# These will just be trivial operations
