@@ -27,4 +27,7 @@ phys_data[phys_data$individual_id == "F02" ,]
 # OR
 phys_data[9,]
 
+# c) The first six entries in the sprint speed column
+head(trial_data[trial_data$sprint_speed_cm_s ,])
+
 

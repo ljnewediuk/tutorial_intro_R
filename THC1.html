@@ -13,7 +13,7 @@
 
 <meta name="date" content="2026-01-22" />
 
-<title>Take Home Challenge #1</title>
+<title>Take Home Challenge X</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,7 +350,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Take Home Challenge #1</h1>
+<h1 class="title toc-ignore">Take Home Challenge X</h1>
 <h4 class="author">YOUR NAME HERE</h4>
 <h4 class="date">2026-01-22</h4>
 
@@ -358,7 +358,28 @@ display: none;
 
 
 <div id="take-home-challenge-1" class="section level3">
-<h3>Take Home Challenge #1</h3>
+<h3>Take-home Challenge 1</h3>
+<p>This challenge is due <strong>Thursday, Jan. 29th at 11:59
+pm</strong>. It will be graded out of 10 points (the marks distribution
+is outlined in each section). Your grade on the assignment will make up
+approximately 3–5% of your final grade, which will depend on how many
+additional Take-home Challenges are assigned this semester and how much
+work you are required to do in each. This will likely be the challenge
+with the lightest workload.</p>
+<p>You can either complete your assignment using this .Rmd document or
+using the TakeHomeChallengeFormatting.Rmd. If you use this document,
+please ensure you include the necessary headings and copy and replace
+the YAML in this document with the YAML from
+TakeHomeChallengeFormatting.Rmd (everything at the head of the document
+between “—” and “—”) and change the title and author, e.g.:</p>
+<p>Required submissions for this Take Home Challenge:</p>
+<ul>
+<li>your .Rmd</li>
+<li>your output knitted as an HTML and saved to a PDF</li>
+</ul>
+</div>
+<div id="your-task" class="section level3">
+<h3>Your task</h3>
 <p>You are a summer RA reviewing some data the lab collected the
 previous summer. The dataset contains the physiological performance of
 five animal species subjected to an experiment on physiological
@@ -376,10 +397,10 @@ the trial</p>
 data and you decided to give them a reproducible report with the
 answers.</p>
 <ol style="list-style-type: decimal">
-<li>Create a new folder called <code>BIOL3401_THC1</code> somewhere on
-your computer and save or copy the <code>THC1_data.csv</code> file to
-the folder (note: you should do this step <em>outside</em> of R). Write
-the code needed to:</li>
+<li><strong>(2 pts)</strong> Create a new folder called
+<code>BIOL3401_THC1</code> somewhere on your computer and save or copy
+the <code>THC1_data.csv</code> file to the folder (note: you should do
+this step <em>outside</em> of R). Write the code needed to:</li>
 </ol>
 <ol style="list-style-type: lower-alpha">
 <li>Set the new folder (<code>BIOL3401_THC1</code>) as your working
@@ -388,13 +409,15 @@ directory.</li>
 folder, assigning it the name <code>trial_data</code>.</li>
 </ol>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Create a new folder called <code>data</code> inside the
-<code>BIOL3401_THC1</code> folder (note: you should do this step outside
-of R). Save (write) the same <code>trial_data</code> to the new folder,
-saving it as <code>updated_trial_data.csv</code>. The datasets are
-identical for now, but you have set up a structure that can be used to
-automatically save any future updates to the file.</p></li>
-<li><p>List the data <em>types</em> of the five columns:</p></li>
+<li><p><strong>(1.5 pts)</strong> Create a new folder called
+<code>data</code> inside the <code>BIOL3401_THC1</code> folder (note:
+you should do this step outside of R). Save (write) the same
+<code>trial_data</code> to the new folder, saving it as
+<code>updated_trial_data.csv</code>. The datasets are identical for now,
+but you have set up a structure that can be used to automatically save
+any future updates to the file.</p></li>
+<li><p><strong>(1 pt)</strong> List the data <em>types</em> of the five
+columns:</p></li>
 </ol>
 <ul>
 <li><code>individual_id</code>:</li>
@@ -404,23 +427,21 @@ automatically save any future updates to the file.</p></li>
 <li><code>sprint_speed_cm_s</code>:</li>
 </ul>
 <ol start="4" style="list-style-type: decimal">
-<li><p>Print the first 11 rows of the data using the <code>head()</code>
-function.</p></li>
-<li><p>Create a new data frame called <code>mouse_data</code> with only
-observations from the species <code>Mus_musculus</code>.</p></li>
-<li><p>Create a new data frame called <code>terrestrial_data</code> that
-does not include the species <em>Oncorhynchus mykiss</em>.</p></li>
-<li><p>Use code to find the following two pieces of data:</p></li>
+<li><p><strong>(1.5 pts)</strong> Print the first 11 rows of the data
+using the <code>head()</code> function.</p></li>
+<li><p><strong>(1.5 pts)</strong> Create a new data frame called
+<code>mouse_data</code> with only observations from the species
+<code>Mus_musculus</code>.</p></li>
+<li><p><strong>(1.5 pts)</strong> Create a new data frame called
+<code>terrestrial_data</code> that does not include the species
+<em>Oncorhynchus mykiss</em>.</p></li>
+<li><p><strong>(1 pt)</strong> Use code to find the following two pieces
+of data:</p></li>
 </ol>
 <ol style="list-style-type: lower-alpha">
 <li>The metabolic rate of <em>Parus major</em> individual B08.</li>
-<li>All data from individual F02.</li>
+<li>All data from <em>Lithobates pipiens</em> individual F02.</li>
 </ol>
-<p>Required submissions for this Take Home Challenge:</p>
-<ul>
-<li>your .Rmd</li>
-<li>your output knitted as an HTML and saved to a PDF</li>
-</ul>
 </div>
 
 
