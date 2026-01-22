@@ -1,0 +1,74 @@
+---
+title: 'Take Home Challenge #1'
+author: "YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+### Take Home Challenge #1
+
+You are a summer RA reviewing some data the lab collected the previous summer. The dataset contains the physiological performance of five animal species subjected to an experiment on physiological performance. The authors collected metabolic, temperature, and movement speed data from separate trials. The columns are:
+
+`individual_id`: unique identification number of the individual animal
+`species`: species name and genus to which the individual belongs
+`temperature_C`: the body temperature of the individual at the time of the trial in Celsius
+`metabolic_rate_ml02_g_hr`: oxygen consumed by the individual during the trial in milliliters per gram of body mass per hour
+`spring_speed_cm_s`: movement speed of the individual during the trial
+
+Your supervisor has asked you some very specific questions about the data and you decided to give them a reproducible report with the answers.
+
+1. Create a new folder called `BIOL3401_THC1` somewhere on your computer and save or copy the `THC1_data.csv` file to the folder (note: you should do this step *outside* of R). Write the code needed to:
+
+a. Set the new folder (`BIOL3401_THC1`) as your working directory.
+b. Load the `THC1_data.csv` dataset directly from the folder, assigning it the name `trial_data`.
+
+```{r}
+
+```
+
+2. Create a new folder called `data` inside the `BIOL3401_THC1` folder (note: you should do this step outside of R). Save (write) the same `trial_data` to the new folder, saving it as `updated_trial_data.csv`. The datasets are identical for now, but you have set up a structure that can be used to automatically save any future updates to the file.
+
+```{r}
+
+```
+
+3. List the data *types* of the five columns:
+
+* `individual_id`: 
+* `species`: 
+* `temperature_C`:
+* `metabolic_rate_ml02_g_hr`: 
+* `sprint_speed_cm_s`: 
+
+4. Print the first 11 rows of the data using the `head()` function.
+
+```{r}
+
+```
+
+5. Create a new data frame called `mouse_data` with only observations from the species `Mus_musculus`.
+
+```{r}
+
+```
+
+6. Create a new data frame called `terrestrial_data` that does not include the species *Oncorhynchus mykiss*.
+
+```{r}
+
+```
+
+7. Use code to find the following two pieces of data:
+
+a. The metabolic rate of *Parus major* individual B08.
+b. All data from individual F02.
+
+Required submissions for this Take Home Challenge: 
+
+- your .Rmd
+- your output knitted as an HTML and saved to a PDF
+
