@@ -83,3 +83,8 @@ Your supervisor has asked you some very specific questions about the data and yo
   a. The metabolic rate of *Parus major* individual B08.
   b. All data from *Lithobates pipiens* individual F02.
 
+```{r}
+
+```
+
+
