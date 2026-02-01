@@ -1,0 +1,925 @@
+---
+title: "Data Visualization"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 4, Winter 2026"
+output: 
+  html_document:
+    df_print: kable
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+
+## Data Visualization
+
+One of the major advantages of using R for data analyses is that it is very easy to produce figures that are high quality for publication. Please visit <https://www.r-graph-gallery.com/> and the `ggplot2` cheat sheet on the Google Drive to get an idea for what the options and possibilities are.
+
+`ggplot2` (referred to simply as 'ggplot') is a `tidyverse` package that is basically the gold standard for plotting data when using R. The basic anatomy of a ggplot consists of the following elements:
+
+| Syntax     | Description                                          |
+|------------|------------------------------------------------------|
+| `ggplot()` | Creates a ggplot                                     |
+| `aes()`    | Constructs aesthetic mappings                        |
+| `+`        | Adds a component to your plot                        |
+| `geom_`    | Geometric object being used to set the plotting type |
+
+With these basic elements, you can create a high quality figure, and there are many aesthetic components you can add/change as well. The workflow for making a ggplot is typically an iterative process where you gradually refine your work towards your finished project.
+
+#### Step 0: Set up your R session for the day!
+
+```{r, eval = F}
+setwd("~/Desktop/MRU_Faculty/Teaching/Fall2025/Biol3401/Lectures/T06_dataViz")
+```
+
+Load our libraries:
+
+```{r}
+library(tidyverse)
+```
+
+And load our data:
+
+```{r}
+data <- read_delim("snails.csv")
+```
+
+#### Step 1: Explore & understand your data
+
+This data comes from an experiment on snail survival in different humidity & temperature treatments.
+
+```{r}
+head(data)
+
+summary(data)
+```
+
+Here, we have: 
+- the species of snail 
+- the exposure to the treatment level (in weeks) 
+- the relative humidity of the treatment (4 levels) 
+- the temperature of the treatment (in °C) 
+- the number of deaths in the specific treatment (count)
+- the number of snails each treatment started with (count)
+
+#### Step 2: Process & clean data
+
+Let's say we're interested in knowing the percentage of snails that survived in each treatment in the Purple-Ring Topsnail. We could do that calculation and create a new column in our data frame with `mutate()` that stores this information.
+
+```{r}
+snail_survival <- data %>%
+  rename(spp = Species, exp = Exposure, hum = Rel.Hum, temp = Temp, mort = Deaths, n = N) %>%
+  mutate(perc.surv = ((n - mort)/n)*100) %>%
+  filter(spp == "Purple-Ring Topsnail")
+```
+
+#### Let's plot some data!
+
+The first layer to specify when making figures is the global axes. These axes will apply to all layers that follow this first one. This is typically where you want to specify your main axes.
+
+```{r}
+ggplot(snail_survival, aes(x = temp, y = perc.surv))
+```
+
+As we can see, no data has been plotted! This is because we haven't told R in what format to plot it in. All we have specified is what to put on the x and y axes.
+
+We are interested in how different exposure treatments effect snail survival. So first lets make a box plot to show how the data is distributed in the different treatments. Box plots are great for showing the distribution of data and highlighting outliers.
+
+```{r}
+ggplot(snail_survival, aes(x = temp, y = perc.surv, fill = spp)) + 
+  geom_boxplot()
+```
+
+Hmm, that's not right. How many temperature treatments did we have? 
+
+```{r}
+snail_survival %>%
+  select(temp) %>%
+  distinct()
+```
+
+If you look at the x axis, there should be 3 categories, not one! Why is this?
+
+There are two ways R can deal with characters: as *characters* or as *factors*. Factors are a special kind of character type to represent categorical data. Factors can be useful, but also introduce some issues, which we can come back to. If you're interested in more information on factors, check it out [here](http://swcarpentry.github.io/r-novice-inflammation/12-supp-factors/).
+
+To fix this issue, we will make sure the exposure variable is being treated as a *factor* - we can do that using `mutate()`!
+
+```{r}
+snailed_it <- snail_survival %>%
+  mutate(temp = as_factor(temp))
+
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot()
+```
+
+That's better!
+
+#### Layering Geoms
+
+We have our first box plot! It's a good idea to add data distributions so that we can see everything, as some people feel like box plots don't sufficiently display data. We can stack another geometry argument on top of our box plot to display all our data points; in this case `geom_point()`.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_point()
+```
+
+Well... there are points. But it looks terrible. We can make the points "jitter" so they aren't placed all on top of each other.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_jitter()
+```
+
+Better. But this makes it really hard to tell which dots are which, because they're all black!
+
+`fill` changes the colour of the inside of an object, while `colour` changes the outline. Let's add colour to our aesthetics. To do this, we specify which column in our data frame will be used to specify the different colour groups.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp, colour = temp)) +
+  geom_boxplot() + 
+  geom_jitter()
+```
+
+Terrible. Do you notice how the lines on the box plot changed too?? 
+
+Plus, we can't see data because everything is the same colour! Luckily, we can change the aesthetics within individual geoms - so let's move the `colour` argument to the `geom_jitter` function.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(colour = temp))
+```
+
+#### Organizing layers
+
+Getting there! But, it's annoying that the points are above the box plot and it looks messy. We can adjust that by changing the order of the layers while building the plot. The order of our geom arguments is the order they will be layered on our plots.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot() 
+```
+
+#### Alpha
+
+Now the box plot is back in front of the points, but it's still blocking our data. To fix this, we can change the opacity with an `alpha` argument in our box plot geometry. An alpha of 1 is completely opaque whereas an alpha of 0 is transparent. Let's just step back a little on the opacity of the box plot:
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) 
+```
+
+#### Changing colours
+
+Looks good now! But what if we want to change our colours? You can make a colour variable that you associate with your data, which is a fun way to practice creating variables again. Since temperature usually has pretty common colours associated with it (blue = cold, red = hot), we can make the colours of our boxplots match our treatment!
+
+Colour is an effective tool in visual story telling, but it's also very subjective and we should always be mindful of how people interpret colour. There are some great colour packages out there that take into account how different palettes are interpreted by people with differing abilities to distinguish colours (try the packages `viridis`, `colorBlindness`, or `RColorBrewer`).
+
+```{r}
+my_cols <- c("10" = "lightskyblue", "15" = "goldenrod", "20" = "tomato")
+```
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols)
+```
+
+
+### **Mini Challenge 1**
+
+1. Pick any other two hex colour code (websites like https://htmlcolorcodes.com/ can help you pick your codes, or Googling 'R colour palettes') and create a new colour object called `my_cols_2`. Use these colours on the previous plot.
+
+
+Use the code block below to code your answer! 
+```{r}
+
+```
+
+
+
+
+
+
+###-----------------------------------------------------
+
+```{r}
+my_cols_2 <- c("10" = "#2B827B", "15" = "#827B2B", "20" = "#822B32")
+
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols_2) +
+  scale_fill_manual(values = my_cols_2)
+```
+
+
+
+#### Themes
+
+One of the easiest ways of making your figures look more professional/less "cookie cutter" is to change the theme. I like a cleaner, simpler look. There are a few different theme options that you can explore, but I prefer to start with `classic()`.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic()
+```
+
+We can also change where the legend is positioned. Currently it is off to the right side but we can change that with the `theme()` argument.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() + 
+  theme(legend.position = "top")
+```
+
+#### Labelling the axes
+
+While the column names in our data set are easy to code with, they don't look great on the axes, do they? We can re-label the axes so they are easier and clearer to read.
+
+### **Mini Challenge 2**
+
+1. Change the code below to so the placeholder labels are meaningful a.k.a. communicate the correct information for each label.
+
+2. Also change the code below to get rid of the legend, rather than having it at the top of the figure (hint: how can you *ask for help in R*?)
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() +
+  theme(legend.position = "top") + 
+  labs(x = "X axis label here", y = "Y axis label here", 
+       color = "Colour label here", 
+       fill = "Fill label here") 
+```
+
+
+
+
+
+
+
+
+
+
+###-----------------------------------------------------
+
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)")
+```
+
+#### Faceting
+
+This is an element of visually subsetting your data, again, without messing up your raw data. We can separate the way our data is displayed using a facet. A `facet_wrap` is used for separating by one variable, and a `facet_grid` is used if you want to separate by 2 variables.
+
+We could want to see what the interactive effect of temperature and humidity is on survival:
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+```
+
+That is a NICE figure! 
+
+We are so close to the final touch on this figure. Last thing - there are these weird grey dots on the boxplots. 
+
+These are outliers identified by the `geom_boxplot()` function, but those data points are part of the raw data plotted with `geom_jitter()`. By having BOTH of these data points on the figure, we're double-plotting the same individual(s) when we don't need to. Let's make one small tweak to our boxplot to get rid of this: 
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+```
+
+This new addition to the `geom_boxplot()` function assigned our outliers as NAs so they wouldn't be plotted - but it didn't impact how the `geom_jitter()` function plotted the data! Now we have a nice, clean figure that we've put a lot of effort into.
+
+#### Saving your plot
+
+You can save your plot but first we need to make a plot object, or we can't tell R *which* plot to save very easily. You can assign a plot to a new object with the classic `<-` operator and then to see the plot output you need to call the plot object
+
+```{r}
+pretty_boxplot <- ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+
+pretty_boxplot
+```
+
+
+There are many options within `ggsave` as to how to save your plot. I recommend saving files in a vector format (.png for example) as these are easier to resize and touch up for different aesthetics in something like Adobe Illustrator. You can also use a .png which be used for changing resolutions. Within `ggsave` you can change the width and height as well to make sure the size and shape of your plot is exactly what you want.
+
+```{r}
+ggsave(plot = pretty_boxplot, filename = "pretty_boxplot.pdf")
+```
+
+You can also save it with the "Export" button in the Plots pane!
+
+
+### **More types of visualizations**
+
+#### Histograms
+
+Now that we know how the different layers work within `ggplot`, altering our code to make a histogram is very simple. Instead of `geom_boxplot()` we will use `geom_histogram()`. With a histogram, we also only need to specify the x-axis, as the y-axis will automatically become the count.
+
+Lets make a histogram of the snail percent survival.
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram()
+```
+
+With histograms we can also change the number of bars with the argument `bins`. We can also change the colour of all our bars using a fill argument, but if we just want to change all the bins and not base the fill on a column in our data frame, this will just go in the `geom_histogram` layer and not in an aesthetic argument (like we did in the box plot).
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram(color = "black", fill = "skyblue", bins = 15)
+```
+
+### **Mini Challenge 3**
+
+Now lets make this plot a bit prettier. Copy and paste the code above into the code chunk below, and do the following:
+
+1.  Customized x and y labels
+
+2.  *Fill* all the bars with the colour "#127d76".
+
+3.  Add our favourite theme, `theme_classic()`
+
+Use the code chunk below to code your answer!
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------
+
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram(color = "black", fill = "#127d76", bins = 15) + 
+  labs(x = "Percent Survival (%)", y = "Count") + 
+  theme_classic()
+```
+
+
+
+#### Interval Plot
+
+Let's make an interval plot of these data to display the means +/- standard error. R can do the mean and standard error calculations for us(!) directly in the plot, so we don't have to bother ourselves with doing extra calculations. 
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv)) + 
+  stat_summary(fun = mean, geom = "point") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.3) + 
+  labs(x = "Temperature (°C)", y = "Mean Survival (%)") + 
+  theme_bw()
+```
+
+
+#### Scatter Plot
+
+One final plot type you are definitely going to encounter (and probably want to make at some point!) is a scatter plot. This is a great visualization for two continuous variables, so let's use our `iris` data set to try this out. 
+
+```{r}
+iris <- read_delim("iris.csv")
+
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
+  geom_point() +
+  theme_classic()
+```
+
+One final thing you may want to do is add a line of best fit to your plot.
+
+```{r}
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
+  geom_point() +
+  theme_classic() +
+  geom_smooth(method = "lm")
+```
+
+So pretty! Enjoy making beautiful plots.
+
+---
+title: "Biol 3401 T06 - Data Visualization"
+author: "Dr. Sara J. Smith"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    df_print: kable
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+## **Learning Outcomes**
+
+After completing this topic, you should feel comfortable:
+
+1.  Creating a variety of appropriate data visualizations to effectively communicate patterns and trends in biological data.
+2.  Interpreting ecological and biological plots to identify trends, outliers, and relationships among variables.
+3.  Evaluating the suitability of different graph types for representing specific data structures and scientific questions.
+
+## Data Visualization
+
+One of the major advantages of using R for data analyses is that it is very easy to produce figures that are high quality for publication. Please visit <https://www.r-graph-gallery.com/> and the `ggplot2` cheat sheet on the Google Drive to get an idea for what the options and possibilities are.
+
+`ggplot2` (referred to simply as 'ggplot') is a `tidyverse` package that is basically the gold standard for plotting data when using R. The basic anatomy of a ggplot consists of the following elements:
+
+| Syntax     | Description                                          |
+|------------|------------------------------------------------------|
+| `ggplot()` | Creates a ggplot                                     |
+| `aes()`    | Constructs aesthetic mappings                        |
+| `+`        | Adds a component to your plot                        |
+| `geom_`    | Geometric object being used to set the plotting type |
+
+With these basic elements, you can create a high quality figure, and there are many aesthetic components you can add/change as well. The workflow for making a ggplot is typically an iterative process where you gradually refine your work towards your finished project.
+
+#### Step 0: Set up your R session for the day!
+
+```{r, eval = F}
+setwd("~/Desktop/MRU_Faculty/Teaching/Fall2025/Biol3401/Lectures/T06_dataViz")
+```
+
+Load our libraries:
+
+```{r}
+library(tidyverse)
+```
+
+And load our data:
+
+```{r}
+data <- read_delim("snails.csv")
+```
+
+#### Step 1: Explore & understand your data
+
+This data comes from an experiment on snail survival in different humidity & temperature treatments.
+
+```{r}
+head(data)
+
+summary(data)
+```
+
+Here, we have: 
+- the species of snail 
+- the exposure to the treatment level (in weeks) 
+- the relative humidity of the treatment (4 levels) 
+- the temperature of the treatment (in °C) 
+- the number of deaths in the specific treatment (count)
+- the number of snails each treatment started with (count)
+
+#### Step 2: Process & clean data
+
+Let's say we're interested in knowing the percentage of snails that survived in each treatment in the Purple-Ring Topsnail. We could do that calculation and create a new column in our data frame with `mutate()` that stores this information.
+
+```{r}
+snail_survival <- data %>%
+  rename(spp = Species, exp = Exposure, hum = Rel.Hum, temp = Temp, mort = Deaths, n = N) %>%
+  mutate(perc.surv = ((n - mort)/n)*100) %>%
+  filter(spp == "Purple-Ring Topsnail")
+```
+
+#### Let's plot some data!
+
+The first layer to specify when making figures is the global axes. These axes will apply to all layers that follow this first one. This is typically where you want to specify your main axes.
+
+```{r}
+ggplot(snail_survival, aes(x = temp, y = perc.surv))
+```
+
+As we can see, no data has been plotted! This is because we haven't told R in what format to plot it in. All we have specified is what to put on the x and y axes.
+
+We are interested in how different exposure treatments effect snail survival. So first lets make a box plot to show how the data is distributed in the different treatments. Box plots are great for showing the distribution of data and highlighting outliers.
+
+```{r}
+ggplot(snail_survival, aes(x = temp, y = perc.surv, fill = spp)) + 
+  geom_boxplot()
+```
+
+Hmm, that's not right. How many temperature treatments did we have? 
+
+```{r}
+snail_survival %>%
+  select(temp) %>%
+  distinct()
+```
+
+If you look at the x axis, there should be 3 categories, not one! Why is this?
+
+There are two ways R can deal with characters: as *characters* or as *factors*. Factors are a special kind of character type to represent categorical data. Factors can be useful, but also introduce some issues, which we can come back to. If you're interested in more information on factors, check it out [here](http://swcarpentry.github.io/r-novice-inflammation/12-supp-factors/).
+
+To fix this issue, we will make sure the exposure variable is being treated as a *factor* - we can do that using `mutate()`!
+
+```{r}
+snailed_it <- snail_survival %>%
+  mutate(temp = as_factor(temp))
+
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot()
+```
+
+That's better!
+
+#### Layering Geoms
+
+We have our first box plot! It's a good idea to add data distributions so that we can see everything, as some people feel like box plots don't sufficiently display data. We can stack another geometry argument on top of our box plot to display all our data points; in this case `geom_point()`.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_point()
+```
+
+Well... there are points. But it looks terrible. We can make the points "jitter" so they aren't placed all on top of each other.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_jitter()
+```
+
+Better. But this makes it really hard to tell which dots are which, because they're all black!
+
+`fill` changes the colour of the inside of an object, while `colour` changes the outline. Let's add colour to our aesthetics. To do this, we specify which column in our data frame will be used to specify the different colour groups.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp, colour = temp)) +
+  geom_boxplot() + 
+  geom_jitter()
+```
+
+Terrible. Do you notice how the lines on the box plot changed too?? 
+
+Plus, we can't see data because everything is the same colour! Luckily, we can change the aesthetics within individual geoms - so let's move the `colour` argument to the `geom_jitter` function.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(colour = temp))
+```
+
+#### Organizing layers
+
+Getting there! But, it's annoying that the points are above the box plot and it looks messy. We can adjust that by changing the order of the layers while building the plot. The order of our geom arguments is the order they will be layered on our plots.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot() 
+```
+
+#### Alpha
+
+Now the box plot is back in front of the points, but it's still blocking our data. To fix this, we can change the opacity with an `alpha` argument in our box plot geometry. An alpha of 1 is completely opaque whereas an alpha of 0 is transparent. Let's just step back a little on the opacity of the box plot:
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) 
+```
+
+#### Changing colours
+
+Looks good now! But what if we want to change our colours? You can make a colour variable that you associate with your data, which is a fun way to practice creating variables again. Since temperature usually has pretty common colours associated with it (blue = cold, red = hot), we can make the colours of our boxplots match our treatment!
+
+Colour is an effective tool in visual story telling, but it's also very subjective and we should always be mindful of how people interpret colour. There are some great colour packages out there that take into account how different palettes are interpreted by people with differing abilities to distinguish colours (try the packages `viridis`, `colorBlindness`, or `RColorBrewer`).
+
+```{r}
+my_cols <- c("10" = "lightskyblue", "15" = "goldenrod", "20" = "tomato")
+```
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols)
+```
+
+
+### **Mini Challenge 1**
+
+1. Pick any other two hex colour code (websites like https://htmlcolorcodes.com/ can help you pick your codes, or Googling 'R colour palettes') and create a new colour object called `my_cols_2`. Use these colours on the previous plot.
+
+
+Use the code block below to code your answer! 
+```{r}
+
+```
+
+
+
+
+
+
+###-----------------------------------------------------
+
+```{r}
+my_cols_2 <- c("10" = "#2B827B", "15" = "#827B2B", "20" = "#822B32")
+
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols_2) +
+  scale_fill_manual(values = my_cols_2)
+```
+
+
+
+#### Themes
+
+One of the easiest ways of making your figures look more professional/less "cookie cutter" is to change the theme. I like a cleaner, simpler look. There are a few different theme options that you can explore, but I prefer to start with `classic()`.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic()
+```
+
+We can also change where the legend is positioned. Currently it is off to the right side but we can change that with the `theme()` argument.
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() + 
+  theme(legend.position = "top")
+```
+
+#### Labelling the axes
+
+While the column names in our data set are easy to code with, they don't look great on the axes, do they? We can re-label the axes so they are easier and clearer to read.
+
+### **Mini Challenge 2**
+
+1. Change the code below to so the placeholder labels are meaningful a.k.a. communicate the correct information for each label.
+
+2. Also change the code below to get rid of the legend, rather than having it at the top of the figure (hint: how can you *ask for help in R*?)
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() +
+  theme(legend.position = "top") + 
+  labs(x = "X axis label here", y = "Y axis label here", 
+       color = "Colour label here", 
+       fill = "Fill label here") 
+```
+
+
+
+
+
+
+
+
+
+
+###-----------------------------------------------------
+
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)")
+```
+
+#### Faceting
+
+This is an element of visually subsetting your data, again, without messing up your raw data. We can separate the way our data is displayed using a facet. A `facet_wrap` is used for separating by one variable, and a `facet_grid` is used if you want to separate by 2 variables.
+
+We could want to see what the interactive effect of temperature and humidity is on survival:
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+```
+
+That is a NICE figure! 
+
+We are so close to the final touch on this figure. Last thing - there are these weird grey dots on the boxplots. 
+
+These are outliers identified by the `geom_boxplot()` function, but those data points are part of the raw data plotted with `geom_jitter()`. By having BOTH of these data points on the figure, we're double-plotting the same individual(s) when we don't need to. Let's make one small tweak to our boxplot to get rid of this: 
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+```
+
+This new addition to the `geom_boxplot()` function assigned our outliers as NAs so they wouldn't be plotted - but it didn't impact how the `geom_jitter()` function plotted the data! Now we have a nice, clean figure that we've put a lot of effort into.
+
+#### Saving your plot
+
+You can save your plot but first we need to make a plot object, or we can't tell R *which* plot to save very easily. You can assign a plot to a new object with the classic `<-` operator and then to see the plot output you need to call the plot object
+
+```{r}
+pretty_boxplot <- ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
+  geom_jitter(aes(colour = temp)) + 
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  facet_wrap(~ hum) +
+  theme_classic() +
+  theme(legend.position = "none") + 
+  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
+
+pretty_boxplot
+```
+
+
+There are many options within `ggsave` as to how to save your plot. I recommend saving files in a vector format (.png for example) as these are easier to resize and touch up for different aesthetics in something like Adobe Illustrator. You can also use a .png which be used for changing resolutions. Within `ggsave` you can change the width and height as well to make sure the size and shape of your plot is exactly what you want.
+
+```{r}
+ggsave(plot = pretty_boxplot, filename = "pretty_boxplot.pdf")
+```
+
+You can also save it with the "Export" button in the Plots pane!
+
+
+### **More types of visualizations**
+
+#### Histograms
+
+Now that we know how the different layers work within `ggplot`, altering our code to make a histogram is very simple. Instead of `geom_boxplot()` we will use `geom_histogram()`. With a histogram, we also only need to specify the x-axis, as the y-axis will automatically become the count.
+
+Lets make a histogram of the snail percent survival.
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram()
+```
+
+With histograms we can also change the number of bars with the argument `bins`. We can also change the colour of all our bars using a fill argument, but if we just want to change all the bins and not base the fill on a column in our data frame, this will just go in the `geom_histogram` layer and not in an aesthetic argument (like we did in the box plot).
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram(color = "black", fill = "skyblue", bins = 15)
+```
+
+### **Mini Challenge 3**
+
+Now lets make this plot a bit prettier. Copy and paste the code above into the code chunk below, and do the following:
+
+1.  Customized x and y labels
+
+2.  *Fill* all the bars with the colour "#127d76".
+
+3.  Add our favourite theme, `theme_classic()`
+
+Use the code chunk below to code your answer!
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------
+
+
+```{r}
+ggplot(snailed_it, aes(x = perc.surv)) +
+  geom_histogram(color = "black", fill = "#127d76", bins = 15) + 
+  labs(x = "Percent Survival (%)", y = "Count") + 
+  theme_classic()
+```
+
+
+
+#### Interval Plot
+
+Let's make an interval plot of these data to display the means +/- standard error. R can do the mean and standard error calculations for us(!) directly in the plot, so we don't have to bother ourselves with doing extra calculations. 
+
+```{r}
+ggplot(snailed_it, aes(x = temp, y = perc.surv)) + 
+  stat_summary(fun = mean, geom = "point") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.3) + 
+  labs(x = "Temperature (°C)", y = "Mean Survival (%)") + 
+  theme_bw()
+```
+
+
+#### Scatter Plot
+
+One final plot type you are definitely going to encounter (and probably want to make at some point!) is a scatter plot. This is a great visualization for two continuous variables, so let's use our `iris` data set to try this out. 
+
+```{r}
+iris <- read_delim("iris.csv")
+
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
+  geom_point() +
+  theme_classic()
+```
+
+One final thing you may want to do is add a line of best fit to your plot.
+
+```{r}
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
+  geom_point() +
+  theme_classic() +
+  geom_smooth(method = "lm")
+```
+
+So pretty! Enjoy making beautiful plots.
+
