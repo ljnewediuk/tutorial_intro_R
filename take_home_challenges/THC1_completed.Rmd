@@ -1,0 +1,106 @@
+---
+title: "Take-home Challenge 1"
+author: "Levi Newediuk"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+### Take-home Challenge 1
+
+### Your task
+
+You are a summer RA reviewing some data the lab collected the previous summer. The dataset contains the physiological performance of five animal species subjected to an experiment on physiological performance. The authors collected metabolic, temperature, and movement speed data from separate trials. The columns are:
+
+`individual_id`: unique identification number of the individual animal
+`species`: species name and genus to which the individual belongs
+`temperature_C`: the body temperature of the individual at the time of the trial in Celsius
+`metabolic_rate_ml02_g_hr`: oxygen consumed by the individual during the trial in milliliters per gram of body mass per hour
+`spring_speed_cm_s`: movement speed of the individual during the trial
+
+Your supervisor has asked you some very specific questions about the data and you decided to give them a reproducible report with the answers.
+
+1. **(2 pts)** 
+
+- 1 pt for correctly setting working directory
+- 1 pt for loading the data
+
+[ANNOTATION - SETTING WORKING DIRECTORY AND LOADING DATA]
+
+```{r}
+# Setting working directory
+setwd("/Users/levi/Documents/R-Projects/tutorial_intro_R/datasets/")
+# Loading the data
+trial_data <- read.csv("THC1_data.csv")
+```
+
+2. **(1.5 pts)** 
+
+- 1.5 pts for running the code (this assumes the folder was created correctly)
+
+[ANNOTATION - SET WD TO NEW FOLDER AND SAVE THE FILE AS AN UPDATE]
+
+```{r, eval = FALSE}
+# Saving the data
+write.csv(trial_data, "data/updated_trial_data.csv")
+```
+
+3. **(1 pt)** List the data *types* of the five columns:
+
+- 0.2 pts each 
+
+* `individual_id`: **Character**
+* `species`: **Character**
+* `temperature_C`: **Integer**/**Numeric**
+* `metabolic_rate_ml02_g_hr`: **Numeric**
+* `sprint_speed_cm_s`: **Integer**/**Numeric**
+
+4. **(1.5 pts)** 
+
+[ANNOTATION - PRINT FIRST 11 ROWS OF DATA]
+
+- 0.5 pts for correct function
+- 1 pt for specifying 11 rows
+
+```{r}
+head(trial_data, n = 11)
+```
+
+5. **(1.5 pts)**
+
+- 1.5 pts for correct code
+- Remove 0.25 pts for each missing/incorrect element (e.g., comma)
+
+[ANNOTATION - CREATE NEW DATA WITH ONLY MOUSE DATA]
+
+```{r}
+mouse_data <- trial_data[trial_data$species == "Mus musculus" ,]
+```
+
+6. **(1.5 pts)**
+
+- 1.5 pts for correct code
+- Remove 0.25 pts for each missing/incorrect element (e.g., comma)
+
+[ANNOTATION - CREATE NEW DATA WITHOUT SALMON DATA]
+
+```{r}
+terrestrial_data <- trial_data[trial_data$species != "Oncorhynchus mykiss" ,]
+```
+
+7. **(1 pt)**
+
+[ANNOTATION - FINDING THE METABOLIC RATE OF BO8 AND ALL DATA FROM F02]
+
+- 0.5 pts each (any approach is fine)
+
+
+```{r}
+trial_data[24, ][4]
+trial_data[9 ,]
+```
+
+
