@@ -151,3 +151,25 @@ msleep %>%
 
 ggsave("imgs/bad_binned_plot.svg", width = 8, height = 5, device = "svg")
 
+msleep %>%
+  ggplot(aes(x = bodywt, y = sleep_total, colour = order)) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = c("#FF0000", "#FF5100", "#FFA100", "#FFF200", 
+                                 "#BCFF00", "#6BFF00", "#1BFF00", "#00FF36", 
+                                 "#00FF86", "#00FFD7", "#00D7FF", "#0086FF",
+                                 "#0036FF", "#1B00FF", "#6B00FF", "#BC00FF",
+                                 "#FF00F2", "#FF00A1", "#FF0051")) +
+  theme(panel.background = element_rect(colour = 'black', fill = 'lightgrey', linewidth = 2),
+        panel.grid = element_blank(),
+        plot.margin = unit(c(0.5, 0.5, 1, 1), 'cm'),
+        axis.title.x = element_text(size = 18, colour = 'black', vjust = -5),
+        axis.title.y = element_text(size = 18, colour = 'black', vjust = 5),
+        axis.text = element_text(size = 18, colour = 'black'),
+        legend.text = element_text(size = 14, colour = 'black'),
+        legend.title = element_text(size = 18, colour = 'black', vjust = 5),
+        legend.key.height = unit(.6, 'cm'),
+        legend.key.width = unit(.6, 'cm'),
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  labs(x = "Log body weight (Kg)", y = "Total sleep (hours)")
+
+ggsave("imgs/bad_rainbow_plot.svg", width = 8, height = 5, device = "svg")
