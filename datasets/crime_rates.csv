@@ -1,5 +1,4 @@
-Year,Violent crime (per 100 000),Property crime (per 100 000),,
-Canada,United States,Canada,United States,
+year,violent_crime_per100K_US,violent_crime_per100K_CA,property_crime_per_100K_CA,property_crime_per100K_US
 1998,246,533,"4,158","4,052"
 1999,243,490,"3,882","3,744"
 2000,245,474,"3,708","3,618"
@@ -23,6 +22,5 @@ Canada,United States,Canada,United States,
 2018,191,339,"2,155","2,247"
 2019,204,333,"2,220","2,132"
 2020,207,356,"1,771","1,954"
-2021,218,..not available for a specific reference period,"1,729",..not available for a specific reference period
 2022,235,346,"1,969","1,969"
 2023,252,334,"1,995","1,906"
