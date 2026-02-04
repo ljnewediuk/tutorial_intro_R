@@ -5,6 +5,11 @@ library(tidyverse)
 # Load elephant data
 dino_data <- read_table('datasets/dinosaurs.tsv')
 
+# Get mammal sleep data
+data("msleep")
+# Log body weight
+msleep$bodywt <- log(msleep$bodywt)
+
 # Simulate some data
 sim_dat <- data.frame(x = rnorm(20, mean = 5, sd = 3)) %>%
   mutate(a = -5 + x * 3 + rnorm(length(x), 0, 3),
@@ -38,6 +43,7 @@ sim_dat %>%
                                      levels = c('c', 'a', 'e', 'b', 'd'),
                                      labels = c('> 100 km', '80-99 km', '50-79 km', '30-49 km', '10-29 km'))) %>%
   ggplot(aes(x = x, y = value)) +
+  geom_point(size = 0.75) +
   geom_smooth(aes(colour = `Coastal distance`, fill = `Coastal distance`), size = 1, method = 'lm') +
   scale_colour_brewer(palette = 'Blues', direction = -1) +
   scale_fill_brewer(palette = 'Blues', direction = -1) +
@@ -53,11 +59,10 @@ sim_dat %>%
         legend.title = element_text(size = 14, colour = 'black', vjust = 5),
         legend.key.height = unit(.6, 'cm'),
         legend.key.width = unit(.6, 'cm'),
-        legend.position = "inside",
-        legend.position.inside = c(.7,.7),
+        legend.position = "right",
         legend.background = element_rect(colour = NA, fill = NA)) 
 
-ggsave("imgs/good_lake_plot.svg", width = 6, height = 5, device = "svg")
+ggsave("imgs/good_lake_plot.svg", width = 7, height = 5, device = "svg")
 
 # Bad dino plot
 dino_data %>%
@@ -102,3 +107,47 @@ dino_data %>%
         legend.background = element_rect(colour = NA, fill = NA)) 
 
 ggsave("imgs/good_dino_plot.svg", width = 8, height = 5, device = "svg")
+
+# Binned plot
+msleep %>%
+  ggplot(aes(x = bodywt, y = sleep_total, colour = order)) +
+  geom_point(size = 3) +
+  scale_colour_viridis_d() +
+  theme(panel.background = element_rect(colour = 'black', fill = 'lightgrey', linewidth = 2),
+        panel.grid = element_blank(),
+        plot.margin = unit(c(0.5, 0.5, 1, 1), 'cm'),
+        axis.title.x = element_text(size = 18, colour = 'black', vjust = -5),
+        axis.title.y = element_text(size = 18, colour = 'black', vjust = 5),
+        axis.text = element_text(size = 18, colour = 'black'),
+        legend.text = element_text(size = 14, colour = 'black'),
+        legend.title = element_text(size = 18, colour = 'black', vjust = 5),
+        legend.key.height = unit(.6, 'cm'),
+        legend.key.width = unit(.6, 'cm'),
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  labs(x = "Log body weight (Kg)", y = "Total sleep (hours)")
+
+ggsave("imgs/good_binned_plot.svg", width = 8, height = 5, device = "svg")
+
+msleep %>%
+  mutate(wt_bin = case_when(bodywt < -2.5 ~ "Light",
+                            bodywt >= -2.5 & bodywt < 0 ~ "Medium",
+                            bodywt >= 0 & bodywt < 2.5 ~ "Heavy",
+                            bodywt >= 2.5 ~ "Heaviest")) %>%
+  ggplot(aes(x = wt_bin, y = sleep_total, fill = wt_bin)) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis_d(name = "Relative weight") +
+  theme(panel.background = element_rect(colour = 'black', fill = 'lightgrey', linewidth = 2),
+        panel.grid = element_blank(),
+        plot.margin = unit(c(0.5, 0.5, 1, 1), 'cm'),
+        axis.title.x = element_text(size = 18, colour = 'black', vjust = -5),
+        axis.title.y = element_text(size = 18, colour = 'black', vjust = 5),
+        axis.text = element_text(size = 18, colour = 'black'),
+        legend.text = element_text(size = 14, colour = 'black'),
+        legend.title = element_text(size = 18, colour = 'black', vjust = 5),
+        legend.key.height = unit(.6, 'cm'),
+        legend.key.width = unit(.6, 'cm'),
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  labs(x = "Log body weight (Kg)", y = "Total sleep (hours)")
+
+ggsave("imgs/bad_binned_plot.svg", width = 8, height = 5, device = "svg")
+
