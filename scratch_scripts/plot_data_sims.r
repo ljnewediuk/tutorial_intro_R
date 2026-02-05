@@ -1,4 +1,6 @@
 
+library(tidyverse)
+
 # 1 - Scatterplot data (cell size and ATP production)
 # Explanatory: Cell size 
 # Response: Metabolic rate
@@ -61,7 +63,80 @@ cortisol_data %>%
 # Response: Heart rate
 # Groups for additional comparison: Fitness level
 
+set.seed(91011)
+
+# minutes post-exercise
+time <- seq(0, 20, by = 1)  
+
+fitness_levels <- c("Low", "Moderate", "High")
+
+recovery_data <- lapply(fitness_levels, function(fit) {
+  
+  resting_hr <- switch(fit,
+                       "Low" = 75,
+                       "Moderate" = 65,
+                       "High" = 55)
+  
+  recovery_rate <- switch(fit,
+                          "Low" = 0.08,
+                          "Moderate" = 0.12,
+                          "High" = 0.18)
+  
+  peak_hr <- 170
+  
+  heart_rate <- resting_hr +
+    (peak_hr - resting_hr) * exp(-recovery_rate * time) +
+    rnorm(length(time), 0, 3)
+  
+  data.frame(
+    time_min = time,
+    heart_rate_bpm = heart_rate,
+    fitness_level = fit
+  )
+})
+
+recovery_data <- do.call(rbind, recovery_data)
+
+# Plot
+recovery_data %>%
+  ggplot(aes(x = time_min, y = heart_rate_bpm, group = fitness_level)) + 
+  geom_line()
+
 # 4 - Bar chart data (survival counts across fish stocking treatments)
 # Explanatory: Stocking density
 # Response: Proportion surviving
+
+set.seed(101112)
+
+densities <- c("Low", "Medium", "High", "Very high")
+environments <- c("Artificial tank", "Natural pond")
+
+fish_data <- expand.grid(
+  density = densities,
+  environment = environments
+)
+
+# Number stocked per tank
+fish_data$n_stocked <- 100
+
+# Survival probabilities
+survival_prob <- with(
+  fish_data, ifelse(environment == "Artificial tank",
+                    c(Low = 0.85, Medium = 0.65, High = 0.40, `Very high` = 0.15)[density],
+                    c(Low = 0.90, Medium = 0.85, High = 0.70, `Very high` = 0.55)[density])
+)
+
+fish_data$n_survived <- rbinom(
+  nrow(fish_data),
+  size = fish_data$n_stocked,
+  prob = survival_prob
+)
+
+fish_data$survival_proportion <- fish_data$n_survived / fish_data$n_stocked
+
+# Plot
+fish_data %>%
+  ggplot(aes(x = density, y = survival_proportion)) + 
+  geom_bar(stat = "identity") + 
+  facet_wrap(~ environment)
 
