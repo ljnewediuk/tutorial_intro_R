@@ -47,75 +47,82 @@ setwd()
 ## Step 1b: Load packages
 
 ```{r, message = F}
-# Load tidyverse (ggplot2 is a part of the tidyverse)
+# Load tidyverse (ggplot2 is a part of the tidyverse, so you already have it installed)
 library(tidyverse) 
 ```
 
-And load our data:
+## Step 1c: Load data
+
+We are using four datasets today. All four are .csv files. We are going to use them to create four different plots, visualizing the patterns and adding new ggplot2 elements as we go. The datasets are as follows:
+
+* **cell_metabolism.csv**: Contains 150 observations from three human cell types. We are going to use the data to visualize the relationship between cell size and metabolic rate.
+  * cell_type: The type of cell (epithelial, neuron, or muscle)
+  * length_um: The length of the cell in micrometers
+  * metabolic_rate_pmol_min: The metabolic rate of the cell in picomoles per minute
+* **cortisol_stress.csv**: Contains 240 observations from an experiment where human subjects experienced stressor "treatments", and then blood samples were taken to measure their circulating blood cortisol (stress hormone). We are going to use the data to visualize the relationship between human exposure to stressors and stress levels.
+  * treatment: The stressor the subject was exposed to (Control, Heat stress, or Diet restriction)
+  * sex: M (male) or F (female) subjects
+  * cortisol_ng_ml: The concentration of circulating blood cortisol after exposure to the stressor in nanograms per millileter
+* **exercise_recovery.csv**: Contains 63 observations of human heart rates following exercise. We are going to use the data to visualize cardiovascular recovery over time.
+  * time_min: Time since stopping exercise in minutes
+  * heart_rate_bpm: Heart rate of the subject in beats per minute
+  * fitness_level: Relative fitness level of the subject (Low, Moderate, or High)
+* **fish_stocking.csv**: Contains 8 observations of fish survival under different hatchery stocking densities (fish per m^2). We are going to use the data to compare survival by stocking density.
+  * density: The density treatment where the fish were stocked (Low, Medium, High, or Very High)
+  * environment: The setting where the fish was stocked (Artificial tank or Natural pond)
+  * n_stocked: Number of fish stocked in the treatment
+  * n_survived: The number of fish that survived out of those that were stocked
+  * survival_proportion: The proportion of surviving fish out of those that were stocked
+  
+Let's load the datasets now! Finish the `read_csv()` functions.
 
 ```{r}
-data <- read_delim("datasets/snails.csv")
+# Load the cell_metabolism.csv data
+cell_data <- read_csv()
+# Load the cortisol_stress.csv data
+cortisol_data <- read_csv()
+# Load the exercise_recovery.csv data
+recovery_data <- read_csv()
+# Load the fish_stocking.csv data
+fish_data <- read_csv()
 ```
 
-#### Step 1: Explore & understand your data
+# 2 - Construct a basic scatterplot
 
-This data comes from an experiment on snail survival in different humidity & temperature treatments.
+We are going to start with cell_data. We are going to construct a scatterplot to visualize the relationship between cell size and metabolic rate.
+
+## Step 2a: ggplot2 basics
+
+The first layer to specify when making figures is the global axes. These axes will apply to all layers that follow this first one. This is typically where you want to specify your main axes (in the aesthecic) and the dataset.
 
 ```{r}
-head(data)
-
-summary(data)
+ggplot(cell_data, aes(x = length_um, y = metabolic_rate_pmol_min))
 ```
 
-Here, we have: 
-- the species of snail 
-- the exposure to the treatment level (in weeks) 
-- the relative humidity of the treatment (4 levels) 
-- the temperature of the treatment (in °C) 
-- the number of deaths in the specific treatment (count)
-- the number of snails each treatment started with (count)
+As we can see, there are axes, but no data has been plotted! This is because we haven't told R in what *layers* (`geoms`) we want to plot it in. All we have specified is what to put on the x and y axes.
 
-#### Step 2: Process & clean data
-
-Let's say we're interested in knowing the percentage of snails that survived in each treatment in the Purple-Ring Topsnail. We could do that calculation and create a new column in our data frame with `mutate()` that stores this information.
+We are interested in the relationship between cell size and metabolic rate, both of which are continuous variables. This is a perfect application for a `geom_point()` (scatterplot).
 
 ```{r}
-snail_survival <- data %>%
-  rename(spp = Species, exp = Exposure, hum = Rel.Hum, temp = Temp, mort = Deaths, n = N) %>%
-  mutate(perc.surv = ((n - mort)/n)*100) %>%
-  filter(spp == "Purple-Ring Topsnail")
+ggplot(cell_data, aes(x = length_um, y = metabolic_rate_pmol_min)) + 
+  geom_point()
 ```
 
-#### Let's plot some data!
+Something doesn't seem quite right here. Why do we have a stack of points lined up around zero length?
 
-The first layer to specify when making figures is the global axes. These axes will apply to all layers that follow this first one. This is typically where you want to specify your main axes.
+This is actually quite a common problem when we plot data like sizes, masses, distances, volumes, etc. because they can often vary by orders of magnitude. The issue is that the length_um variable needs to be *rescaled* to prevent the very large cells from overwhelming the plot. We are going to adjust the axis to a *natural log scale* by using the `log()` function. We could use `log()` within the `mutate()` function to add a column to the data with logged lengths, but ggplot2 actually makes it possible to do that within the aesthetic.
 
 ```{r}
-ggplot(snail_survival, aes(x = temp, y = perc.surv))
+ggplot(cell_data, aes(x = log(length_um), y = metabolic_rate_pmol_min)) + 
+  geom_point()
 ```
 
-As we can see, no data has been plotted! This is because we haven't told R in what format to plot it in. All we have specified is what to put on the x and y axes.
+That's much better! We can now see the small cells (~ 100 micrometers) as well as the larger cells (~ 8 millimeters).
 
-We are interested in how different exposure treatments effect snail survival. So first lets make a box plot to show how the data is distributed in the different treatments. Box plots are great for showing the distribution of data and highlighting outliers.
+Let's also add a "trend line" to the plot. The simplest trend line we can add is a linear trend line. We can tell the relationship here is not exactly linear 
 
-```{r}
-ggplot(snail_survival, aes(x = temp, y = perc.surv, fill = spp)) + 
-  geom_boxplot()
-```
-
-Hmm, that's not right. How many temperature treatments did we have? 
-
-```{r}
-snail_survival %>%
-  select(temp) %>%
-  distinct()
-```
-
-If you look at the x axis, there should be 3 categories, not one! Why is this?
-
-There are two ways R can deal with characters: as *characters* or as *factors*. Factors are a special kind of character type to represent categorical data. Factors can be useful, but also introduce some issues, which we can come back to. If you're interested in more information on factors, check it out [here](http://swcarpentry.github.io/r-novice-inflammation/12-supp-factors/).
-
-To fix this issue, we will make sure the exposure variable is being treated as a *factor* - we can do that using `mutate()`!
+- Rename the axes to specify logs, etc.
+- Colour the points by group
 
 ```{r}
 snailed_it <- snail_survival %>%
