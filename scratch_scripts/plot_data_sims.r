@@ -17,8 +17,11 @@ cell_atp_data <- tibble(
     cell_type == 'neuron' ~ (0.8 * log(length_um)),
     cell_type == 'muscle' ~ (1.3 * log(length_um)))) %>%
   group_by(cell_type) %>%
-  mutate(metabolic_rate_pmol_min = metabolic_rate_pmol_min + 
-           rnorm(50, 0, metabolic_rate_pmol_min/4))
+  mutate(metabolic_rate_pmol_min = round(metabolic_rate_pmol_min + 
+           rnorm(50, 0, metabolic_rate_pmol_min/4), 2))
+
+# Save the data
+write.csv(cell_atp_data, "datasets/cell_metabolism.csv", row.names = F)
   
 # Relationship and clear groups, but muscle cells are much larger, which will
 # force them to log the length
@@ -49,7 +52,12 @@ cortisol_data$cortisol_ng_ml <- rlnorm(
   sdlog = 0.35
 )
 
-cortisol_data <- select(cortisol_data, !Var3)
+cortisol_data <- cortisol_data %>%
+  select(!Var3) %>%
+  mutate(cortisol_ng_ml = round(cortisol_ng_ml, 2))
+
+# Save the data
+write.csv(cortisol_data, "datasets/cortisol_stress.csv", row.names = F)
 
 # Cort increases with heat stress and diet restriction, and is also higher for 
 # females than males. They can plot them separately and then we can consider faceting.
@@ -97,6 +105,11 @@ recovery_data <- lapply(fitness_levels, function(fit) {
 
 recovery_data <- do.call(rbind, recovery_data)
 
+recovery_data$heart_rate_bpm <- round(recovery_data$heart_rate_bpm, 0)
+
+# Save the data
+write.csv(recovery_data, "datasets/exercise_recovery.csv", row.names = F)
+
 # Plot
 recovery_data %>%
   ggplot(aes(x = time_min, y = heart_rate_bpm, group = fitness_level)) + 
@@ -133,6 +146,9 @@ fish_data$n_survived <- rbinom(
 )
 
 fish_data$survival_proportion <- fish_data$n_survived / fish_data$n_stocked
+
+# Save the data
+write.csv(fish_data, "datasets/fish_stocking.csv", row.names = F)
 
 # Plot
 fish_data %>%
