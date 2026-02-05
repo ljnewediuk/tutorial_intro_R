@@ -132,7 +132,7 @@ tusks_rename <- tusks %>%
   rename(estimated_age_cm = estimated_age, shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
 
 #2 - by renaming the columns without a pipe
-tusks_rename <- rename(estimated_age_cm = estimated_age, shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
+tusks_rename <- rename(tusks, estimated_age_cm = estimated_age, shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
 ```
 
 One of the major new things in how we coded the above block is the pipe operator (`%>%`). Remember, the pipe passes the *output* on the left hand side of the pipe as the *input* expected in the tidyverse function on the next line of code.
