@@ -1,0 +1,9 @@
+"density","environment","n_stocked","n_survived","survival_proportion"
+"Low","Artificial tank",100,88,0.88
+"Medium","Artificial tank",100,71,0.71
+"High","Artificial tank",100,39,0.39
+"Very high","Artificial tank",100,16,0.16
+"Low","Natural pond",100,91,0.91
+"Medium","Natural pond",100,81,0.81
+"High","Natural pond",100,62,0.62
+"Very high","Natural pond",100,59,0.59
