@@ -20,8 +20,6 @@ knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRU
 
 ## Data Visualization
 
-One of the major advantages of using R for data analyses is that it is very easy to produce figures that are high quality for publication. Please visit <https://www.r-graph-gallery.com/> and the `ggplot2` cheat sheet on the Google Drive to get an idea for what the options and possibilities are.
-
 `ggplot2` (referred to simply as 'ggplot') is a `tidyverse` package that is basically the gold standard for plotting data when using R. The basic anatomy of a ggplot consists of the following elements:
 
 | Syntax     | Description                                          |
@@ -216,7 +214,46 @@ cort_plot +
   facet_wrap(~ sex)
 ```
 
-Great! Now we can see sex differences in responses to the treatments.
+Great! Now we can see sex differences in responses to the treatments. The "facet labels" appear above each panel.
+
+However, the facet labels are currently just "F" and "M". If we want the graph to be publication quality, we will want to change the labels to "Female" and "Male". We also want to re-order the boxes so that the control appears first, followed by heat stress, and finally, diet restriction. 
+
+We have used the `factor()` function before, to turn data columns into `factor` data types, but we haven't really encountered many applications where it is useful. We are going to see how `factor()` can both help us rename the values in our columns and re-order them in plots. 
+
+If you look at the `factor()` help files, you will see that it actually takes multiple arguments:
+
+* **x**: The column or variable we want to turn into a `factor`
+* **levels**: A vector of all the unique values in the column we want to `factor`, *which can be arranged in any order we want* (remember that R interprets `factors` as ordered integers)
+* **labels**: A vector of any values, with the same number of elements as **levels**, which *allows us to rename the values* in the `factor` and map them on to the old **levels**
+
+Here is an example of how this works:
+
+```{r}
+# Create a character vector of unordered numbers
+nums <- c("4", "6", "5")
+# Create a vector of labels we want to rename with, in the correct order
+num_names <- c("four", "five", "six")
+# Factor and re-order the numbers in a new factor
+num_fac <- factor(nums, levels = c("4", "5", "6"), labels = num_names)
+# Print the new factor
+num_fac
+```
+
+### **Mini Challenge 2**
+
+1. Create a new `factor` column in cortisol_data called *"sex_f"*, relabelling "F" and "M" as "Female" and "Male"
+2. Create another new `factor` column in cortisol_data called *"treatment_f"*, re-ordering the levels in the order: Control, Heat stress, Diet restriction
+3. Assign the new data a name: `cortisol_data_factored`
+4. Create a new cort_plot with the new data, starting with specifying the global axes (you can copy and paste the plot structure), and replacing the old variables with the new factors
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
 
 # Step 4 - Construct a line graph
 
@@ -224,7 +261,7 @@ Next, we are going to create a line graph. That is, *you* are going to create a 
 
 ## Step 4a: Basic line graph
 
-### **Mini Challenge 2**
+### **Mini Challenge 3**
 
 The `geom()` function to create a line graph is `geom_line()`. 
 
@@ -288,7 +325,7 @@ R also recognizes something called *hex codes*. These are alphanumeric strings t
 "#FFDDDD"
 ```
 
-### **Mini Challenge 3**
+### **Mini Challenge 4**
 
 The website [color-hex.com](https://www.color-hex.com/) provides the hex codes for a huge variety of colours.
 
@@ -306,11 +343,75 @@ Use the code block below to code your answers!
 
 # Step 5 - Construct a bar chart
 
-****HERE, GET THEM TO FILL THE BARS WITH SOME COLOUR
-****ALSO GET THEM TO FACTOR FOR ORDERING
+The final plot we are going to construct is a bar chart. We are going to use the fish data to visualize the proportions of fish that survived at each stocking density.
+
+## Step 5a: Basic bar chart
+
+The `geom()` function for bar charts is `geom_bar()`. We want to compare `survival_proportions` (y) between `density` treatments (x).
+
+```{r}
+ggplot(fish_data, aes(x = density, y = survival_proportion)) +
+  geom_bar()
+```
+
+It didn't work! Unlike the other `geom()` functions, `geom_bar()` has a necessary argument. If you look at the help files for this function, you will see the argument *"stat"*. By default, the value for this argument is "count". What this means is that the values in the column are counted and the sum is used as the response variable. However, the counts were already calculated: n_survived is the number of surviving fish, and survival_proportion is the proportion of surviving fish out of those stocked. This means we can use the values in the column *directly*. To do this, we need to specify `stat = "identity"` in the `geom_bar()` function.
+
+```{r}
+ggplot(fish_data, aes(x = density, y = survival_proportion)) +
+  geom_bar(stat = "identity")
+```
+
+## Step 5b: Factor the treatments
+
+That's better. However, you can immediately see that the density treatments are out of order. You know they should go from Low to Very high, but they are currently ordered: High, Low, Medium, Very high. Again, we can fix this by adding a new column with the treatments as a factor.
+
+```{r}
+# Add a new factor for density treatment
+fish_data_factored <- fish_data %>%
+  mutate(density_f = factor(density, 
+                            levels = c("Low", "Medium", "High", "Very high")))
+
+ggplot(fish_data_factored, aes(x = density_f, y = survival_proportion)) +
+  geom_bar(stat = "identity")
+```
+
+## Step 5c: Fill the bars by a variable
+
+Let's add some colour to the plot. Earlier, we saw that we can specify a colour in the aesthetic of the plot or the aesthetic of a `geom()` to distinguish groups in the data. Alternatively, we ca recolour *all* the data with the same colour by specifying the colour outside of the aesthetic.
+
+Points, lines, and other single dimensional `geoms()` are recoloured with the `colour` argument. However, `geoms()` like boxplots and bars are *2-dimensional*. To recolour them, we need a new a argument: `fill`.
+
+```{r}
+ggplot(fish_data_factored, aes(x = density_f, y = survival_proportion)) +
+  geom_bar(fill = "cornflowerblue",
+           stat = "identity")
+```
+
+That's a nice plot! But something is off--*why do some of the survival proportions add to values > 1?*
+
+The problem is that we have two *environments* in our data: "Artificial tanks" and "Natural ponds". When we plot the data with a bar chart, ggplot2 stacks both environments on top of each other, resulting in survival proportions > 1. 
+
+To fix the issue, *we can just go back to colouring within the aesthetic*. If we colour by environment, we should end up with two bars for each density treatment representing the different environments.
+
+```{r}
+ggplot(fish_data_factored, aes(x = density_f, y = survival_proportion)) +
+  geom_bar(aes(fill = environment),
+           stat = "identity")
+```
+
+By default, the bars are "stacked". We can specify separate bars for each environment using the `position` argument in geom_bar, which we will set to *"dodge"* (the default is *"stack"*).
+
+```{r}
+ggplot(fish_data_factored, aes(x = density_f, y = survival_proportion)) +
+  geom_bar(aes(fill = environment),
+           stat = "identity",
+           position = "dodge")
+```
+
 
 ### FINAL TASKS
 ****ALSO SHOW THEM HOW TO SAVE PLOTS
+****AND HOW TO DO SOME BASIC THEMES
 ****THEN SHOW THEM WHERE THEY CAN GO TO LEARN MORE (DIFFERENT PLOT TYPES, THEMES, ETC)
 (https://www.r-graph-gallery.com/, https://ggplot2-book.org/)
 
