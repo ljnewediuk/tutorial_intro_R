@@ -74,15 +74,15 @@ We are using four datasets today. All four are .csv files. We are going to use t
   
 Let's load the datasets now! Finish the `read_csv()` functions.
 
-```{r}
+```{r, echo = F, message=FALSE}
 # Load the cell_metabolism.csv data
-cell_data <- read_csv("datasets/cell_metabolism.csv")
+cell_data <- read_csv()
 # Load the cortisol_stress.csv data
-cortisol_data <- read_csv("datasets/cortisol_stress.csv")
+cortisol_data <- read_csv()
 # Load the exercise_recovery.csv data
-recovery_data <- read_csv("datasets/exercise_recovery.csv")
+recovery_data <- read_csv()
 # Load the fish_stocking.csv data
-fish_data <- read_csv("datasets/fish_stocking.csv")
+fish_data <- read_csv()
 ```
 
 # 2 - Construct a basic scatterplot
@@ -349,7 +349,7 @@ The final plot we are going to construct is a bar chart. We are going to use the
 
 The `geom()` function for bar charts is `geom_bar()`. We want to compare `survival_proportions` (y) between `density` treatments (x).
 
-```{r}
+```{r, eval = FALSE}
 ggplot(fish_data, aes(x = density, y = survival_proportion)) +
   geom_bar()
 ```
@@ -407,12 +407,5 @@ ggplot(fish_data_factored, aes(x = density_f, y = survival_proportion)) +
            stat = "identity",
            position = "dodge")
 ```
-
-
-### FINAL TASKS
-****ALSO SHOW THEM HOW TO SAVE PLOTS
-****AND HOW TO DO SOME BASIC THEMES
-****THEN SHOW THEM WHERE THEY CAN GO TO LEARN MORE (DIFFERENT PLOT TYPES, THEMES, ETC)
-(https://www.r-graph-gallery.com/, https://ggplot2-book.org/)
 
 
