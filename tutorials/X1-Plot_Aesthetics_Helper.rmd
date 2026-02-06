@@ -1,0 +1,26 @@
+---
+title: "Plot aesthetics in R"
+output: html_document
+date: "2026-02-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Getting your plots ready for publication
+
+You could easily take an entire course in `ggplot2`, but we only have one week to cover data visualization. This means we can only really scratch the surface of what's possible with ggplot2. In this helper file, I will show you how to save your plots, some tricks for making your plots prettier, and some resources you can look at if you'd like to learn more about plotting in R.
+
+### Resources for learning more
+
+Here are some resources for you to learn more about `ggplot2` (all are also linked through D2L):
+
+* [The R Graph Gallery](https://www.r-graph-gallery.com/) shows you hundreds of options for graphing your data, along with the code to create the plots
+* [The ggplot2 cheatsheet](https://rstudio.github.io/cheatsheets/html/data-visualization.html) is a quick reference for `ggplot2()` aesthetic, `geom()`s, and other formatting options
+* [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/) is an entire online book if you'd like to take your plotting to the next level
+
+### Saving your plots
+
+
+
