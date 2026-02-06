@@ -1,0 +1,38 @@
+---
+title: "Take-home Challenge 2"
+author: "YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This challenge will cover tidyverse and data visualization
+
+## Task 1 - Take a dataset and recreate a plot
+
+This task will give them a bar chart image and they will have to figure out how to recreate it using tidyverse and ggplot. 
+
+Data-wrangling tasks:
+
+- `filter()` out one variable that does not appear in the plot
+- `group_by()` a variable and `summarize()` to get the counts
+- `factor()` so the ordered bars end up in the correct order
+
+Plotting tasks:
+
+- Change axis labels
+- Colour the bars by group
+- Facet so the groups end up on separate panels
+
+
+## Task 2 - Take a poorly-made plot and fix it
+
+This task will be a bit more free-form in terms of their final output, but there will be some things they clearly need to fix. These could include:
+
+- Axis labels unclear
+- Variables need to be re-scaled
+- Poor colour choices
+- Plotted with wrong plot type (e.g., was made as a scatter plot but should be a boxplot)
