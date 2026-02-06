@@ -153,7 +153,6 @@ Your first option is to save plots manually from the plot viewer in your RStudio
 You can set the size of the saved plot either by dragging the corner of the plot in the viewer or manually setting the width and height.
 
 ```{r echo = FALSE, fig.cap = "<center>*Saving a plot manually in R Studio*</center>"}
-setwd("/Users/levi/Documents/R-Projects/tutorial_intro_R")
 knitr::include_graphics("imgs/save_plot.png")
 ```
 
