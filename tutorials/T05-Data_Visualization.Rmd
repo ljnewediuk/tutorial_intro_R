@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization"
 author: "BIOL 3401 Mount Royal University"
-date: "Topic 4, Winter 2026"
+date: "Topic 5, Winter 2026"
 output: 
   html_document:
     df_print: kable
@@ -78,13 +78,13 @@ Let's load the datasets now! Finish the `read_csv()` functions.
 
 ```{r}
 # Load the cell_metabolism.csv data
-cell_data <- read_csv()
+cell_data <- read_csv("datasets/cell_metabolism.csv")
 # Load the cortisol_stress.csv data
-cortisol_data <- read_csv()
+cortisol_data <- read_csv("datasets/cortisol_stress.csv")
 # Load the exercise_recovery.csv data
-recovery_data <- read_csv()
+recovery_data <- read_csv("datasets/exercise_recovery.csv")
 # Load the fish_stocking.csv data
-fish_data <- read_csv()
+fish_data <- read_csv("datasets/fish_stocking.csv")
 ```
 
 # 2 - Construct a basic scatterplot
@@ -99,16 +99,20 @@ The first layer to specify when making figures is the global axes. These axes wi
 ggplot(cell_data, aes(x = length_um, y = metabolic_rate_pmol_min))
 ```
 
-As we can see, there are axes, but no data has been plotted! This is because we haven't told R in what *layers* (`geoms`) we want to plot it in. All we have specified is what to put on the x and y axes.
+Something has popped up in our plots tab in the lower right. No data are plotted, but we have axes! There are no data because we haven't told R in what *layers* (`geoms`) we want to plot it in. All we have specified is what variables to put on the x and y axes.
 
-We are interested in the relationship between cell size and metabolic rate, both of which are continuous variables. This is a perfect application for a `geom_point()` (scatterplot).
+## Step 2b: Plot a scatterplot
+
+We are interested in the relationship between cell size and metabolic rate, both of which are continuous variables. This is a perfect application for a scatterplot using `geom_point()`.
 
 ```{r}
 ggplot(cell_data, aes(x = length_um, y = metabolic_rate_pmol_min)) + 
   geom_point()
 ```
 
-Something doesn't seem quite right here. Why do we have a stack of points lined up around zero length?
+Something is not quite right here. Why do we have a stack of points lined up around zero length?
+
+## Step 2c: Rescale variables
 
 This is actually quite a common problem when we plot data like sizes, masses, distances, volumes, etc. because they can often vary by orders of magnitude. The issue is that the length_um variable needs to be *rescaled* to prevent the very large cells from overwhelming the plot. We are going to adjust the axis to a *natural log scale* by using the `log()` function. We could use `log()` within the `mutate()` function to add a column to the data with logged lengths, but ggplot2 actually makes it possible to do that within the aesthetic.
 
@@ -119,354 +123,195 @@ ggplot(cell_data, aes(x = log(length_um), y = metabolic_rate_pmol_min)) +
 
 That's much better! We can now see the small cells (~ 100 micrometers) as well as the larger cells (~ 8 millimeters).
 
-Let's also add a "trend line" to the plot. The simplest trend line we can add is a linear trend line. We can tell the relationship here is not exactly linear 
+## Step 2d: Adding a trend line
 
-- Rename the axes to specify logs, etc.
-- Colour the points by group
+Let's also add a "trend line" to the plot. The simplest trend line we can add is a linear trend line. We can tell the relationship here is not exactly linear (actually, it's log-linear), but it will do to visualize the general relationship.
 
-```{r}
-snailed_it <- snail_survival %>%
-  mutate(temp = as_factor(temp))
-
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_boxplot()
-```
-
-That's better!
-
-#### Layering Geoms
-
-We have our first box plot! It's a good idea to add data distributions so that we can see everything, as some people feel like box plots don't sufficiently display data. We can stack another geometry argument on top of our box plot to display all our data points; in this case `geom_point()`.
+Plot layers or `geoms()` get *added* together, so we can just *add* the trend line to our existing plot. The `geom()` for trend lines is called `geom_smooth()`, and it has several possible arguments. One important argument is *method*, which specifies the type of trend line (linear, nonlinear, etc.). The method we are going to use is "lm".
 
 ```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_boxplot() + 
-  geom_point()
+ggplot(cell_data, aes(x = log(length_um), y = metabolic_rate_pmol_min)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
 ```
 
-Well... there are points. But it looks terrible. We can make the points "jitter" so they aren't placed all on top of each other.
+## Step 2e: Rename the axis labels
 
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_boxplot() + 
-  geom_jitter()
-```
-
-Better. But this makes it really hard to tell which dots are which, because they're all black!
-
-`fill` changes the colour of the inside of an object, while `colour` changes the outline. Let's add colour to our aesthetics. To do this, we specify which column in our data frame will be used to specify the different colour groups.
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp, colour = temp)) +
-  geom_boxplot() + 
-  geom_jitter()
-```
-
-Terrible. Do you notice how the lines on the box plot changed too?? 
-
-Plus, we can't see data because everything is the same colour! Luckily, we can change the aesthetics within individual geoms - so let's move the `colour` argument to the `geom_jitter` function.
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_boxplot() + 
-  geom_jitter(aes(colour = temp))
-```
-
-#### Organizing layers
-
-Getting there! But, it's annoying that the points are above the box plot and it looks messy. We can adjust that by changing the order of the layers while building the plot. The order of our geom arguments is the order they will be layered on our plots.
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot() 
-```
-
-#### Alpha
-
-Now the box plot is back in front of the points, but it's still blocking our data. To fix this, we can change the opacity with an `alpha` argument in our box plot geometry. An alpha of 1 is completely opaque whereas an alpha of 0 is transparent. Let's just step back a little on the opacity of the box plot:
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) 
-```
-
-#### Changing colours
-
-Looks good now! But what if we want to change our colours? You can make a colour variable that you associate with your data, which is a fun way to practice creating variables again. Since temperature usually has pretty common colours associated with it (blue = cold, red = hot), we can make the colours of our boxplots match our treatment!
-
-Colour is an effective tool in visual story telling, but it's also very subjective and we should always be mindful of how people interpret colour. There are some great colour packages out there that take into account how different palettes are interpreted by people with differing abilities to distinguish colours (try the packages `viridis`, `colorBlindness`, or `RColorBrewer`).
-
-```{r}
-my_cols <- c("10" = "lightskyblue", "15" = "goldenrod", "20" = "tomato")
-```
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols)
-```
-
+The next thing we want to do is rename the axis labels. The labels from our tibble column names get the job done, but the lower-case letters and underscores aren't exactly publication-worthy. We can change the labels using the `labs()` function. Like in most cases where we want to add something to a plot, `labs()` just gets added on to the ggplot. 
 
 ### **Mini Challenge 1**
 
-1. Pick any other two hex colour code (websites like https://htmlcolorcodes.com/ can help you pick your codes, or Googling 'R colour palettes') and create a new colour object called `my_cols_2`. Use these colours on the previous plot.
+Two arguments in `labs()` are *x* and *y*.
 
+1. Copy and paste the ggplot we have been building
+2. Change the axis labels to "Metabolic rate (pmol/min)" "and Log length (um)"
 
-Use the code block below to code your answer! 
-```{r}
-
-```
-
-
-
-
-
-
-###-----------------------------------------------------
-
-```{r}
-my_cols_2 <- c("10" = "#2B827B", "15" = "#827B2B", "20" = "#822B32")
-
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols_2) +
-  scale_fill_manual(values = my_cols_2)
-```
-
-
-
-#### Themes
-
-One of the easiest ways of making your figures look more professional/less "cookie cutter" is to change the theme. I like a cleaner, simpler look. There are a few different theme options that you can explore, but I prefer to start with `classic()`.
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  theme_classic()
-```
-
-We can also change where the legend is positioned. Currently it is off to the right side but we can change that with the `theme()` argument.
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  theme_classic() + 
-  theme(legend.position = "top")
-```
-
-#### Labelling the axes
-
-While the column names in our data set are easy to code with, they don't look great on the axes, do they? We can re-label the axes so they are easier and clearer to read.
-
-### **Mini Challenge 2**
-
-1. Change the code below to so the placeholder labels are meaningful a.k.a. communicate the correct information for each label.
-
-2. Also change the code below to get rid of the legend, rather than having it at the top of the figure (hint: how can you *ask for help in R*?)
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  theme_classic() +
-  theme(legend.position = "top") + 
-  labs(x = "X axis label here", y = "Y axis label here", 
-       color = "Colour label here", 
-       fill = "Fill label here") 
-```
-
-
-
-
-
-
-
-
-
-
-###-----------------------------------------------------
-
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  theme_classic() +
-  theme(legend.position = "none") + 
-  labs(x = "Temperature (°C)", y = "Percent Survival (%)")
-```
-
-#### Faceting
-
-This is an element of visually subsetting your data, again, without messing up your raw data. We can separate the way our data is displayed using a facet. A `facet_wrap` is used for separating by one variable, and a `facet_grid` is used if you want to separate by 2 variables.
-
-We could want to see what the interactive effect of temperature and humidity is on survival:
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  facet_wrap(~ hum) +
-  theme_classic() +
-  theme(legend.position = "none") + 
-  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
-```
-
-That is a NICE figure! 
-
-We are so close to the final touch on this figure. Last thing - there are these weird grey dots on the boxplots. 
-
-These are outliers identified by the `geom_boxplot()` function, but those data points are part of the raw data plotted with `geom_jitter()`. By having BOTH of these data points on the figure, we're double-plotting the same individual(s) when we don't need to. Let's make one small tweak to our boxplot to get rid of this: 
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  facet_wrap(~ hum) +
-  theme_classic() +
-  theme(legend.position = "none") + 
-  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
-```
-
-This new addition to the `geom_boxplot()` function assigned our outliers as NAs so they wouldn't be plotted - but it didn't impact how the `geom_jitter()` function plotted the data! Now we have a nice, clean figure that we've put a lot of effort into.
-
-#### Saving your plot
-
-You can save your plot but first we need to make a plot object, or we can't tell R *which* plot to save very easily. You can assign a plot to a new object with the classic `<-` operator and then to see the plot output you need to call the plot object
-
-```{r}
-pretty_boxplot <- ggplot(snailed_it, aes(x = temp, y = perc.surv, fill = temp)) + 
-  geom_jitter(aes(colour = temp)) + 
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
-  scale_color_manual(values = my_cols) +
-  scale_fill_manual(values = my_cols) +
-  facet_wrap(~ hum) +
-  theme_classic() +
-  theme(legend.position = "none") + 
-  labs(x = "Temperature (°C)", y = "Percent Survival (%)") 
-
-pretty_boxplot
-```
-
-
-There are many options within `ggsave` as to how to save your plot. I recommend saving files in a vector format (.png for example) as these are easier to resize and touch up for different aesthetics in something like Adobe Illustrator. You can also use a .png which be used for changing resolutions. Within `ggsave` you can change the width and height as well to make sure the size and shape of your plot is exactly what you want.
-
-```{r}
-ggsave(plot = pretty_boxplot, filename = "pretty_boxplot.pdf")
-```
-
-You can also save it with the "Export" button in the Plots pane!
-
-
-### **More types of visualizations**
-
-#### Histograms
-
-Now that we know how the different layers work within `ggplot`, altering our code to make a histogram is very simple. Instead of `geom_boxplot()` we will use `geom_histogram()`. With a histogram, we also only need to specify the x-axis, as the y-axis will automatically become the count.
-
-Lets make a histogram of the snail percent survival.
-
-```{r}
-ggplot(snailed_it, aes(x = perc.surv)) +
-  geom_histogram()
-```
-
-With histograms we can also change the number of bars with the argument `bins`. We can also change the colour of all our bars using a fill argument, but if we just want to change all the bins and not base the fill on a column in our data frame, this will just go in the `geom_histogram` layer and not in an aesthetic argument (like we did in the box plot).
-
-```{r}
-ggplot(snailed_it, aes(x = perc.surv)) +
-  geom_histogram(color = "black", fill = "skyblue", bins = 15)
-```
-
-### **Mini Challenge 3**
-
-Now lets make this plot a bit prettier. Copy and paste the code above into the code chunk below, and do the following:
-
-1.  Customized x and y labels
-
-2.  *Fill* all the bars with the colour "#127d76".
-
-3.  Add our favourite theme, `theme_classic()`
-
-Use the code chunk below to code your answer!
+Use the code block below to code your answers!
 
 ```{r}
 
 ```
-
-
-
-
-
-
-
-
 
 
 #-------------------------------------------------
 
+## Step 2f: Colour points by group
+
+We will make one final adjustment to help us visualize the data. We might imagine the cluster of very large cells must be a different cell type than the smaller cells in the corner of the graph. However, we don't know which cluster belongs to which cell type. We can visualize the cell types if we *colour the graph by cell type*. This operation is very similar to what `group_by()` does to our tibbles when we give it a column we want to group by--ggplot2 recognizes that the similar elements of a column now belong to a group.
+
+Let's colour the points by `cell_type`. Colour is specified with the argument `colour` in the aesthetic (`aes()`), along with the x and y axes. The value of the argument is the name of the column we want to colour by.
 
 ```{r}
-ggplot(snailed_it, aes(x = perc.surv)) +
-  geom_histogram(color = "black", fill = "#127d76", bins = 15) + 
-  labs(x = "Percent Survival (%)", y = "Count") + 
-  theme_classic()
-```
-
-
-
-#### Interval Plot
-
-Let's make an interval plot of these data to display the means +/- standard error. R can do the mean and standard error calculations for us(!) directly in the plot, so we don't have to bother ourselves with doing extra calculations. 
-
-```{r}
-ggplot(snailed_it, aes(x = temp, y = perc.surv)) + 
-  stat_summary(fun = mean, geom = "point") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.3) + 
-  labs(x = "Temperature (°C)", y = "Mean Survival (%)") + 
-  theme_bw()
-```
-
-
-#### Scatter Plot
-
-One final plot type you are definitely going to encounter (and probably want to make at some point!) is a scatter plot. This is a great visualization for two continuous variables, so let's use our `iris` data set to try this out. 
-
-```{r}
-iris <- read_delim("iris.csv")
-
-ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
+ggplot(cell_data, aes(x = log(length_um), 
+                      y = metabolic_rate_pmol_min,
+                      colour = cell_type)
+       ) + 
   geom_point() +
-  theme_classic()
-```
-
-One final thing you may want to do is add a line of best fit to your plot.
-
-```{r}
-ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species, shape = Species)) + 
-  geom_point() +
-  theme_classic() +
   geom_smooth(method = "lm")
 ```
 
-So pretty! Enjoy making beautiful plots.
+We can now distinguish the cell type, but something strange happened! Our trend lines are now truncated and also coloured by cell type. This happened because we included colour in the *main* plot aesthetic, which tells ggplot2 to colour *all* of the layers that way. If we don't want to colour all of the layers, we can add a *second aesthetic function inside the `geom()` we want to colour*, and move the colour argument there.
+
+```{r}
+ggplot(cell_data, aes(x = log(length_um), 
+                      y = metabolic_rate_pmol_min)
+       ) + 
+  geom_point(aes(colour = cell_type)) +
+  geom_smooth(method = "lm")
+```
+
+Perfect! This is a pretty nice plot.
+
+# 3 - Construct a boxplot
+
+Next, we're going to construct a boxplot to compare circulating cortisol levels from our cortisol_data. Boxplots will allow us to visualize how the levels differ among stressors.
+
+## Step 3a: Basic boxplot
+
+We follow the same process: Specify the data and global axes, which apply to all layers that follow, then add a `geom()`. The x (independent) variable is our now `treatment`, and the y (dependent variable) is `cortisol_ng_ml` This time, however, we are going to do something different. If we assign the plot a name to make it an object in our environment, we can keep adding layers to the *object* rather than recreating the plot each time we want to add a new layer.
+
+```{r}
+cort_plot <- ggplot(cortisol_data, aes(x = treatment, y = cortisol_ng_ml)) +
+  geom_boxplot()
+```
+
+The plot now shows up as an object in our environment, but doesn't display in the viewing panel. To display it, we need to type the name of the plot. 
+
+While we're at it, we can add the labels just with the name of the plot object + `labs()`.
+
+```{r}
+cort_plot +
+  labs(x = "Treatment", y = "Circulating cortisol (ng/ml)")
+```
+
+## Step 3b: Facetting
+
+This looks fine, but didn't we also have two sexes in the data? What if there are differences in how males and females respod to the treatments? We might want to visualize that.
+
+We already aw how we could distinguish groups with colour. Now, we will see how we can distinguish groups by plotting them in separate *panels*. The function for separating groups by panel is called `facet_wrap()`. The argument for `facet_wrap()` is the group, preceded by a tilde (~). Like other layers, it just gets added to the plot.
+
+```{r}
+cort_plot +
+  labs(x = "Treatment", y = "Circulating cortisol (ng/ml)") +
+  facet_wrap(~ sex)
+```
+
+Great! Now we can see sex differences in responses to the treatments.
+
+# Step 4 - Construct a line graph
+
+Next, we are going to create a line graph. That is, *you* are going to create a line graph. You are going to use the recovery_data to visualize the patterns by which the heart returns to its resting rate after exercise. You are comparing patterns between people with Low, Moderate, and High fitness levels.
+
+## Step 4a: Basic line graph
+
+### **Mini Challenge 2**
+
+The `geom()` function to create a line graph is `geom_line()`. 
+
+1. Create a basic graph with `heart_rate_bpm` as the response variable and `time_min` as the explanatory variable
+2. Add the layer for the line `geom()`, colouring by `fitness_level`
+3. Change the axis labels to "Time (minutes)" "Heart rate (beats per minute)"
+4. Assign the plot the name *"recovery_plot"*
+5. Visualize the plot
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+## Step 4b: Customize your colours
+
+This looks pretty good! However, these colours are getting a bit boring, don't you think? Wouldn't it be nicer if you could customize your colours?
+
+Well, you can! The colour aesthetic belongs to the realm of ggplot *scales*. Scales control how data get mapped to the visual elements of your plot. Data elements you can scale include:
+
+* axis breaks
+* legends
+* shapes
+* sizes
+* line types
+* *and* colours
+
+We are going to use a function/layer called `scale_colour_manual()`. The most important argument in the function is `values`, which requires a vector of colours. The syntax is, "values, equals, vector of colours". The colour vector must:
+
+* be a character vector, each element specifying a colour
+* include the same number of colour elements as groups you have coloured in your plot
+
+You already saw that R associates some names with specific colours. For example:
+
+```{r}
+"orange"
+"red"
+"blue"
+```
+
+There are also some interesting variations:
+
+```{r}
+"darkgoldenrod1"
+"deeppink"
+"cornflowerblue"
+```
+
+R also recognizes something called *hex codes*. These are alphanumeric strings that represent colours. Unlike the R names for colours, there are countless variations of hex codes that make virtually any colour possible. Hex codes are entered as characters, just like colour names, with hashtags at the beginning of the alphanumeric string:
+
+```{r}
+# Black
+"#000000"
+# Red
+"#FF0000"
+# Pink
+"#FFDDDD"
+```
+
+### **Mini Challenge 3**
+
+The website [color-hex.com](https://www.color-hex.com/) provides the hex codes for a huge variety of colours.
+
+1. Create a character vector called *"fitness_cols"*, containing the required number of hex codes for the fitness levels in recovery_data, using any colours you like from color-hex.com
+2. Use the `scale_colour_manual()` function to recolour the fitness level lines in *"recovery_plot"*
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+# Step 5 - Construct a bar chart
+
+****HERE, GET THEM TO FILL THE BARS WITH SOME COLOUR
+****ALSO GET THEM TO FACTOR FOR ORDERING
+
+### FINAL TASKS
+****ALSO SHOW THEM HOW TO SAVE PLOTS
+****THEN SHOW THEM WHERE THEY CAN GO TO LEARN MORE (DIFFERENT PLOT TYPES, THEMES, ETC)
+(https://www.r-graph-gallery.com/, https://ggplot2-book.org/)
+
 
