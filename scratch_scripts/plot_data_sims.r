@@ -156,3 +156,65 @@ fish_data %>%
   geom_bar(stat = "identity") + 
   facet_wrap(~ environment)
 
+# ADDITIONAL DATASETS FOR ASSIGNMENTS
+
+# 5- Boxplot: Sleep duration/antibody titres for COVID-19 after vaccination
+# This dataset compares anti-spike protein antibodies 4 weeks after vaccination
+# from individuals vaccinated for Sars-CoV2
+
+# Antibody titres are measured in Binding Antibody Units (BAU/mL) and range from
+# a median ~ 40 BAU/mL to ~ 15,000 BAU/ml
+
+# Use this dataset to make the boxplot they need to fix. The distributions will
+# all be skewed and will be difficult to see differences between groups because
+# the data should be on a log scale instead.
+
+# Levels:
+# - Very short (< 5 h)
+# - Short (5-6 h)
+# - Normal (7-8 h)
+# - Long (9-10 h)
+# - Very long (> 10 h)
+
+# 6- Stacked barchart: Gut microbiome composition depending on diet
+
+# Data are proportion of bacteria in the diet (they can be approximate with their 
+# proportions) with different diet types. 
+
+# I will give them: Information from mice with one of three diet types and the 
+# amount of each bacteria type in billions of microbes/gram of stool (each gram
+# of stool contains ~ 100 billion microbes)
+
+# They will calculate: The proportion of each type of microbe in the total stool
+# sample as a percentage, which will go on the graph. They might need a reminder
+# about how to make a tibble!
+
+# Diet types:
+# - High protein
+# - High fibre
+# - High carbohydrate
+
+# Bacterial groups:
+# - Firmicutes
+# - Bacteroidetes 
+# - Actinobacteria
+# - Proteobacteria 
+
+# High fibre diet:
+# - 140 billion/g Bacteroidetes
+# - 120 billion/g Firmicutes
+# - 20 billion/g Actinobacteria
+# - 10 billion/g Proteobacteria
+
+# High protein:
+# - 90 billion/g Bacteroidetes
+# - 170 billion/g Firmicutes
+# - 20 billion/g Actinobacteria
+# - 5 billion/g Proteobacteria
+
+# High carb:
+# - 115 billion/g Bacteroidetes
+# - 145 billion/g Firmicutes
+# - 25 billion/g Actinobacteria
+# - 15 billion/g Proteobacteria
+
