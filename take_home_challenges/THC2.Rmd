@@ -23,8 +23,9 @@ Data-wrangling tasks:
 Plotting tasks:
 
 - Change axis labels
-- Colour the point groups by group
-- Facet so the different groups end up on separate panels
+- Colour the point groups by species
+- Separate trend lines for each habitat
+- Facet by region so the different regions end up on separate panels
 
 
 ## Task 2 - Take a poorly-made plot and fix it
