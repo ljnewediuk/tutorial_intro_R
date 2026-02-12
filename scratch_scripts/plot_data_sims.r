@@ -176,6 +176,47 @@ fish_data %>%
 # - Long (9-10 h)
 # - Very long (> 10 h)
 
+n <- 600
+
+sleep_levels <- c("Very short", "Normal", "Short", "Very long", "Long")
+
+sleep_data <- tibble(
+  sleep_score = sample(sleep_levels, n, replace = TRUE)
+) %>%
+  mutate(BAU_mL = case_when(
+    sleep_score == "Very short" ~ rnorm(1, 40, 3),
+    sleep_score == "Short" ~ rnorm(1, 500, 50),
+    sleep_score == "Normal" ~ rnorm(1, 14200, 1000),
+    sleep_score == "Long" ~ rnorm(1, 14000, 1000),
+    sleep_score == "Very long" ~ rnorm(1, 14300, 1000)
+  )
+  )
+
+# BAU titres
+BAU_meds <- c(
+  `Very short` = 40,
+  `Short` = 500,
+  `Normal` = 14200,
+  `Long` = 14000,
+  `Very long` = 14300
+)
+
+sleep_data <- sleep_data %>%
+  mutate(
+    dispersal_distance_m =
+      species_intercept[species] +
+      habitat_slope[habitat] * body_size_mm +
+      rnorm(n(), 0, 5)
+  )
+
+# Optional: make Island slightly weird
+insect_data <- insect_data %>%
+  mutate(
+    dispersal_distance_m = ifelse(region == "I",
+                                  dispersal_distance_m * 0.6,
+                                  dispersal_distance_m)
+  )
+
 # 6- Stacked barchart: Gut microbiome composition depending on diet
 
 # Data are proportion of bacteria in the diet (they can be approximate with their 
@@ -218,3 +259,70 @@ fish_data %>%
 # - 25 billion/g Actinobacteria
 # - 15 billion/g Proteobacteria
 
+# 7 - Body size vs. dispersal distance in insects
+
+# Biological story: Larger insects tend to disperse farther. The strength of 
+# this relationship varies among habitat types.
+
+set.seed(42)
+
+n <- 300
+
+species_levels <- c("anax_walsinghami", "melanoplus_femurrubrum", "cicindela_patruela", "limenitis_arthemis")
+habitat_levels <- c("Wetland", "Forest", "Grassland") 
+
+# Intentionally awkward order for faceting exercise (north, central, south, island)
+region_levels <- c("N", "C", "S", "I")
+
+insect_data <- tibble(
+  species = sample(species_levels, n, replace = TRUE),
+  habitat = sample(habitat_levels, n, replace = TRUE),
+  region  = sample(region_levels, n, replace = TRUE)
+)
+
+# Body size distributions (mm)
+insect_data <- insect_data %>%
+  mutate(
+    body_size_mm = rlnorm(n(),
+                          meanlog = case_when(
+                            species == "anax_walsinghami"  ~ 2.2,
+                            species == "melanoplus_femurrubrum" ~ 2.0,
+                            species == "cicindela_patruela"      ~ 1.8,
+                            species == "limenitis_arthemis"   ~ 1.9
+                          ),
+                          sdlog = 0.25)
+  ) 
+
+# Habitat-dependent slopes
+habitat_slope <- c(
+  Forest = 2.5,
+  Grassland = 3.2,
+  Wetland = 2.8
+)
+
+# Species intercepts
+species_intercept <- c(
+  `anax_walsinghami` = 5,
+  `melanoplus_femurrubrum` = 2,
+  `cicindela_patruela` = 1,
+  `limenitis_arthemis` = 3
+)
+
+insect_data <- insect_data %>%
+  mutate(
+    dispersal_distance_m =
+      species_intercept[species] +
+      habitat_slope[habitat] * body_size_mm +
+      rnorm(n(), 0, 5)
+  )
+
+# Optional: make Island slightly weird
+insect_data <- insect_data %>%
+  mutate(
+    dispersal_distance_m = ifelse(region == "I",
+                                  dispersal_distance_m * 0.6,
+                                  dispersal_distance_m)
+  )
+
+# Save the data
+write.csv(insect_data, "datasets/insect_dispersal.csv", row.names = F)
