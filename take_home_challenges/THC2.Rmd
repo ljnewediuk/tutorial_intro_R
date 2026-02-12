@@ -19,7 +19,7 @@ Required submissions for this Take Home Challenge:
 
 * your .Rmd
 * your output knitted as an HTML and saved to a PDF
-* Two figures, one for each part of this assignment, saved as .jpg files. Please see [this helper file](https://ljnewediuk.github.io/tutorial_intro_R/tutorials/X1-Plot_Aesthetics_Helper.html) for instructions on saving your plots.
+* Two figures, one for each part of this assignment, saved as .jpg, .png, or .tiff files. Please see [this helper file](https://ljnewediuk.github.io/tutorial_intro_R/tutorials/X1-Plot_Aesthetics_Helper.html) for instructions on saving your plots.
 
 Your marks breakdown for this assignment:
 
@@ -27,7 +27,7 @@ Your marks breakdown for this assignment:
 * **Task 2:** 10 points
 * **Task 3:** 5 points
 * **Annotations:** 3 points
-* **Plots as jpg files:** 5 points
+* **Plots as jpg, png, or tiff files:** 5 points
 * **Both Rmd and knitted html (saved as pdf) submitted:** 3 points
 
 In this assignment, you are an author on two publications. You have been tasked with writing code and creating plots for the two papers. You have access to some of the data from the papers, but your co-authors are not organized, and some things have been lost. You need to fill in the gaps to make your project reproducible.

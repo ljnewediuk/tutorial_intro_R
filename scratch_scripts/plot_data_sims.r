@@ -194,7 +194,8 @@ sleep_data <- tibble(
       sleep_score == "Very long" ~ log(3000)
     ),
     BAU_mL = round(rlnorm(n(), meanlog = log_mean, sdlog = 0.35), 2)
-  ) 
+  ) %>%
+  select(! log_mean)
 
 ggplot(sleep_data, aes(x = sleep_score, y = BAU_mL)) +
   geom_boxplot()
