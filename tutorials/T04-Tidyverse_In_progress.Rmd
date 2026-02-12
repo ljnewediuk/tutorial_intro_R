@@ -1,0 +1,499 @@
+---
+title: "Tidyverse"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 4, Winter 2026"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy=TRUE)
+```
+
+# **Learning Objectives**
+
+Tidyverse is a group of packages with functions for organizing tabular data (data frames/spreadsheet-like data). Many of the functions are equivalent to operations you performed previously in base R. The whole point of the Tidyverse is to make your code "cleaner" and easier for humans to understand, especially those of us with minimal programming experience. It's important for you to know and understand some basic R functionality, but after today, it's unlikely you will want to go back to using base R!
+
+After completing this topic, you should feel comfortable:
+
+1.  Describing the basic format of of a `tidyverse` function
+2.  Using some of the key `tidyverse` functions
+3.  Applying the 'pipe' (%>%) operator in `tidyverse`
+4.  Planning a basic data wrangling task
+4.  Performing a basic data wrangling task using `tidyverse`
+
+# 1 - Set up your R workspace for the day
+
+## Step 1a: Set your working directory
+
+Make sure we're setting our working directory!
+
+```{r, eval = F}
+# Set your working directory, then remove "eval = F"!
+setwd()
+```
+
+## Step 1b: Load packages
+
+```{r, message = F}
+# Install the tidyverse package if you haven't already
+
+# Load it
+library(tidyverse) 
+```
+
+Now that we have some useful packages loaded, we can start to play with data.
+
+## Step 1c: Load your data!
+
+We're going to use a new dataset to explore a number of the `tidyverse` functions.
+
+Whenever we work with a new dataset, we need to familiarize ourselves with what it contains. Let's pretend we don't have metadata for this dataset (you actually don't), but we *do* have some idea about what it contains: body measurements from a population of elephants measured from 1966--1968 and again in 2005--2013.
+
+```{r}
+# Load the dataset
+tusks <- read_csv("/Users/lnewediuk/Documents/R-Projects/tutorial_intro_R/datasets/elephant_tusks.csv")
+
+# Summarize the dataset
+summary(tusks)
+```
+
+Notice that instead of `read.csv`, we've switched to `read_csv` to load our dataset, which is a tidyverse dataset. It is useful because it makes what's called a *tibble*, which is a modern style of tidyverse data frame with some special properties. You'll see that it's given us a message about the number of rows, columns, the delimiter (comma-separated, i.e., csv), and its assumptions about the data type of each column. If you type the name of the object (tusks) in your R will print out only the first 10 rows of the tibble, instead of all 780 rows as it would for a basic data frame.
+
+We can check out the class of the tusks tibble:
+
+```{r}
+# Check the object class
+class(tusks)
+```
+
+R tells us it's a "spec_tbl_df", "tbl_df/tbl", and "data.frame". This means it has a class both as a data frame in base R and as a tibble for more modern functions.
+
+# 2 - Planning our data cleaning task
+
+## Step 2a: Defining our endpoint
+
+By the end of this topic, we need to create a dataset meeting the following criteria:
+
+* Compares the means and standard deviations of tusk lengths and circumferences between study periods
+* Includes only adult elephants (≥ 12 years for females and ≥ 10 years for males)
+* Separates female from male elephants
+
+## Step 2b: Understanding the data
+
+The tusks tibble has 780 observations and six columns. Here are the columns:
+
+* `sample_period`, when the observation was made.
+* `sex`, the sex of the elephant (male or female).
+* `estimated_age`, the age of the elephant in *years*.
+* `shoulder_height`, the height of the elephant in *centimeters*.
+* `tusk_length`, the length of the tusks in *centimeters*.
+* `tusk_circumference`, the circumference of the tusks in *centimeters*.
+
+## Step 2c: Locate the obstacles
+
+* **Missing data:** A quick glance at the data tells us we have many missing values (NA).
+* **Duplicated rows:** You likely won't be able to detect them visually because there are so many observations in the data, but there are also a few duplicated rows. We will learn how to detect duplicates when there are too many rows in the data to locate them visually. 
+* **Inconsistencies:** So far, it doesn't look like there are any improperly entered values. One clue is that the data types of all the rows are as expected. If we had improperly entered measurements, for example, the measurement columns (currently numeric) might be characters instead.
+
+## Step 2d: Plan decisions
+
+Starting with the raw data, we are going to execute the following general steps to produce the endpoint dataset we decided we wanted:
+
+1. Rename some columns for clarity
+2. Remove the missing and duplicated data
+3. Add a column that defines the age class of the elephant (juvenile versus adult)
+4. Filter out the juvenile elephants
+5. Select out the columns we don't need
+6. Pivot the data into a "longer" format to help us summarize
+7. Summarize by the mean and standard deviation (our final dataset)
+
+We're going to clean the data by running through some functions belonging to `tidyr` & `dplyr` (two packages that are automatically loaded when you load `tidyverse`).
+
+# 3 - Execute the data cleaning task
+
+## Step 3a: **Change column names**
+
+Functions we will use in this step:
+
+* `rename()`
+
+Right now, the measurement units in our data are unclear. Let's first rename the columns to include units for each of the the four variables with units (`estimated_age`, `shoulder_height`, `tusk_length`, `tusk_circumference`). We will start with the three columns measured in centimeters.
+
+The *syntax* of using `rename()` is `new name = old name`.
+
+```{r}
+#1 - by renaming the columns with a pipe (%>%)
+tusks_rename <- tusks %>%
+  rename(shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
+
+#2 - by renaming the columns without a pipe
+tusks_rename <- rename(tusks, shoulder_height_cm = shoulder_height, tusk_length_cm = tusk_length, tusk_circumference_cm = tusk_circumference)
+```
+
+One of the major new things in how we coded the above block is the pipe operator (`%>%`). Remember, the pipe passes the *output* on the left hand side of the pipe as the *input* expected in the tidyverse function on the next line of code.
+
+This is the basic structure:
+
+```{r, eval = FALSE}
+# A tidyverse function without piping
+output <- function(input, arguments)
+  
+# The same task using piping
+output <- input %>%
+  function(arguments)
+```
+
+Piping might not seem very useful at the moment wwith only one function, but we will soon see how useful it can be!
+
+### **Mini Challenge 1**
+
+We renamed our measurement columns, but we also need to rename the estimated_age column.
+
+1.  Rename `tusks_rename` to replace `estimated_age` with `estimated_age_yr`.
+2. Call the new data `tusks_rename_all`
+
+Use the code block below to code your answers!
+
+```{r}
+tusks_rename_all <- tusks_rename %>%
+  rename(estimated_age_yr = estimated_age)
+```
+
+
+#-------------------------------------------------
+
+## Step 3b: **Cleaning the data: Remove the missing and duplicated data**
+
+Functions we will use in this step:
+
+* `drop_na()`
+* `arrange()`
+* `distinct()`
+* `group_by()`
+
+We can clearly see the missing data (NA). If we run `summary(tusks)`, we can also see the exact number of NAs in each column at the bottom of the column summary. I also happen to know there are three duplicate rows in the data. However, you would have a very difficult time finding them in 780 rows of observations!
+
+### Drop the missing observations
+
+The first thing we are going to do is drop the missing observations using the function `drop_na()`. We are also going to use the helper function `any_of()` to tell R which columns we want to remove the missing observations from: `tusk_length`, `tusk_circumference`, and `estimated_age`. This is because we need these columns for our summary, and missing values will get in our way. Specifying the columns isn't always necessary, but it's good to get into the habit of specifying the columns; `drop_na()` removes *all* missing values by default, and sometimes you might remove rows you need for your analysis just because there are missing values in another column you don't really care about. In our case, there is one missing value in the `shoulder_height` column, which we don't really care about, but will remove an observation with all the other data we *do* care about if we don't specify.
+
+```{r}
+# Remove NAs, using helper function any_of() to specify only missing tusk measurements
+tusks_no_na <- tusks_rename_all %>%
+  drop_na(any_of(
+    c('tusk_length_cm', 'tusk_circumference_cm', 'estimated_age_yr'))
+  )
+```
+
+#### **STOP and check your work**
+
+We need to check in frequently to ensure our intermediate data wrangling steps make sense. We just removed the missing observations from the data. At this point, we should run the `summary()` function again to make sure that we have a dataset with *fewer rows and no NAs in the tusk_length_cm, tusk_circumference, or estimated_age columns*.
+
+You should now have a dataset with 597 rows and no NA in either of the tusk measurement columns.
+
+### Try to find the duplicates
+
+Next, we want to remove all the duplicate rows from the data.
+
+One way to look for duplicates is by using the `arrange()` function. This function orders the data according to the values in one or more columns. This can be an effective way to look for duplicates because the duplicate rows will now be one after the other.
+
+### **Mini Challenge 2**
+
+You can apply the `arrange()` function using basic tidyverse syntax or piping.
+
+1. Arrange the `tusks_no_na` dataset by shoulder height
+2. Call the new data `tusks_arrange`
+
+Use the code block below to code your answers!
+
+```{r}
+tusks_arrange <- tusks_no_na %>%
+  arrange(shoulder_height_cm)
+```
+
+
+#-------------------------------------------------
+
+That didn't work very well. With so few duplicates, and many elephants having the same shoulder height measurements, it's hard to see the duplicates.
+
+### Filter out the duplicates
+
+Another way we can look for duplicates is by grouping the elephants by *all* columns and then filtering out the groups with identical data in all columns. Let's break this down.
+
+1. The `group_by()` function groups the data by one or more columns. The *syntax* is `group_by(column_1, column_2, ... column_n)`. 
+2. The `filter()` function uses relational operators to *remove* or *keep* rows that meet our criteria. The *syntax* is `column name(or other identifier), relational operator, criteria`.
+3. The `n()` function is a helper function to count the number of rows in each group (most useful when used with `group_by()`). This function does not need arguments within the parentheses when used within another `tidyverse` function.
+
+```{r}
+# Make a new dataset "tusks_dups" with all duplicate rows to we can see the problem
+tusks_dups <- tusks_arrange %>%
+  # Group by all columns in the dataset to pick out 100% identical rows
+  group_by(sample_period, 
+           sex, 
+           estimated_age_yr, 
+           shoulder_height_cm, 
+           tusk_length_cm, 
+           tusk_circumference_cm) %>%
+  # Filter the groups with more than one row ("groups, greater than, 1")
+  filter(n() > 1)
+```
+
+The new dataset `tusks_dups` has six rows. We can clearly see that these 6 rows are duplicates of only three distinct rows in the dataset.
+
+Now that we've assessed the issue, we can remove the duplicates using the `distinct()` function. This function's job is to keep only the rows that are "distinct" from other rows in the data, i.e., filter out the duplicates. It has no arguments other than the dataset name. If used with a pipe, it can be added on behind the pipe without any arguments.
+
+### **Mini Challenge 3**
+
+1. Use `distinct()` to remove the duplicate rows from `tusks_arrange`.
+2. Call the new dataset `tusks_distinct`.
+
+Use the code block below to code your answers!
+
+```{r}
+tusks_distinct <- tusks_arrange %>%
+  distinct()
+```
+
+#### **STOP and check your work**
+
+We just removed three duplicate rows from the data. This means our new dataset should have 594 rows.
+
+## Step 3c: **Enriching the data: Add an age class column**
+
+Functions we will use in this step:
+
+* `mutate()`
+* `case_when()`
+
+We only want a summary of the adult tusk measurements. Next, we need to remove the juveniles from the data. We don't have a column for age class, so we need to make one using the `mutate()` function.
+
+The *syntax* for `mutate()` is `new column = operator, criteria`. This is a simple mutate we might do if, for example, we wanted to add a column for tusk length in millimeters (10 mm in 1 cm):
+
+```{r, eval = FALSE}
+# Make a new column for tusk length in millimeters
+mutate(tusks_distinct, tusk_length_mm = tusk_length_cm * 10)
+```
+
+We are going to use relational operators to ask R whether the elephant in each row is an adult or juvenile, and insert a value in the new age class column depending on the answer. In fact, we are going to see how we can give the function multiple relational operators at once. We can string two relational operators together with two new operators, `|` and `&`. `|` between two criteria means "or". It says, "find whether the elephant meets *either* of these criteria. `&` between two criteria means "and". It says, "find whether the elephant meets *both* of these criteria.
+
+In our case, we want "and" because we first need to know whether an elephant is male or female to know whether it would be classified as a juvenile or adult based on its age (female adult elephants are ≥ 12 years and male adult elephants are ≥ 10 years).
+
+The `case_when()` function allows us to specify multiple criteria for a single column. The syntax is `if criteria 1 matches ~ insert value 1, if criteria 2 matches ~ insert value 2, ... if criteria n matches, insert value n`. We can specify as many criteria as we want. 
+
+Here is an example of how we might separate tall elephants with shoulder heights ≥ 150 cm from short elephants < 150 cm, then convert the column to a factor:
+
+```{r, eval = F}
+# Add new column for two heights
+tusks_distinct %>%
+  mutate(split_height = case_when(shoulder_height_cm >= 150 ~ "tall",
+                                  shoulder_height_cm < 150 ~ "short")) %>%
+  mutate(split_height_f = factor(split_height))
+```
+
+### **Mini Challenge 4**
+
+We need to make a new column with the following criteria to separate juveniles from adults:
+
+* If sex is female and age is ≥ 12, "ADULT"
+* If sex is female and age is < 12, "JUVENILE"
+* If sex is male and age is ≥ 10, "ADULT"
+* If sex is female and age is < 10, "JUVENILE"
+
+1. Create a new column in the `tusks_distinct` dataset called `age_class`.
+2. Name the two age classes "ADULT" and "JUVENILE".
+3. Create an additional column, `age_class_f`, with the age classes as factors.
+4. Call the new dataset `tusks_with_age_class`.
+
+Use the code block below to code your answers!
+
+```{r, eval = F}
+# Add new column for two heights
+tusks_with_age_class <- tusks_distinct %>%
+  mutate(age_class = case_when(sex == "f" & estimated_age_yr >= 12 ~ "ADULT",
+                               sex == "f" & estimated_age_yr < 12 ~ "JUVENILE",
+                               sex == "m" & estimated_age_yr >= 10 ~ "ADULT",
+                               sex == "m" & estimated_age_yr < 10 ~ "JUVENILE")) %>%
+  mutate(age_class_f = factor(age_class))
+```
+
+
+#-------------------------------------------------
+
+#### **STOP and check your work**
+
+We just added a column with our two age classes as a factor. Our dataset should now have two categories in the `age_class_f` column, with 350 adults and 244 juveniles.
+
+## Step 3d: **Reshaping the data: Filter the adults and remove extra columns**
+
+Functions we will use in this step:
+
+* `filter()`
+* `select()`
+
+Our next task is to remove the data we don't need so we can focus on summarizing the data we do need. We need to do the following:
+
+* Remove unnecessary observations (rows)
+* Remove unnecessary variables (columns)
+
+### Filter out the juveniles (and keep the adults)
+
+We will filter out the juveniles (leaving only the adult observations) using the `filter()` function. Filter works something like indexing and subsetting a data frame by relational operator in base R, but much more straightforward. The *syntax* of `filter()` is `column name, relational operator, criteria`. It looks something like this:
+
+```{r, eval = F}
+# Subset by indexing in base R
+df[df$column == "criteria" ,]
+
+# The equivalent, using filter() in tidyverse
+filter(df, column == "criteria")
+
+# The same thing with piping
+df %>%
+  filter(column == "criteria")
+```
+
+### **Mini Challenge 5**
+
+1. Filter the `tusks_with_age_class` data so only adults remain (*hint: There is more than one way to do this using filter!*)
+2. Call the new dataset `tusks_adults`
+
+Use the code block below to code your answers!
+
+```{r}
+tusks_adults <- tusks_with_age_class %>%
+  filter(age_class_f == "ADULT")
+
+tusks_adults <- tusks_with_age_class %>%
+  filter(age_class_f != "JUVENILE")
+```
+
+
+#-------------------------------------------------
+
+### Select only the columns we need
+
+There are several columns in our data that we no longer need. The only ones we really need to keep are `sample_period`, `sex`, `tusk_length_cm`, and `tusk_circumference_cm`. We can safely get rid of the other variables.
+
+The function that gets rid of columns is `select()`. It's related to `filter()`, but it works on columns instead. We can remove as many columns as we want up to n-1. The *syntax* for *keeping* a subset of columns is `select(data, column1, column2, ... column_n)`. *Removing* a subset of columns looks like this: `select(data, ! c(column1, column2, ... column_n))`.
+
+### **Mini Challenge 6**
+
+1. Select only the columns from `tusks_adults` that we need to keep (`sample_period`, `sex`, `tusk_length_cm`, and `tusk_circumference_cm`).
+2. Call the new dataset `tusks_select`
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+#### **STOP and check your work**
+
+We just removed unnecessary columns and filtered out the juvenile elephants. Our dataset should now have four variables and 350 rows.
+
+## Step 3e: **Reshaping the data: Summarizing tusks by sex and period**
+
+Functions we will use in this step:
+
+* `pivot_longer()`
+* `summarize()`
+* `group_by()`
+
+We are finally ready to summarize the data to meet our goal: the mean and standard deviation of both tusk measurements, compared between study periods and separated by sex. 
+
+### Pivot the data 
+
+Before we summarize, we need to finish one more reshaping task. We currently have two columns with tusk measurements in our data: `tusk_length_cm` and `tusk_circumference_cm`. What we want is the following:
+
+* One column called `tusk_dimension` with two factors: "length_cm" and "circumference_cm".
+* Another column called `measurement` with the measurement in centimeters.
+
+We can accomplish this task with the `pivot_longer()` function. `pivot_longer()` has several arguments. The necessary ones include:
+
+* `cols`, specifying which columns should be "pivotted" (moved into a single column).
+* `names_to`, specifying the names of the factor column.
+* `values_to`, specifying the name of the values column corresponding with each factor's observation.
+
+We are also going to include another argument in this case:
+
+* `names_prefix`, specifying a part of the factor names we want to remove.
+
+Here is what the pivot looks like:
+
+```{r}
+tusks_long <- tusks_select %>%
+  pivot_longer(
+    # Specifying the columns to pivot
+    cols = c(tusk_length, tusk_circumference),
+    # The prefix we want to remove
+    names_prefix = 'tusk_',
+    # The name of the factor column
+    names_to = 'tusk_dimension',
+    # The name of the values column
+    values_to = 'measurement'
+  )
+```
+
+### **Mini Challenge 7**
+
+1. Convert the `tusk_dimension` column into a factor. *(TIP: you can replace an existing column with a different data type using the syntax: `mutate(column_x = function(column_x))` )*
+2. Call the new dataset `tusks_long_factor`.
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+### Summarize the data
+
+To get to our final endpoint with this dataset, we will need to use the `summarize()` function. `summarize()` takes a column and squishes it down into a single value (mean, sum, standard deviation, etc.) that summarizes all rows. The *syntax* is: `summarize(data, summarized_column_x = function(column_x))`.
+
+There are several useful helper functions we can use within summarize:
+
+* `mean()`, the mean of all values.
+* `median()`, the median of all values.
+* `sum()`, the sum of all values.
+* `sd()`, the standard deviation of all values.
+
+The other important thing to know is that summarize will give us a single value summarizing all rows *unless* we tell it to summarize *by group*. We already know we need to do this, because we want a separate mean for each sex, sample period, and tusk dimension. We previously used the `group_by()` function to group each row by all variables and then looked for any duplicates. Now we will use `group_by()` to group by all of the variables we want to summarize by.
+
+### **Mini Challenge 8**
+
+Your final challenge is to summarize the mean and standard deviation for each tusk dimension of each sex in each sample period.
+
+1. Use `group_by()` to group `tusks_long_factor` by `sample_period`, `sex`, and `tusk_dimension`. *(NOTE: grouping must happen before summarizing)*
+2. Summarize the dataset with two new columns called `mean_measurement` and `sd_measurement` for the mean and standard deviation of the tusk measurements.
+2. Call the finalized dataset `tusks_cleaned`.
+
+Use the code block below to code your answers!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+#### **CHECK YOUR FINAL WORK**
+
+Your final dataset should have:
+
+* 8 rows
+* 5 columns:
+  * *sample_period,* a character
+  * *sex,*, a character
+  * *tusk_dimension*, a factor
+  * *mean_measurement*, a numeric/double
+  * *sd_measurement*, a numeric/double
+
