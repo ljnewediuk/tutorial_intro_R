@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Take-home Challenge 2
 
-This challenge is due **Thursday, Feb. 26th at 11:59 pm**. It will be graded out of XX points (the marks distribution is outlined in each section). Your grade on the assignment will make up approximately 5% of your final grade, which will depend on how many additional Take-home Challenges are assigned this semester and how much work you are required to do in each.
+This challenge is due **Thursday, Feb. 26th at 11:59 pm**. It will be graded out of 28 points (the marks distribution is outlined in each section and below). Your grade on the assignment will make up approximately 5% of your final grade, which will depend on how many additional Take-home Challenges are assigned this semester and how much work you are required to do in each.
 
 You can either complete your assignment using this .Rmd document or using the TakeHomeChallengeFormatting.Rmd. If you use this document, please ensure you revise the YAML at the beginning of the document with your name and the date.
 
@@ -21,63 +21,68 @@ Required submissions for this Take Home Challenge:
 * your output knitted as an HTML and saved to a PDF
 * Two figures, one for each part of this assignment, saved as .jpg files. Please see [this helper file](https://ljnewediuk.github.io/tutorial_intro_R/tutorials/X1-Plot_Aesthetics_Helper.html) for instructions on saving your plots.
 
+Your marks breakdown for this assignment:
+
+* **Task 1:** 2 points
+* **Task 2:** 10 points
+* **Task 3:** 5 points
+* **Annotations:** 3 points
+* **Plots as jpg files:** 5 points
+* **Both Rmd and knitted html (saved as pdf) submitted:** 3 points
+
 In this assignment, you are an author on two publications. You have been tasked with writing code and creating plots for the two papers. You have access to some of the data from the papers, but your co-authors are not organized, and some things have been lost. You need to fill in the gaps to make your project reproducible.
 
+### Task 1: Set up your environment (2 points)
 
-### Task 1: Recreate the plot
+Use this space to load the packages and data you'll need for this assignment. You can either set your working directory and load your data from there, or load your data using the full path names. You *must* use code to load your data and packages to receive marks for this section. **Note:** *You need to remove "eval = FALSE" for this chunk to run!*
 
-Paper 1's data (`insect_dispersal.csv`) contains observations of dispersal distances in four insect species from Northwestern Ontario. The columns are:
+```{r, eval = FALSE}
+# Load packages
+library()
 
-`species`: The genus and specific epithet of the insect
-`habitat`: Three habitat types where the insects were found: "Wetland", "Forest", and "Grassland"
-`region`: The region where the insect was found: "I" = Island, "C" = Central, "S" = South, and "N" = North
-`body_size_mm`: Body length of the insect, in millimeters
-`dispersal_disance_m`: Observed dispersal distance of the insect, in metres
+# Set working directory (optional)
+
+# Load data
+insect_data <- read_csv()
+sleep_data <- read_csv()
+```
+
+
+### Task 2: Recreate the plot (10 points)
+
+Paper 1's data (`TCH2_data_insects.csv`) contains observations of dispersal distances in four insect species from Northwestern Ontario. The columns are:
+
+* `species`: The genus and specific epithet of the insect
+* `habitat`: Three habitat types where the insects were found: "Wetland", "Forest", and "Grassland"
+* `region`: The region where the insect was found: "I" = Island, "C" = Central, "S" = South, and "N" = North
+* `body_size_mm`: Body length of the insect, in millimeters
+* `dispersal_disance_m`: Observed dispersal distance of the insect, in metres
 
 In this paper, you and your coauthors were testing the relationship between body size and dispersal distance by region. You have a copy of the original plot, but unfortunately your coauthor lost the code used to create it.
 
-**Your task: recreate the plot `TCH2_plot.tiff`, starting with the `insect_dispersal.csv` dataset.**
+**Your task: recreate the plot `TCH2_plot.tiff` below, starting with the `TCH_data_insects.csv` dataset.**
 
-### Task 2: Fix the plot
+```{r}
 
-Paper 2's data (``) compares anti-spike protein antibodies from subjects vaccinated for Sars-CoV2 4 weeks after vaccination. The subjects were each assigned a sleep score based on the average number of hours of sleep they had per night in the 4 weeks after vaccination. The columns are:
+```
 
+**Please remember to save and submit this plot to the dropbox along with the rest of your assignment!**
 
+### Task 3: Fix the plot (5 points)
 
+Paper 2's data (`TCH2_data_sleep.csv`) compares anti-spike protein antibodies from subjects vaccinated for Sars-CoV2 4 weeks after vaccination. The subjects were each assigned a sleep score based on the average number of hours of sleep they had per night in the 4 weeks after vaccination. The columns are:
 
+* `sleep_score`: The relative amount of sleep the subject received per night binned into categories: `Very short` ≤ 5 hours; `Short` 5-7 hours; `Normal` 8-9 hours; `Long` 10-12 hours; `Very long` ≥ 12 hours
+* `BAU_mL`: Binding antibody units of anti-spike antibodies in the blood, in milliliters
 
+In this paper, you and your coauthors were testing the relationship between sleep duration and antibody response after vaccination. Your coauthor made the original plot (code below), but you and your coauthors think they made some poor plotting decisions. Fix the code below to make a better graph for the paper! **Note:** *You need to remove "eval = FALSE" for this chunk to run!*
 
+```{r, eval = FALSE}
+# Plot the sleep data, comparing sleep scores
+ggplot(data = sleep_data, aes(x = sleep_score, y = BAU_mL)) +
+  geom_point()
+```
 
-
-
-
-
-
-
-This challenge will cover tidyverse and data visualization
-
-## Task 1 - Take a dataset and recreate a plot
-
-This task will give them a scatterplot image and they will have to figure out how to recreate it using tidyverse and ggplot. 
-
-Data-wrangling tasks:
-
-- `filter()` out one variable group that does not appear in the plot
-- `factor()` so the ordered groups end up in the correct order in the facets
-
-Plotting tasks:
-
-- Change axis labels
-- Colour the point groups by species
-- Separate trend lines for each habitat
-- Facet by region so the different regions end up on separate panels
+**Please remember to save and submit this plot to the dropbox along with the rest of your assignment!**
 
 
-## Task 2 - Take a poorly-made plot and fix it
-
-This task will be a bit more free-form in terms of their final output, but there will be some things they clearly need to fix. These could include:
-
-- Axis labels unclear
-- Variables need to be re-scaled
-- Poor colour choices
-- Plotted with wrong plot type (e.g., was made as a scatter plot but should be a boxplot)
