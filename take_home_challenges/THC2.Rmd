@@ -13,19 +13,18 @@ This challenge will cover tidyverse and data visualization
 
 ## Task 1 - Take a dataset and recreate a plot
 
-This task will give them a bar chart image and they will have to figure out how to recreate it using tidyverse and ggplot. 
+This task will give them a scatterplot image and they will have to figure out how to recreate it using tidyverse and ggplot. 
 
 Data-wrangling tasks:
 
-- `filter()` out one variable that does not appear in the plot
-- `group_by()` a variable and `summarize()` to get the counts
-- `factor()` so the ordered bars end up in the correct order
+- `filter()` out one variable group that does not appear in the plot
+- `factor()` so the ordered groups end up in the correct order in the facets
 
 Plotting tasks:
 
 - Change axis labels
-- Colour the bars by group
-- Facet so the groups end up on separate panels
+- Colour the point groups by group
+- Facet so the different groups end up on separate panels
 
 
 ## Task 2 - Take a poorly-made plot and fix it
