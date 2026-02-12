@@ -176,6 +176,8 @@ fish_data %>%
 # - Long (9-10 h)
 # - Very long (> 10 h)
 
+set.seed(1234)
+
 n <- 600
 
 sleep_levels <- c("Very short", "Normal", "Short", "Very long", "Long")
@@ -183,39 +185,25 @@ sleep_levels <- c("Very short", "Normal", "Short", "Very long", "Long")
 sleep_data <- tibble(
   sleep_score = sample(sleep_levels, n, replace = TRUE)
 ) %>%
-  mutate(BAU_mL = case_when(
-    sleep_score == "Very short" ~ rnorm(1, 40, 3),
-    sleep_score == "Short" ~ rnorm(1, 500, 50),
-    sleep_score == "Normal" ~ rnorm(1, 14200, 1000),
-    sleep_score == "Long" ~ rnorm(1, 14000, 1000),
-    sleep_score == "Very long" ~ rnorm(1, 14300, 1000)
-  )
-  )
-
-# BAU titres
-BAU_meds <- c(
-  `Very short` = 40,
-  `Short` = 500,
-  `Normal` = 14200,
-  `Long` = 14000,
-  `Very long` = 14300
-)
-
-sleep_data <- sleep_data %>%
   mutate(
-    dispersal_distance_m =
-      species_intercept[species] +
-      habitat_slope[habitat] * body_size_mm +
-      rnorm(n(), 0, 5)
-  )
+    log_mean = case_when(
+      sleep_score == "Very short" ~ log(50),
+      sleep_score == "Short" ~ log(500),
+      sleep_score == "Normal" ~ log(15000),
+      sleep_score == "Long" ~ log(12000),
+      sleep_score == "Very long" ~ log(3000)
+    ),
+    BAU_mL = round(rlnorm(n(), meanlog = log_mean, sdlog = 0.35), 2)
+  ) 
 
-# Optional: make Island slightly weird
-insect_data <- insect_data %>%
-  mutate(
-    dispersal_distance_m = ifelse(region == "I",
-                                  dispersal_distance_m * 0.6,
-                                  dispersal_distance_m)
-  )
+ggplot(sleep_data, aes(x = sleep_score, y = BAU_mL)) +
+  geom_boxplot()
+
+ggplot(sleep_data, aes(x = sleep_score, y = log(BAU_mL))) +
+  geom_boxplot()
+
+# Save
+write.csv(sleep_data, "datasets/TCH2_data_sleep.csv", row.names = F)
 
 # 6- Stacked barchart: Gut microbiome composition depending on diet
 
@@ -325,4 +313,4 @@ insect_data <- insect_data %>%
   )
 
 # Save the data
-write.csv(insect_data, "datasets/insect_dispersal.csv", row.names = F)
+write.csv(insect_dispersal, "datasets/TCH2_data_insects.csv", row.names = F)
