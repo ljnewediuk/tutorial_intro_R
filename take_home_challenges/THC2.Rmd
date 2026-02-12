@@ -9,6 +9,51 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+### Take-home Challenge 2
+
+This challenge is due **Thursday, Feb. 26th at 11:59 pm**. It will be graded out of XX points (the marks distribution is outlined in each section). Your grade on the assignment will make up approximately 5% of your final grade, which will depend on how many additional Take-home Challenges are assigned this semester and how much work you are required to do in each.
+
+You can either complete your assignment using this .Rmd document or using the TakeHomeChallengeFormatting.Rmd. If you use this document, please ensure you revise the YAML at the beginning of the document with your name and the date.
+
+Required submissions for this Take Home Challenge: 
+
+* your .Rmd
+* your output knitted as an HTML and saved to a PDF
+* Two figures, one for each part of this assignment, saved as .jpg files. Please see [this helper file](https://ljnewediuk.github.io/tutorial_intro_R/tutorials/X1-Plot_Aesthetics_Helper.html) for instructions on saving your plots.
+
+In this assignment, you are an author on two publications. You have been tasked with writing code and creating plots for the two papers. You have access to some of the data from the papers, but your co-authors are not organized, and some things have been lost. You need to fill in the gaps to make your project reproducible.
+
+
+### Task 1: Recreate the plot
+
+Paper 1's data (`insect_dispersal.csv`) contains observations of dispersal distances in four insect species from Northwestern Ontario. The columns are:
+
+`species`: The genus and specific epithet of the insect
+`habitat`: Three habitat types where the insects were found: "Wetland", "Forest", and "Grassland"
+`region`: The region where the insect was found: "I" = Island, "C" = Central, "S" = South, and "N" = North
+`body_size_mm`: Body length of the insect, in millimeters
+`dispersal_disance_m`: Observed dispersal distance of the insect, in metres
+
+In this paper, you and your coauthors were testing the relationship between body size and dispersal distance by region. You have a copy of the original plot, but unfortunately your coauthor lost the code used to create it.
+
+**Your task: recreate the plot `TCH2_plot.tiff`, starting with the `insect_dispersal.csv` dataset.**
+
+### Task 2: Fix the plot
+
+Paper 2's data (``) compares anti-spike protein antibodies from subjects vaccinated for Sars-CoV2 4 weeks after vaccination. The subjects were each assigned a sleep score based on the average number of hours of sleep they had per night in the 4 weeks after vaccination. The columns are:
+
+
+
+
+
+
+
+
+
+
+
+
+
 This challenge will cover tidyverse and data visualization
 
 ## Task 1 - Take a dataset and recreate a plot

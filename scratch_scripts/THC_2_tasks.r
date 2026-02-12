@@ -3,68 +3,27 @@
 
 library(tidyverse)
 
-# Body size vs. dispersal distance in insects
-
-# Biological story: Larger insects tend to disperse farther. The strength of 
-# this relationship varies among habitat types.
-
-
-set.seed(42)
-
-n <- 300
-
-species_levels <- c("Dragonfly", "Grasshopper", "Beetle", "Butterfly")
-habitat_levels <- c("Wetland", "Forest", "Grassland")  
-# Intentionally awkward order for faceting exercise
-
-region_levels <- c("North", "Central", "South", "Island")
-
-dat <- tibble(
-  species = sample(species_levels, n, replace = TRUE),
-  habitat = sample(habitat_levels, n, replace = TRUE),
-  region  = sample(region_levels, n, replace = TRUE)
-)
-
-# Body size distributions (mm)
-dat <- dat %>%
+# Load data
+insect_dat <- read_csv("datasets/insect_dispersal.csv") %>%
+  filter(region != "I") %>%
   mutate(
-    body_size_mm = rlnorm(n(),
-                          meanlog = case_when(
-                            species == "Dragonfly"  ~ 2.2,
-                            species == "Grasshopper" ~ 2.0,
-                            species == "Beetle"      ~ 1.8,
-                            species == "Butterfly"   ~ 1.9
-                          ),
-                          sdlog = 0.25)
-  )
+    species = factor(
+      species, 
+      levels = c("cicindela_patruela", "melanoplus_femurrubrum", "anax_walsinghami" , "limenitis_arthemis"),
+      labels = c("C. patruela", "M. femurrubrum", "A. walsinghami", "L. arthemis")),
+    region = factor(
+      region, 
+      levels = c("N", "S", "C"), 
+      labels = c("North", "South", "Central")
+    ))
 
-# Habitat-dependent slopes
-habitat_slope <- c(
-  Forest = 2.5,
-  Grassland = 3.2,
-  Wetland = 2.8
-)
+insect_dat %>%
+  ggplot(aes(x = body_size_mm, y = dispersal_distance_m)) +
+  geom_point(aes(colour = species)) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ region) +
+  labs(x = "Body size (mm)", y = "Dispersal distance (m)")
 
-# Species intercepts
-species_intercept <- c(
-  Dragonfly = 5,
-  Grasshopper = 2,
-  Beetle = 1,
-  Butterfly = 3
-)
+ggsave("TCH2_plot.tiff", last_plot(), path = "imgs/", device = "tiff",
+       width = 10, height = 6, units = "in")
 
-dat <- dat %>%
-  mutate(
-    dispersal_distance_m =
-      species_intercept[species] +
-      habitat_slope[habitat] * body_size_mm +
-      rnorm(n(), 0, 5)
-  )
-
-# Optional: make Island slightly weird
-dat <- dat %>%
-  mutate(
-    dispersal_distance_m = ifelse(region == "Island",
-                                  dispersal_distance_m * 0.6,
-                                  dispersal_distance_m)
-  )
