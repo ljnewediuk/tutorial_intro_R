@@ -6,10 +6,10 @@
 library(tidyverse)
 
 # Set random seed
-set.seed(2213)
+set.seed(123)
 
 # Number of observations
-n <- 210
+n <- 410
 
 # Start basic data frame
 lizard_dat <- tibble(
@@ -28,11 +28,11 @@ lizard_dat <- lizard_dat %>%
     body_size_mm =
       ifelse(sex == "Female",
              
-             80 + 3.8 * age_years +   # Females grow faster
-               rnorm(n(), 0, 2.5),
+             60 + 4 * age_years +   # Females grow faster
+               rnorm(n(), 0, 3.5),
              
              82 + 2.2 * age_years +   # Males grow slower
-               rnorm(n(), 0, 3.5)
+               rnorm(n(), 0, 5.5)
       )
   )
 
@@ -46,7 +46,7 @@ lizard_dat <- lizard_dat %>%
     body_temp_C = ifelse(
       habitat == "Open",
       
-      rgamma(n(), shape = 18, scale = 1.6),   # Higher mean, larger variance
+      rgamma(n(), shape = 18, scale = 3),   # Higher mean, larger variance
       rgamma(n(), shape = 35, scale = 0.8)    # Lower variance, less skew
     )
   )
@@ -93,8 +93,9 @@ summary(aov(body_size_mm ~ sex, data = lizard_dat))
 summary(lm(body_size_mm ~ sex, data = lizard_dat))
 
 # Body size and age (assumptions met)
-lizard_dat %>% ggplot(aes(y =body_size_mm, x = age_years)) + geom_point() + geom_smooth(method = 'lm')
-size_age_mod <- lm(body_size_mm ~ age_years, data = lizard_dat)
+lizard_dat %>% filter(sex == "Female") %>%
+  ggplot(aes(y =body_size_mm, x = age_years)) + geom_point() + geom_smooth(method = 'lm')
+size_age_mod <- lm(body_size_mm ~ age_years, data = lizard_dat[lizard_dat$sex == "Female" ,])
 summary(size_age_mod)
 plot(size_age_mod)
 
