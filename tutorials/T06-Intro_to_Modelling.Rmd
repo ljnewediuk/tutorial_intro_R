@@ -1,0 +1,91 @@
+---
+title: "Introduction to Models"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 6, Winter 2026"
+output: 
+  pdf_document:
+    toc: yes
+  html_document:
+    df_print: kable
+    toc: yes
+    toc_float: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+
+## Introduction to modelling in R
+
+The most basic form of modelling is a linear model. You will also hear this referred to as a linear regression. We've already discussed how some of the tests you are already familiar with (e.g., ANOVA) are just a different form of linear model. The only real difference is that:
+
+* ANOVA is a *test of difference*. We want to know whether there is a signficant difference between two groups in terms of a discrete variable, **X**, across a response variable, **Y**.
+* Linear regression is a *test of relationship*. We want to know whether there is a significant relationship between **X** and **Y**. 
+
+# 1 - Set up your R workspace for the day
+
+## Step 1a: Set your working directory
+
+Make sure we're setting our working directory!
+
+```{r, eval = F}
+# Set your working directory, then remove "eval = F"!
+setwd()
+```
+
+## Step 1b: Install and load packages
+
+We are going to need to load tidyverse. We are also going to install a new package called `car`, which stands for "Companion to Applied Regression".
+
+Using the code block below, install the `car` package, then load `car` and `tidyverse`.
+
+## Step 1c: Load data
+
+Our dataset for this topic (**lizard_data.csv**) comes from a study on lizard running speeds in different habitats. Lizards are ectotherms, which means their physiological performance depends on the external temperature. We will be testing a number of hypotheses relating body size, temperature, age, sex, habitat, and running speed.
+
+Load the dataset by finishing the `read_csv()` function.
+
+```{r, echo = F, message=FALSE}
+lizard_data <- read_csv()
+```
+
+## Step 2: Test four different hypotheses
+
+Tests of difference:
+
+* body size ~ sex (meets assumptions)
+* temperature ~ habitat (violates assumptions)
+
+Plot boxplots and assess assumptions visually, then test with Shapiro and Levene's
+
+Tests of relationship:
+
+* body size ~ age (meets assumptions)
+* speed ~ temperature (violates assumptions)
+
+Fit the models, then look at the diagnostic plots (residual plot and qqplots)
+
+## Step 3: Multiple regression
+
+Fit models for:
+
+* body size ~ age
+* body size ~ sex
+* body size ~ age + sex
+
+Compare r-squareds and assess using AIC.
+
+## Step 4: Interactions
+
+Add interaction between sex and age: body size ~ age*sex
+
+## Step 5: Outliers
+
+Assess outliers using Cook's distance
+
+
+
+
