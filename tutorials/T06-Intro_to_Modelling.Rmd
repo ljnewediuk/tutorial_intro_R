@@ -46,7 +46,14 @@ Using the code block below, install the `car` package, then load `car` and `tidy
 
 ### Load data
 
-Our dataset for this topic (**lizard_data.csv**) comes from a study on lizard running speeds in different habitats. Lizards are ectotherms, which means their physiological performance depends on the external temperature. We will be testing a number of hypotheses relating body size, temperature, age, sex, habitat, and running speed.
+Our dataset for this topic (**lizard_data.csv**) comes from a study on lizard running speeds in different habitats. Each row is a measurement from a new lizard. Lizards are ectotherms, which means their physiological performance depends on the external temperature. We will be testing a number of hypotheses relating body size, temperature, age, sex, habitat, and running speed. The columns are defined as follows:
+
+* `sex`: Sex of the lizard (female or male)
+* `habitat`: The habitat where the lizard was captured (open or forest)
+* `age_years`: The age of the lizard
+* `body_size_mm`: The snout-vent length of the lizard, measured in millimeters
+* `body_temp_C`: The temperature of the lizard's body, in degrees Celsius, at the time of its running trial
+* `speed_m_s`: The running speed of the lizard in metres per second
 
 Load the dataset by finishing the `read_csv()` function.
 
