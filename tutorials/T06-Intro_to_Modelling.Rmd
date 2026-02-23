@@ -196,7 +196,7 @@ summary(lizard_sex_lm)
 
 This output looks a little different. Some additional things we can see:
 
-* **Estimate:** This is the "effect size" of the variable. The effect size `sexMale` tells us how much larger males are than females. When the effects are categories, the model automatically picks a "reference category" for comparison, which is "Female" in this case. The estimate is, therefore, the increase in body size when the lizard is male versus female.
+* **Estimate:** This is the *"effect size"* of the variable. The effect size `sexMale` tells us how much larger males are than females. When the effects are categories, the model automatically picks a "reference category" for comparison, which is "Female" in this case. The estimate is, therefore, the increase in body size when the lizard is male versus female. The effect size for `(Intercept)` is the mean body size of the reference category, i.e., when the lizard is female.
 * **Std. Error:** This is the variation or uncertainty in the effect size.
 * **Pr(>|t|):** This is the p-value, telling us whether the relationship is statistically significant (< 0.05).
 
@@ -216,7 +216,7 @@ We are going to start backwards and first fit the linear regression. Then, we wi
 
 We are going to fit a separate model for male and female lizards.
 
-1. Filter the data to create two lizard datasets, one with only males, and the other with only females. Call the datasets "size_age_M_data" and "size_age_F_data".
+1. Filter the data to create two lizard datasets, one with only males, and the other with only females. Call the datasets "M_lizard_data" and "F_lizard_data".
 2. Use the `lm()` function to test for an effect of `age_years` on `body_size_mm` for each sex.
 3. Call the models "size_age_M_lm" and "size_age_F_lm".
 
@@ -229,9 +229,24 @@ Use the code block below for your answer!
 
 #-------------------------------------------------
 
+Let's look at the summaries of the models.
+
+```{r}
+# Male lizard model
+summary(size_age_M_lm)
+# Female lizard model
+summary(size_age_M_lm)
+```
+
+Our output looks very familiar, but there are a few key differences. First, we now have an Estimate for `age_years`. Instead of comparing males and females, this estimate reflects *the amount by which body mass changes for each unit increase in age*. Because the estimate is positive, there is an increase in size with age, which we expect.
+
+The meaning of `(Intercept)` has also changed. In our model comparing males and females, the intercept reflected the mean size of lizards in the reference category. *We now need to interpret the intercept as the lizard's size when age = zero*.
+
+We also see our R-squared, which tells us about the model's fit.
+
 ### Part 2b: Test assumptions
 
-Now we will use the linear model objects to test our assumptions. This time, we are going to test all of the assumptions. Again, the assumptions of linear regression are:
+Now we will test whether the linear models we just fit meet the assumptions of linear models. This time, we are going to test all of the assumptions. Again, the assumptions of linear regression are:
 
 * Independent errors
 * Linear relationship
@@ -267,7 +282,7 @@ Next, we are going to test the hypothesis that external temperature affects phys
 
 ### **Mini Challenge 4**
 
-1. Fit a linear model to test the relationship between `speed_m_s` and `body_temp_C`.
+1. Fit a linear model to test the relationship between `speed_m_s` and `body_temp_C`, including both male and female lizards.
 2. Use your diagnostic plots to assess whether the model meets the assumptions of a linear model.
 
 Use the code block below for your answer!
@@ -320,7 +335,7 @@ Use the code block below for your answer!
 
 ```
 
-Have the model results changed?
+Have the model results changed? Would you recommend removing the outliers or leaving them in your model?
 
 #-------------------------------------------------
 
@@ -333,7 +348,7 @@ Based on the R-squared values from our model summaries, we know that both sex an
 
 To add multiple variables to a model, we use the `+` operator on the right side of the `~` in our formula. We can technically add as many variables as we want. However, we also need to be careful. Adding too many variables can lead to something called **overfitting**, which actually makes it *more difficult to understand the patterns in our data*. 
 
-We will talk more about overfitting in a couple of weeks. For now, you just need to think about which variables you need to include to address the hypotheses you are trying to test. Including age and sex in the same model makes sense for us, because our hypothesis is that *sex- and age-specific reproductive strategies in this species drive differences in growth trajectories and eventual body size*. Let's compare how our model changes when we add sex and age to the same model.
+We will talk more about overfitting in a couple of weeks. For now, you just need to think about being as parsimonious as you can. Which variables do you need to include to address the hypotheses you are trying to test? Including age and sex in the same model makes sense for us, as our hypothesis is that *sex- and age-specific reproductive strategies in this species drive differences in growth trajectories and eventual body size*. Let's compare how our model changes when we add sex and age to the same model.
 
 ### Effects of sex and age on body size
 
@@ -376,7 +391,7 @@ ggplot(lizard_data, aes(x = age_years, y = body_size_mm, colour = sex)) +
   labs(x = "Lizard age (years)", y = "Body size (mm)")
 ```
 
-We can see there is a positive relationship betweenn age and body size for both sexes. However, female lizards do appear to grow faster than males, even though they start at a smaller body size and eventually reach a smaller adult size.
+We can see there is a positive relationship between age and body size for both sexes. However, female lizards appear to grow faster than males, even though they start at a smaller body size and eventually reach a smaller adult size.
 
 Let's see if accounting for the interactive effect explains any more variation in body size. We can include an interaction using the `*` operator. Using this operator still specifies the additive effects of each variable, but includes the interaction in addition. This interaction can be thought of as the amount by which the additive effect changes when the lizard is a male instead of a female.
 
@@ -387,15 +402,40 @@ lizard_sex_age_lm_intxn <- lm(body_size_mm ~ sex * age_years, data = lizard_data
 summary(lizard_sex_age_lm_intxn)
 ```
 
-We can see that when the lizard is male, the effect of the relationship between age and body size is slightly smaller compared to females (-1.44). The R-squared for this model is also slightly higher, meaning the interaction explains slightly more variation in body size!
+Our model summary now has two familiar lines, `sexMale` and `age_years`, and one new line, `sexMale:age_years`. This is our interaction term. Just like the other variables, our interaction term has an "Estimate", "Std. Error", and "Pr(>|t|)". 
 
-## Part 5: Model comparison
+### **Mini Challenge 6**
 
-Compare models using AIC:
+In your own words, write your interpretation of the interaction term in your model.
+
+#-------------------------------------------------
+
+## Part 5: Model selection
+
+The R-squared for this model with the interaction is also slightly higher, meaning the interaction explains slightly more variation in body size! But how do we know that the model with the interaction is worth it? We already talked about the principle of parsimony. We also saw that adding the interaction technically adds a new variable, which increases the risk that our model is overfit. How can we weigh the risk of overfitting the model against the benefit of the interaction?
+
+We have now entered the realm of model selection procedures. Model selection allows us to weigh the relative support for models when we have multiple options. The procedure we are going to use is called the **Akaike Information Criterion (AIC)**. We aren't going to go into too much detail about deriving AIC. You can think of it as some measure of how the model compares to an unknown true model that perfectly describes all of the variation in the response we are estimating (`body_size_mm`). Such a model would have an R-squared = 1 and the linear regression would be a perfect slope = 1. This is obviously unrealistic. However, *the lower the AIC, the closer our model it is to this idealized model*. AIC also *penalizes models for each additional parameter*, allowing us to evaluate how good the model is against the additional variables we added. Generally, if one model is ≥ 2 AIC lower than another, it is considered a superior model.
+
+### **Mini Challenge 7**
+
+The function to calculate AIC for a model is just `AIC()`. The only required argument is the model object from your environment.
+
+1. Using `lm()`, fit the following four models. Don't worry about separating male and female lizards--include both sexes in the same models.
 
 * body size ~ age
 * body size ~ sex
 * body size ~ age + sex
 * body size ~ age * sex
 
-The interaction model should be the best
+2. Evaluate each model using AIC
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+Which model is the "best", model according to AIC?
+
+#-------------------------------------------------
+
