@@ -43,7 +43,7 @@ We already talked about how these tests are different forms of the same basic mo
 
 Make sure we're setting our working directory!
 
-```{r, eval = F}
+```{r}
 # Set your working directory, then remove "eval = F"!
 setwd()
 ```
@@ -67,7 +67,7 @@ Our dataset for this topic (**lizard_data.csv**) comes from a study on lizard ru
 
 Load the dataset by finishing the `read_csv()` function.
 
-```{r, eval = F}
+```{r}
 lizard_data <- read_csv()
 ```
 
@@ -84,7 +84,7 @@ Before we test our hypothesis, we want to visualize how the distributions of dat
 
 #### Size differences between male and female lizards
 
-```{r, eval = F}
+```{r}
 ggplot(lizard_data, aes(x = sex, y = body_size_mm)) +
   geom_boxplot() +
   labs(x = "Lizard sex", y = "Body size (mm)")
@@ -141,7 +141,7 @@ Let's see how this works for a test of difference in body size between sexes.
 
 The leveneTest function takes two important arguments. `y` is the response variable, which can either be a vector or a column from a data frame. `group` is the variable defining the groups. It can either be a vector or column, but must be the same length as `y`.
 
-```{r, eval = F}
+```{r}
 leveneTest(y = lizard_age_classes$body_size_mm, group = lizard_age_classes$sex)
 ```
 
@@ -153,7 +153,7 @@ In any case, p `(Pr(>F))` is > 0.05, so we're good!
 
 We want to make sure that Y (body_size_mm) is normally distributed at *all* values of X (sex). The `shapiro.test` function only takes the argument `x`, which is the vector or column defining the response variable. We're going to look at each value of X (female and male) separately by indexing the columns.
 
-```{r, eval = F}
+```{r}
 # Test for normality in male body size
 shapiro.test(lizard_age_classes[lizard_age_classes$sex == "Male" ,]$body_size_mm)
 
@@ -185,7 +185,7 @@ Now that we've tested our assumptions, we can fit a linear model. First, we'll t
 
 Let's start with ANOVA, which is just a linear model, as we know. We are going to use the `aov()` function. The arguments in this function are `data` (the data frame) and `formula`, the formula for the linear model, which includes the dependent variable (body size) and independent variable (sex) separated by a tilde (~). The format is: `dependent variable ~ independent variable` (e.g., `body_size_mm ~ sex`).
 
-```{r, eval = F}
+```{r}
 # Fit the ANOVA
 lizard_sex_anova <- aov(body_size_mm ~ sex, data = lizard_age_classes)
 # Summarize the results
@@ -200,7 +200,7 @@ This is where the linear model comes in! Linear models are essentially equivalen
 
 The function we will use for linear models is `lm()`. This function takes the exact same arguments as `aov()`--a formula and data frame.
 
-```{r, eval = F}
+```{r}
 # Fit the linear model
 lizard_sex_lm <- lm(body_size_mm ~ sex, data = lizard_age_classes)
 # Summarize the results
@@ -246,7 +246,7 @@ Use the code block below for your answer!
 
 Let's look at the summaries of the models.
 
-```{r, eval = F}
+```{r}
 # Male lizard model
 summary(size_age_M_lm)
 # Female lizard model
@@ -275,7 +275,7 @@ Instead of `shapiro.test()` and `leveneTest()`, we are going to evaluate our ass
 
 Let's plot the female model first:
 
-```{r, eval = F}
+```{r}
 plot(size_age_F_lm)
 ```
 
@@ -285,7 +285,7 @@ The Q-Q plot shows us that the errors are normally distributed. If they weren't,
 
 Let's test the male model:
 
-```{r, eval = F}
+```{r}
 plot(size_age_M_lm)
 ```
 
@@ -325,7 +325,7 @@ We will use the function `cooks.distance()` to calculate the Cook's distance ind
 
 Let's check for outliers in our linear model we made to test the relationship between size and age in *male* lizards (`size_age_M_lm`). First, we need to calculate Cook's distance. We are going to save the output as a tibble so we can work with the values.
 
-```{r, eval = F}
+```{r}
 cooks_D_size_age_M <- as_tibble(
   cooks.distance(size_age_M_lm)
 )
@@ -333,7 +333,7 @@ cooks_D_size_age_M <- as_tibble(
 
 Next, we'll calculate the cut-off for Cook's distance values being potentially influential. We can use the function `nrow()` to determine how many rows are in our tibble with male lizard data, `M_lizard_data`.
 
-```{r, eval = F}
+```{r}
 4/nrow(M_lizard_data)
 ```
 
@@ -371,7 +371,7 @@ We will talk more about overfitting in a couple of weeks. For now, you just need
 
 Here are our original three models.
 
-```{r, eval = F}
+```{r}
 # Effect of sex on body size
 summary(lizard_sex_lm)
 # Effect of age on  male body size
@@ -382,7 +382,7 @@ summary(size_age_F_lm)
 
 Individually, each of these models explains between approximately 33% and 67% of the variation in body size (the definition of R-squared). What if we included sex and age in the same model?
 
-```{r, eval = F}
+```{r}
 # Multiple regression model including sex and age effects on body size
 lizard_sex_age_lm <- lm(body_size_mm ~ sex + age_years, data = lizard_data)
 # Model summary
@@ -401,7 +401,7 @@ Our model includes two independent variables, each having an individual effect o
 
 To help you visualize what we're talking about, let's make a quick scatterplot of the change in body size with age for male and female lizards.
 
-```{r, eval = F}
+```{r}
 ggplot(lizard_data, aes(x = age_years, y = body_size_mm, colour = sex)) +
   geom_point() +
   geom_smooth(method = 'lm') +
