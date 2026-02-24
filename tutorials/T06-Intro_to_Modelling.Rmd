@@ -3,12 +3,12 @@ title: "Introduction to Models"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 6, Winter 2026"
 output: 
-  pdf_document:
-    toc: yes
   html_document:
     df_print: kable
     toc: yes
     toc_float: yes
+  pdf_document:
+    toc: yes
 editor_options:
   chunk_output_type: console
 ---
@@ -19,14 +19,14 @@ knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRU
 
 # **Learning Objectives**
 
-MODELS ARE.... Linear models are one of the simplest and most versatile classes of model. We are going to learn to fit and assess linear models in R, and add more complexity to our analyses in the weeks to come.
+Today, we will start learning about statistical models. Linear models are one of the simplest and most versatile classes of statistical model. We will add more complexity to our analyses in the weeks to come.
 
 After completing this topic, you should feel comfortable:
 
-1.  
-2.
-3.
-4.
+1.  Distinguishing between a test of difference and test of relationship
+2.  Test the assumptions of your linear models
+3.  Evaluate your model's fit, and consider how you could improve it
+4.  Fit some models!
 
 ## Introduction to modelling in R
 
@@ -67,7 +67,7 @@ Our dataset for this topic (**lizard_data.csv**) comes from a study on lizard ru
 
 Load the dataset by finishing the `read_csv()` function.
 
-```{r, echo = F, message=FALSE}
+```{r, eval = F}
 lizard_data <- read_csv()
 ```
 
@@ -84,7 +84,7 @@ Before we test our hypothesis, we want to visualize how the distributions of dat
 
 #### Size differences between male and female lizards
 
-```{r}
+```{r, eval = F}
 ggplot(lizard_data, aes(x = sex, y = body_size_mm)) +
   geom_boxplot() +
   labs(x = "Lizard sex", y = "Body size (mm)")
@@ -119,7 +119,7 @@ Use the code block below to code your answers!
 
 ### Part 1b: Test assumptions
 
-Before we test statistically for group differences, we need to confirm our data follows the assumptions of linear models. Those assumptions are:
+Before we test statistically for group differences, we need to confirm our data follows the assumptions of linear models. Those assumptions again:
 
 * Independent errors
 * Linear relationship
@@ -135,23 +135,25 @@ There are two important functions for testing theses assumptions:
 
 #### Test assumptions for size differences between sexes
 
+Let's see how this works for a test of difference in body size between sexes. 
+
 **Test for homogeneity of variance**
 
 The leveneTest function takes two important arguments. `y` is the response variable, which can either be a vector or a column from a data frame. `group` is the variable defining the groups. It can either be a vector or column, but must be the same length as `y`.
 
-```{r}
+```{r, eval = F}
 leveneTest(y = lizard_age_classes$body_size_mm, group = lizard_age_classes$sex)
 ```
 
 The function spits out a warning about "coercing lizard_age_classes$sex to factor". This is just because in our data, sex is not a factor data type, which is required by the function. R is telling us it has done that for us.
 
-In any case, p (Pr(>F)) is > 0.05, so we're good!
+In any case, p `(Pr(>F))` is > 0.05, so we're good!
 
 **Test for normality**
 
 We want to make sure that Y (body_size_mm) is normally distributed at *all* values of X (sex). The `shapiro.test` function only takes the argument `x`, which is the vector or column defining the response variable. We're going to look at each value of X (female and male) separately by indexing the columns.
 
-```{r}
+```{r, eval = F}
 # Test for normality in male body size
 shapiro.test(lizard_age_classes[lizard_age_classes$sex == "Male" ,]$body_size_mm)
 
@@ -163,7 +165,7 @@ It looks like the body size variable also meets the assumption of normally distr
 
 ### **Mini Challenge 2**
 
-We haven't tested the assumptions of normality and homogeneity of variance for body size with respect to age classes. Check these assumptions now.
+We haven't tested the assumptions of normality and homogeneity of variance for body size with respect to the new age class variable we created in `lizard_age_classes`. Check these assumptions now.
 
 Use the code block below to code your answers!
 
@@ -171,18 +173,19 @@ Use the code block below to code your answers!
 
 ```
 
+Do the data meet our assumptions?
 
 #-------------------------------------------------
 
 ### Part 1c: Test for size differences between sexes
 
-Now that we've tested our assumptions, we can fit a linear model.
+Now that we've tested our assumptions, we can fit a linear model. First, we'll test for differences between the sexes.
 
 #### ANOVA
 
-Let's start with ANOVA, which is just a linear model, as we know. We are going to use the `aov()` function. The arguments in this function are `data` (the data frame) and `formula`, the formula for the linear model, which includes the dependent variable (body size) and independent variable (sex) separated by a tilde (~). The format is: `dependent variable ~ independent variable` (`body_size_mm ~ sex`).
+Let's start with ANOVA, which is just a linear model, as we know. We are going to use the `aov()` function. The arguments in this function are `data` (the data frame) and `formula`, the formula for the linear model, which includes the dependent variable (body size) and independent variable (sex) separated by a tilde (~). The format is: `dependent variable ~ independent variable` (e.g., `body_size_mm ~ sex`).
 
-```{r}
+```{r, eval = F}
 # Fit the ANOVA
 lizard_sex_anova <- aov(body_size_mm ~ sex, data = lizard_age_classes)
 # Summarize the results
@@ -197,16 +200,16 @@ This is where the linear model comes in! Linear models are essentially equivalen
 
 The function we will use for linear models is `lm()`. This function takes the exact same arguments as `aov()`--a formula and data frame.
 
-```{r}
+```{r, eval = F}
 # Fit the linear model
 lizard_sex_lm <- lm(body_size_mm ~ sex, data = lizard_age_classes)
 # Summarize the results
 summary(lizard_sex_lm)
 ```
 
-This output looks a little different. Some additional things we can see:
+This output looks a little different than our ANOVA. Some additional things we can see:
 
-* **Estimate:** This is the *"effect size"* of the variable. The effect size `sexMale` tells us how much larger males are than females. When the effects are categories, the model automatically picks a "reference category" for comparison, which is "Female" in this case. The estimate is, therefore, the increase in body size when the lizard is male versus female. The effect size for `(Intercept)` is the mean body size of the reference category, i.e., when the lizard is female.
+* **Estimate:** This is the *"effect size"* of the variable. The effect size `sexMale` tells us how much larger males are than females. When the effects are categories, the model automatically picks a "reference category" for comparison, which is "Female" in this case. The estimate is, therefore, a prediction of how much larger body size is when the lizard is male versus female. The effect size for `(Intercept)` is the mean body size of the reference category, i.e., when the lizard is female.
 * **Std. Error:** This is the variation or uncertainty in the effect size.
 * **Pr(>|t|):** This is the p-value, telling us whether the relationship is statistically significant (< 0.05).
 
@@ -214,17 +217,19 @@ At the bottom of the summary, we can see values for **R-squared**. This is a mea
 
 ## Part 2: Tests of relationship
 
-We tried to use test of difference to test the prediction that older lizards are larger than smaller lizards, but the data did not meet our assumptions. A *linear regression* is a more natural way to think about this test. It turns out that linear regressions are just like tests of difference, where the **X** variable can take *any* value, instead of just a few discrete values (e.g., Juvenile, Prime-age, Senescent).
+We tried to use test of difference to test the prediction that older lizards are larger than younger lizards, but the data did not meet our assumptions when we grouped the ages into categories. A *linear regression* is a more natural way to think about this test because age is essentially continuous data. It turns out that linear regressions are just like tests of difference, where the **X** variable can take *any* value, instead of just a few discrete values (e.g., Juvenile, Prime-age, Senescent).
 
 Let's revisit the prediction that lizard size increases with age.
 
 ### Part 2a: Fit the linear regression
 
-We are going to start backwards and first fit the linear regression. Then, we will test the assumptions. Because every linear model is just a linear model, we're going to use the `lm()` function again. Again, the format is `dependent variable ~ independent variable`.
+We are going to start backwards and first fit the linear regression, then test the assumptions. This is because R needs the actual linear model object to evaluate its assumptions.
+
+Because every linear model is just a linear model, we're going to use the same `lm()` function again. Again, the format is `dependent variable ~ independent variable`.
 
 ### **Mini Challenge 3**
 
-We are going to fit a separate model for male and female lizards.
+Let's fit a separate model for male and female lizards to test the prediction that size increases with age.
 
 1. Filter the data to create two lizard datasets, one with only males, and the other with only females. Call the datasets "M_lizard_data" and "F_lizard_data".
 2. Use the `lm()` function to test for an effect of `age_years` on `body_size_mm` for each sex.
@@ -241,14 +246,14 @@ Use the code block below for your answer!
 
 Let's look at the summaries of the models.
 
-```{r}
+```{r, eval = F}
 # Male lizard model
 summary(size_age_M_lm)
 # Female lizard model
 summary(size_age_M_lm)
 ```
 
-Our output looks very familiar, but there are a few key differences. First, we now have an Estimate for `age_years`. Instead of comparing males and females, this estimate reflects *the amount by which body mass changes for each unit increase in age*. Because the estimate is positive, there is an increase in size with age, which we expect.
+Our output looks very familiar, but there are a few key differences. First, we now have an Estimate for `age_years`. Instead of comparing males and females, like our model of body size differences between the sexes, this estimate reflects *the amount by which body mass changes for each unit increase in age*. Because the estimate is positive, there is an increase in size with age, which we expect.
 
 The meaning of `(Intercept)` has also changed. In our model comparing males and females, the intercept reflected the mean size of lizards in the reference category. *We now need to interpret the intercept as the lizard's size when age = zero*.
 
@@ -256,7 +261,7 @@ We also see our R-squared, which tells us about the model's fit.
 
 ### Part 2b: Test assumptions
 
-Now we will test whether the linear models we just fit meet the assumptions of linear models. This time, we are going to test all of the assumptions. Again, the assumptions of linear regression are:
+Now we will test whether the linear models we just fit meet the assumptions of linear models. This time, we are going to test *all* of the assumptions, including that of independent errors and linear relationship, which didn't make as much sense in our test of difference. Again, the full suite of assumptions of linear regression are:
 
 * Independent errors
 * Linear relationship
@@ -266,21 +271,21 @@ Now we will test whether the linear models we just fit meet the assumptions of l
 Instead of `shapiro.test()` and `leveneTest()`, we are going to evaluate our assumptions visually. The `plot()` function, when using a linear model object as the argument, provides a series of diagnostic plots that help us assess the assumptions of linear models. When you run the function, the plots will appear in the "Plots" window. In your console, R will tell you to "Hit <Return> to see next plot:". The first two plots are:
 
 1. **Residual plot:** Shows us whether the relationship is linear, whether there are any patterns in the errors that could cause non-independence, and whether the variances are homogeneous.
-2. **Q-Q plot:** Shows us whether the errors are normally distributed.
+2. **Quantile-quantile (Q-Q) plot:** Shows us whether the errors are normally distributed.
 
 Let's plot the female model first:
 
-```{r}
+```{r, eval = F}
 plot(size_age_F_lm)
 ```
 
-This looks decent. In the residuual plot, the fact that the points are spread out around zero shows us three of our four assumptions are met. If the model violated these assumptions, we would see a pattern in the points. 
+This looks decent. In the residual plot, the fact that the points are spread out around zero shows us three of our four assumptions are met. If the model violated these assumptions, we would see a pattern in the points. 
 
-The Q-Q plot shows us that the errors are normally distributed. If they weren't, we would see either an s-curve or a parabola shape around the diagonal line.
+The Q-Q plot shows us that the errors are normally distributed. If they weren't, we might see either an s-curve or a parabola shape around the diagonal line.
 
 Let's test the male model:
 
-```{r}
+```{r, eval = F}
 plot(size_age_M_lm)
 ```
 
@@ -288,11 +293,11 @@ This also looks good!
 
 ### Test the relationship between running speed and temperature.
 
-Next, we are going to test the hypothesis that external temperature affects physiological performance in this species. As an ectotherm, cooler temperatures should reduce performance. Our prediction is that lower body temperatures will result in slower running speeds.
+Next, we are going to test the hypothesis that external temperature affects physiological performance in this species. As an ectotherm, cooler temperatures should reduce performance in our lizard. Our associated prediction is that lower body temperatures will result in slower running speeds.
 
 ### **Mini Challenge 4**
 
-1. Fit a linear model to test the relationship between `speed_m_s` and `body_temp_C`, including both male and female lizards.
+1. Fit a linear model to test the relationship between `speed_m_s` and `body_temp_C`, *including both male and female lizards in the same model*.
 2. Use your diagnostic plots to assess whether the model meets the assumptions of a linear model.
 
 Use the code block below for your answer!
@@ -308,35 +313,37 @@ Does your model meet the assumptions? If not, which assumptions do you think hav
 
 ## Part 3: Testing for outliers
 
-Outliers are data points that fall far outside of the expected pattern of the regression model, potentially impacting results and model interpretations. Because they are influential, we need to be able to assess their impact and remove them if neceessary.
+Outliers are data points that fall far outside of the expected pattern of the regression model, potentially impacting results and model interpretations. Because they are influential, we need to be able to assess their impact and remove them if necessary.
 
-Best practice is to *remove outliers only if they have undue influence over the model results*. We don't necessarily want to remove them altogether, but we want to be able to compare the model results with and without the outliers. But how do we know which data points are potential outliers?
+We are going to test statistically for outliers. However, best practice is to *remove outliers only if they have undue influence over the model results and we have reason to believe they don't reflect the true variation in the data*. Sometimes we see some extreme data points, but that doesn't necessarily mean there is anything wrong. Still, we want to be able to compare the model results with and without the outliers to evaluate their impact on our conclusions. 
 
-We will use th function `cooks.distance()` to measure the influence of individual data points. There is no strict definition for what we mean by "influential", but as a rule of thumb, a data point could be influential if its computed Cook's Distance is ≥ 4/number of rows in the data.
+But how do we know which data points are potential outliers?
+
+We will use the function `cooks.distance()` to calculate the Cook's distance index on all individual data points in our regression. This statistically tests the influence of individual data points on our results. There is no strict definition for what we mean by "influential", but as a rule of thumb, a data point could be significantly influential if its computed Cook's Distance is *≥ 4/number of rows in the data*.
 
 ### Part 3b: Calculate Cook's distance 
 
-Let's check for outliers in the linear model we made to test the relationship between size and age in male lizards. First, we need to calculate Cook's distance. We are going to save the output as a tibble so we can work with the values.
+Let's check for outliers in our linear model we made to test the relationship between size and age in *male* lizards (`size_age_M_lm`). First, we need to calculate Cook's distance. We are going to save the output as a tibble so we can work with the values.
 
-```{r}
+```{r, eval = F}
 cooks_D_size_age_M <- as_tibble(
-  cooks.distance(size_age_M_data)
+  cooks.distance(size_age_M_lm)
 )
 ```
 
-Next, we'll calculate the cut-off for Cook's distance values being potentially influential. We can use the function `nrow()` to determine how many rows are in our tibble with male lizard data.
+Next, we'll calculate the cut-off for Cook's distance values being potentially influential. We can use the function `nrow()` to determine how many rows are in our tibble with male lizard data, `M_lizard_data`.
 
-```{r}
-4/nrow(size_age_M_data)
+```{r, eval = F}
+4/nrow(M_lizard_data)
 ```
 
-Any data points with Cook's distance values greater than approximately 0.021 are potentially influential.
+So, any data points with Cook's distance values greater than approximately 0.021 are potentially influential.
 
-The row numbers in our new tibble correspond to the rows in `size_age_M_data`. This means we can find the rows in `cooks_D_size_age_M`, with Cook's distance values ≥ 0.021
+The row numbers in our new tibble `cooks_D_size_age_M` correspond to the same rows in `M_lizard_data`. This means we can isolate the specific rows--i.e, data points--in `cooks_D_size_age_M`, with Cook's distance values ≥ 0.021
 
 ### **Mini Challenge 5**
 
-1. Using vector indexing, remove the potentially influential data points from the `M_age_size` tibble.
+1. Using vector indexing, find and remove the potentially influential data points from the `M_lizard_data` tibble.
 2. Fit the linear model again to test the relationship between size and age in male lizards.
 
 Use the code block below for your answer!
@@ -356,7 +363,7 @@ So far, we've only tested the relationship between two variables in one model. H
 
 Based on the R-squared values from our model summaries, we know that both sex and age individually explain some of the variation in body size. How much more variation in body size would we explain with both variables in the same model?
 
-To add multiple variables to a model, we use the `+` operator on the right side of the `~` in our formula. We can technically add as many variables as we want. However, we also need to be careful. Adding too many variables can lead to something called **overfitting**, which actually makes it *more difficult to understand the patterns in our data*. 
+To add multiple variables to a model, we use the `+` operator on the right side of the `~` in our formula. E.g., `response ~ variable1 + variable2 + ... variable_n`. We can technically add as many variables as we want. However, we also need to be careful. Adding too many variables can lead to something called **overfitting**, which actually makes it *more difficult to understand the patterns in our data*. 
 
 We will talk more about overfitting in a couple of weeks. For now, you just need to think about being as parsimonious as you can. Which variables do you need to include to address the hypotheses you are trying to test? Including age and sex in the same model makes sense for us, as our hypothesis is that *sex- and age-specific reproductive strategies in this species drive differences in growth trajectories and eventual body size*. Let's compare how our model changes when we add sex and age to the same model.
 
@@ -364,7 +371,7 @@ We will talk more about overfitting in a couple of weeks. For now, you just need
 
 Here are our original three models.
 
-```{r}
+```{r, eval = F}
 # Effect of sex on body size
 summary(lizard_sex_lm)
 # Effect of age on  male body size
@@ -375,7 +382,7 @@ summary(size_age_F_lm)
 
 Individually, each of these models explains between approximately 33% and 67% of the variation in body size (the definition of R-squared). What if we included sex and age in the same model?
 
-```{r}
+```{r, eval = F}
 # Multiple regression model including sex and age effects on body size
 lizard_sex_age_lm <- lm(body_size_mm ~ sex + age_years, data = lizard_data)
 # Model summary
@@ -394,7 +401,7 @@ Our model includes two independent variables, each having an individual effect o
 
 To help you visualize what we're talking about, let's make a quick scatterplot of the change in body size with age for male and female lizards.
 
-```{r}
+```{r, eval = F}
 ggplot(lizard_data, aes(x = age_years, y = body_size_mm, colour = sex)) +
   geom_point() +
   geom_smooth(method = 'lm') +
@@ -405,18 +412,18 @@ We can see there is a positive relationship between age and body size for both s
 
 Let's see if accounting for the interactive effect explains any more variation in body size. We can include an interaction using the `*` operator. Using this operator still specifies the additive effects of each variable, but includes the interaction in addition. This interaction can be thought of as the amount by which the additive effect changes when the lizard is a male instead of a female.
 
-```{r}
-# Multiple regression model including interactive sex and age effects on body size
-lizard_sex_age_lm_intxn <- lm(body_size_mm ~ sex * age_years, data = lizard_data)
-# Model summary
-summary(lizard_sex_age_lm_intxn)
-```
-
-Our model summary now has two familiar lines, `sexMale` and `age_years`, and one new line, `sexMale:age_years`. This is our interaction term. Just like the other variables, our interaction term has an "Estimate", "Std. Error", and "Pr(>|t|)". 
-
 ### **Mini Challenge 6**
 
-In your own words, write your interpretation of the interaction term in your model.
+1. Fit a new linear model including an interaction between `sex` and `age_years`
+2. View the model summary
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+What has changed in out model summary? Does there appear to be an important interaction between age and sex?
 
 #-------------------------------------------------
 
@@ -424,13 +431,13 @@ In your own words, write your interpretation of the interaction term in your mod
 
 The R-squared for this model with the interaction is also slightly higher, meaning the interaction explains slightly more variation in body size! But how do we know that the model with the interaction is worth it? We already talked about the principle of parsimony. We also saw that adding the interaction technically adds a new variable, which increases the risk that our model is overfit. How can we weigh the risk of overfitting the model against the benefit of the interaction?
 
-We have now entered the realm of model selection procedures. Model selection allows us to weigh the relative support for models when we have multiple options. The procedure we are going to use is called the **Akaike Information Criterion (AIC)**. We aren't going to go into too much detail about deriving AIC. You can think of it as some measure of how the model compares to an unknown true model that perfectly describes all of the variation in the response we are estimating (`body_size_mm`). Such a model would have an R-squared = 1 and the linear regression would be a perfect slope = 1. This is obviously unrealistic. However, *the lower the AIC, the closer our model it is to this idealized model*. AIC also *penalizes models for each additional parameter*, allowing us to evaluate how good the model is against the additional variables we added. Generally, if one model is ≥ 2 AIC lower than another, it is considered a superior model.
+We have now entered the realm of model selection procedures. Model selection allows us to weigh the relative support for models when we have multiple options. The procedure we are going to use is called the **Akaike Information Criterion (AIC)**. We aren't going to go into too much detail about the theory of AIC, but you can think of it as a measure of how the model compares to an unknown *true* model that perfectly describes 100% of the variation in the response we are estimating (`body_size_mm`). Such a model would theoretically have an R-squared = 1 and the linear regression would be a perfect slope = 1. This is obviously unrealistic. However, *the lower the AIC, the closer our model it is to this idealized model*. AIC also *penalizes models for each additional parameter*, allowing us to evaluate how much better the model gets while accounting for more parameters. Generally, if one model is ≥ 2 AIC lower than the model with the next-lowest AIC, it is considered a superior model.
 
 ### **Mini Challenge 7**
 
 The function to calculate AIC for a model is just `AIC()`. The only required argument is the model object from your environment.
 
-1. Using `lm()`, fit the following four models. Don't worry about separating male and female lizards--include both sexes in the same models.
+1. Using `lm()`, fit the following four models. *Don't worry about separating male and female lizards--include both sexes in the same models*.
 
 * body size ~ age
 * body size ~ sex
