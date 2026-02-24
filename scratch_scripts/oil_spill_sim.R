@@ -69,4 +69,4 @@ head(dat)
 # species: Commercial fishery species
 
 # Save the data
-write.csv(dat, "oil_spill.csv")
+write.csv(dat, "datasets/oil_spill.csv")
