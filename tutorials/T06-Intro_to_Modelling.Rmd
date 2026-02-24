@@ -17,6 +17,16 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
 ```
 
+# **Learning Objectives**
+
+MODELS ARE.... Linear models are one of the simplest and most versatile classes of model. We are going to learn to fit and assess linear models in R, and add more complexity to our analyses in the weeks to come.
+
+After completing this topic, you should feel comfortable:
+
+1.  
+2.
+3.
+4.
 
 ## Introduction to modelling in R
 
