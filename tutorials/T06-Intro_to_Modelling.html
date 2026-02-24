@@ -1525,7 +1525,7 @@ the first part of this tutorial, we will explore this idea.</p>
 <div id="set-your-working-directory" class="section level3">
 <h3>Set your working directory</h3>
 <p>Make sure we’re setting our working directory!</p>
-<pre class="r"><code># Set your working directory, then remove &quot;eval = F&quot;!
+<pre class="r"><code># Set your working directory, then remove &#39;eval = F&#39;!
 setwd()</code></pre>
 </div>
 <div id="install-and-load-packages" class="section level3">
@@ -1581,9 +1581,8 @@ do this is with boxplots. Let’s start with visualizing the sex
 differences.</p>
 <div id="size-differences-between-male-and-female-lizards" class="section level4">
 <h4>Size differences between male and female lizards</h4>
-<pre class="r"><code>ggplot(lizard_data, aes(x = sex, y = body_size_mm)) +
-  geom_boxplot() +
-  labs(x = &quot;Lizard sex&quot;, y = &quot;Body size (mm)&quot;)</code></pre>
+<pre class="r"><code>ggplot(lizard_data, aes(x = sex, y = body_size_mm)) + geom_boxplot() + labs(x = &quot;Lizard sex&quot;,
+    y = &quot;Body size (mm)&quot;)</code></pre>
 <p>We can see a clear difference. It looks like we might be on the right
 track.</p>
 </div>
@@ -1663,10 +1662,10 @@ only takes the argument <code>x</code>, which is the vector or column
 defining the response variable. We’re going to look at each value of X
 (female and male) separately by indexing the columns.</p>
 <pre class="r"><code># Test for normality in male body size
-shapiro.test(lizard_age_classes[lizard_age_classes$sex == &quot;Male&quot; ,]$body_size_mm)
+shapiro.test(lizard_age_classes[lizard_age_classes$sex == &quot;Male&quot;, ]$body_size_mm)
 
 # Test for normality in female body size
-shapiro.test(lizard_age_classes[lizard_age_classes$sex == &quot;Female&quot; ,]$body_size_mm)</code></pre>
+shapiro.test(lizard_age_classes[lizard_age_classes$sex == &quot;Female&quot;, ]$body_size_mm)</code></pre>
 <p>It looks like the body size variable also meets the assumption of
 normally distributed errors.</p>
 </div>
@@ -1885,9 +1884,7 @@ relationship between size and age in <em>male</em> lizards
 (<code>size_age_M_lm</code>). First, we need to calculate Cook’s
 distance. We are going to save the output as a tibble so we can work
 with the values.</p>
-<pre class="r"><code>cooks_D_size_age_M &lt;- as_tibble(
-  cooks.distance(size_age_M_lm)
-)</code></pre>
+<pre class="r"><code>cooks_D_size_age_M &lt;- as_tibble(cooks.distance(size_age_M_lm))</code></pre>
 <p>Next, we’ll calculate the cut-off for Cook’s distance values being
 potentially influential. We can use the function <code>nrow()</code> to
 determine how many rows are in our tibble with male lizard data,
@@ -1945,9 +1942,9 @@ sex and age to the same model.</p>
 <p>Here are our original three models.</p>
 <pre class="r"><code># Effect of sex on body size
 summary(lizard_sex_lm)
-# Effect of age on  male body size
+# Effect of age on male body size
 summary(size_age_M_lm)
-# Effect of age on  female body size
+# Effect of age on female body size
 summary(size_age_F_lm)</code></pre>
 <p>Individually, each of these models explains between approximately 33%
 and 67% of the variation in body size (the definition of R-squared).
@@ -1977,10 +1974,8 @@ they are females</li>
 <p>To help you visualize what we’re talking about, let’s make a quick
 scatterplot of the change in body size with age for male and female
 lizards.</p>
-<pre class="r"><code>ggplot(lizard_data, aes(x = age_years, y = body_size_mm, colour = sex)) +
-  geom_point() +
-  geom_smooth(method = &#39;lm&#39;) +
-  labs(x = &quot;Lizard age (years)&quot;, y = &quot;Body size (mm)&quot;)</code></pre>
+<pre class="r"><code>ggplot(lizard_data, aes(x = age_years, y = body_size_mm, colour = sex)) + geom_point() +
+    geom_smooth(method = &quot;lm&quot;) + labs(x = &quot;Lizard age (years)&quot;, y = &quot;Body size (mm)&quot;)</code></pre>
 <p>We can see there is a positive relationship between age and body size
 for both sexes. However, female lizards appear to grow faster than
 males, even though they start at a smaller body size and eventually

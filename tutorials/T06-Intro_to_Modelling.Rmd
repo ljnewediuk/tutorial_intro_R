@@ -3,12 +3,12 @@ title: "Introduction to Models"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 6, Winter 2026"
 output: 
+  pdf_document:
+    toc: yes
   html_document:
     df_print: kable
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
 editor_options:
   chunk_output_type: console
 ---
@@ -319,7 +319,7 @@ We are going to test statistically for outliers. However, best practice is to *r
 
 But how do we know which data points are potential outliers?
 
-We will use the function `cooks.distance()` to calculate the Cook's distance index on all individual data points in our regression. This statistically tests the influence of individual data points on our results. There is no strict definition for what we mean by "influential", but as a rule of thumb, a data point could be significantly influential if its computed Cook's Distance is *≥ 4/number of rows in the data*.
+We will use the function `cooks.distance()` to calculate the Cook's distance index on all individual data points in our regression. This statistically tests the influence of individual data points on our results. There is no strict definition for what we mean by "influential", but as a rule of thumb, a data point could be significantly influential if its computed Cook's Distance is *>= 4/number of rows in the data*.
 
 ### Part 3b: Calculate Cook's distance 
 
@@ -339,7 +339,7 @@ Next, we'll calculate the cut-off for Cook's distance values being potentially i
 
 So, any data points with Cook's distance values greater than approximately 0.021 are potentially influential.
 
-The row numbers in our new tibble `cooks_D_size_age_M` correspond to the same rows in `M_lizard_data`. This means we can isolate the specific rows--i.e, data points--in `cooks_D_size_age_M`, with Cook's distance values ≥ 0.021
+The row numbers in our new tibble `cooks_D_size_age_M` correspond to the same rows in `M_lizard_data`. This means we can isolate the specific rows--i.e, data points--in `cooks_D_size_age_M`, with Cook's distance values >= 0.021
 
 ### **Mini Challenge 5**
 
@@ -431,7 +431,7 @@ What has changed in out model summary? Does there appear to be an important inte
 
 The R-squared for this model with the interaction is also slightly higher, meaning the interaction explains slightly more variation in body size! But how do we know that the model with the interaction is worth it? We already talked about the principle of parsimony. We also saw that adding the interaction technically adds a new variable, which increases the risk that our model is overfit. How can we weigh the risk of overfitting the model against the benefit of the interaction?
 
-We have now entered the realm of model selection procedures. Model selection allows us to weigh the relative support for models when we have multiple options. The procedure we are going to use is called the **Akaike Information Criterion (AIC)**. We aren't going to go into too much detail about the theory of AIC, but you can think of it as a measure of how the model compares to an unknown *true* model that perfectly describes 100% of the variation in the response we are estimating (`body_size_mm`). Such a model would theoretically have an R-squared = 1 and the linear regression would be a perfect slope = 1. This is obviously unrealistic. However, *the lower the AIC, the closer our model it is to this idealized model*. AIC also *penalizes models for each additional parameter*, allowing us to evaluate how much better the model gets while accounting for more parameters. Generally, if one model is ≥ 2 AIC lower than the model with the next-lowest AIC, it is considered a superior model.
+We have now entered the realm of model selection procedures. Model selection allows us to weigh the relative support for models when we have multiple options. The procedure we are going to use is called the **Akaike Information Criterion (AIC)**. We aren't going to go into too much detail about the theory of AIC, but you can think of it as a measure of how the model compares to an unknown *true* model that perfectly describes 100% of the variation in the response we are estimating (`body_size_mm`). Such a model would theoretically have an R-squared = 1 and the linear regression would be a perfect slope = 1. This is obviously unrealistic. However, *the lower the AIC, the closer our model it is to this idealized model*. AIC also *penalizes models for each additional parameter*, allowing us to evaluate how much better the model gets while accounting for more parameters. Generally, if one model is >= 2 AIC lower than the model with the next-lowest AIC, it is considered a superior model.
 
 ### **Mini Challenge 7**
 
