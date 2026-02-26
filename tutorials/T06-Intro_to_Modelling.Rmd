@@ -24,13 +24,13 @@ Today, we will start learning about statistical models. Linear models are one of
 After completing this topic, you should feel comfortable:
 
 1.  Distinguishing between a test of difference and test of relationship
-2.  Test the assumptions of your linear models
-3.  Evaluate your model's fit, and consider how you could improve it
-4.  Fit some models!
+2.  Testing the assumptions of your linear models
+3.  Evaluating your model's fit, and consider how you could improve it
+4.  Fitting some models!
 
 ## Introduction to modelling in R
 
-The most basic form of modelling is a linear model. Two types of linear model you have already heard of are:
+The most basic form of modelling is a linear model. Two types of linear model you have already heard of:
 
 * ANOVA is a *test of difference*. We want to know whether two groups--categories of a variable, **X**--come from two different populations, based on a variable, **Y**, measured on both groups.
 * Linear regression is a *test of relationship*. We want to know whether a variable, **Y**, varies along levels of **X**.
@@ -44,7 +44,6 @@ We already talked about how these tests are different forms of the same basic mo
 Make sure we're setting our working directory!
 
 ```{r}
-# Set your working directory, then remove "eval = F"!
 setwd()
 ```
 
@@ -53,6 +52,10 @@ setwd()
 We are going to need to load tidyverse. We are also going to install a new package called `car`, which stands for "Companion to Applied Regression".
 
 Using the code block below, install the `car` package, then load `car` and `tidyverse`.
+
+```{r}
+
+```
 
 ### Load data
 
