@@ -1,0 +1,395 @@
+---
+title: "Generalized Linear Models and Distributions"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 7, Winter 2026"
+output: 
+  pdf_document:
+    toc: yes
+  html_document:
+    df_print: kable
+    toc: yes
+    toc_float: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+```
+
+# **Learning Objectives**
+
+Today, we will start learning about statistical models. Linear models are one of the simplest and most versatile classes of statistical model. We will add more complexity to our analyses in the weeks to come.
+
+After completing this topic, you should feel comfortable:
+
+1. Comparing and contrasting Generalized Linear Models (GLMs) and simple linear models.
+2. Identifying appropriate link functions and distributions (e.g., binomial, Poisson) for different types of  response variables.
+3. Fitting GLMs and interpreting results based on the link function.
+4. Evaluating GLM model fit.
+
+## Introduction to modelling in R
+
+In many ways, GLMs are more straightforward and more versatile than simple linear models because their assumptions are not quite as restrictive. Instead of checking whether the residuals are normally distributed and independent with homogeneous variance, and ensuring the Y ~ X relationship is linear, we can often just use our understanding of how the data were generated to make the right modelling choices.
+
+## Set up your R workspace for the day
+
+### Set your working directory
+
+Make sure we're setting our working directory!
+
+```{r}
+setwd()
+```
+
+### Install and load packages
+
+We are going to need to load `tidyverse` and `car`. We are also going to install two new packages called `DHARMa` and `fitdistrplus`.
+
+Using the code block below, install the two new packages and load all four packages.
+
+```{r}
+
+```
+
+### Load data
+
+We have two datasets for this topic.
+
+- Embryo implantation based on hormone treatment (implanted/not) - Logistic regression
+- Number of nestlings fledged based on nest parasites - Poisson regression
+
+(**lizard_data.csv**) comes from a study on lizard running speeds in different habitats. Each row is a measurement from a new lizard. Lizards are ectotherms, which means their physiological performance depends on the external temperature. We will be testing a number of hypotheses relating body size, temperature, age, sex, habitat, and running speed. The columns are defined as follows:
+
+* `sex`: Sex of the lizard (female or male)
+* `habitat`: The habitat where the lizard was captured (open or forest)
+* `age_years`: The age of the lizard
+* `body_size_mm`: The snout-vent length of the lizard, measured in millimeters
+* `body_temp_C`: The temperature of the lizard's body, in degrees Celsius, at the time of its running trial
+* `speed_m_s`: The running speed of the lizard in metres per second
+
+Load the dataset by finishing the `read_csv()` function.
+
+```{r}
+lizard_data <- read_csv()
+```
+
+## Part 1: Tests of difference
+
+
+
+
+
+
+
+
+
+### **Step 2: Process the Data**
+
+The columns names are pretty clean, but we have a ton of NAs in the data set. Let's get rid of them before we start modelling.
+
+```{r}
+clean.data <- data %>%
+  na.omit()
+```
+
+Even though we can check some potential issues after we build a model, let's quickly see if there is a relationship between some of our explanatory variables. If we're interested in the impact these variables have on a diagnosis, then `diabetes` is our response variable. 
+
+#### **Mini Challenge #1** 
+
+1. Visualize the relationship between any two variables of your choice to see if there is potential for any collinearity. 
+
+Use the code block below to code your answer!
+
+```{r}
+
+```
+
+
+
+
+
+
+### -----------------------------------------------
+
+
+I chose to look at insulin & glucose: 
+```{r}
+ggplot(clean.data, aes(x = insulin, y = glucose)) + 
+   geom_point() + 
+   theme_bw()
+```
+
+Doesn't look like there is anything to be worried about. But what if we were interested in a more quantifiable answer to our question as to whether or not these are correlated?
+
+```{r}
+cor(clean.data$insulin, clean.data$glucose)
+```
+
+This function just performed a Pearson correlation to test if there is an appreciable relationship between our two variables. A general rule of thumb is that |0.7| for a Pearson correlation values is a commonly accepted threshold (review on collinearity by Dormann et al., 2013), and our correlation value is lower than that (0.58).
+
+Last step in processing - we might be interested in the interaction between continuous variables so we need to scale them before we use them in an interaction term.
+
+#### **Mini Challenge #2**
+
+1. Overwrite your `clean.data` object so that `clean.data` includes `insulin.c` and `glucose.c`, the standardized variables of `insulin` and `glucose`.
+
+Use the code block below to code your answer! 
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+### ------------------------------------------------
+
+```{r}
+clean.data <- clean.data %>%
+  mutate(insulin.c = insulin - mean(insulin), 
+         glucose.c = glucose - mean(glucose))
+```
+
+
+### **Step 3: Checking Assumptions**
+
+```{r}
+hist(clean.data$diabetes)
+```
+
+We can see pretty clearly here that our response variable does not follow a Guassian distribution. So, that's our first new piece of information: we do not have a normally distributed response variable. 
+
+Any ideas what this shape might be? 
+
+
+
+
+
+```{r}
+fits <- fitDist(diabetes, data = clean.data, type = "binom")
+fits$fits
+```
+
+
+
+
+### **Step 4: Choose an Appropriate Statistical Model**
+
+**Introducing - Generalized Linear Models (GLMs)!**
+
+A generalized linear model is essentially a linear model that allows for data to have a distribution that doesn’t just follow the Gaussian (normal) distribution. However, we can use the same function `glm()` to make a linear model by specifying that the distribution we want to use is a `gaussian()` distribution. To specify which distribution we will be using, we will change the `family` argument. 
+
+Some examples are:
+
+ * Binomial
+ * Beta
+ * Poisson
+ * Negative binomial
+ * Gamma
+
+A GLM follows the same model structure we've seen before: 
+
+response ~ explanatory1 + explanatory2 + explanatory3 ... 
+
+but we're going to add in a new argument to define the `family` or distribution of our response variable. 
+
+```{r}
+glm.mod <- glm(diabetes ~ insulin.c*glucose.c, 
+                    family = binomial(link = "logit"),
+                    data = clean.data)
+
+glm.mod <- glm(diabetes ~ insulin + glucose + insulin.c:glucose.c, 
+                    family = binomial(link = "logit"),
+                    data = clean.data)
+
+### these two models are the same! 
+```
+
+Before we look at the model output, let's go through the extra argument here, *family*. *family* informs R to not expect a Guassian distribution (which we clearly don't have). The *link* argument connects a linear predictor to the mean of the response variable based on a set relationship (in this case, the logistic relationship, defined as `logit`).
+
+
+### **Step 5: Evaluate Models**
+
+How do we check if our model is behaving well? We can generate Q-Q and scatter plots of our residuals with the `DHARMa` package:
+
+```{r}
+sim <- simulateResiduals(glm.mod)
+plot(sim)
+```
+
+What we are seeing here is the result of a Kolmogorov-Smirnov test (KS test) on our QQ plot. The Kolmogorov-Smirnov is essentially a non-parametric equivalent of a Shapiro-Wilks test, but instead of testing whether your residuals are approximately normal (in a SW test), you are testing if your residuals are approximately *the distribution you have chosen* (in a KS test) i.e., did you choose the right `family` in your model?
+
+If this is basically a nonparametric Shapiro-Wilks test, do you think we chose a good family (distribution) for our response variable, based on this KS test p-value?
+
+We also have results for a dispersion test (no significant dispersion) and an outlier test (no significant outliers).
+
+**NB:** if your tests are not overlaid on your plotting pane, just resize and re-plot. 
+
+
+For fun, let's just see what happens if we don't specify the distribution (remembering that the default is set to Guassian)
+
+
+##### **Mini Challenge #3** 
+
+1. Create a model using `glm()` that uses the same predictors as above but _without_ specifying the `family = binomial(link = "logit")` and save it as a variable called `glm.mod.sad`.
+
+2. `simulateResiduals()` and `plot()` the output. 
+
+3. Tell me how this model makes you feel (a.k.a. what's your interpretation?).
+
+Use the code block below to code your answers! 
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------
+
+
+```{r}
+glm.mod.sad <- glm(diabetes ~ insulin + glucose + insulin.c:glucose.c, 
+                    data = clean.data)
+sim.sad <- simulateResiduals(glm.mod.sad)
+plot(sim.sad)
+
+# This model makes me sad
+```
+
+
+
+Another way to test if there is correlation between predictors in our model, we can use the `car` package to check the Variance Inflation Factors (VIFs) of the predictors. If your predictors are highly correlated then adding more won't give you anymore ability to explain variation in the dependent variable and will result in the model potentially underestimating the effects of the predictors.  
+
+```{r}
+vif.mod <- glm(diabetes ~ insulin + glucose, 
+                    family = binomial(link = "logit"),
+                    data = clean.data)
+vif(vif.mod)
+```
+
+**A VIF < 3 is generally considered to be inconsequential (Zuur et al. 2010) and a VIF > 5 is a problem.**
+
+
+##### **Mini Challenge #4:** 
+
+Now it's your turn to determine collinearity. Using the `iris` data we know and love:
+
+1. Create a linear model (`lm()`) to examine if `Sepal.Length` is predicted by `Petal.Length`, `Petal.Width`, and `Sepal.Width` i.e., var1 + var2 + var3
+
+2. Determine the variance inflation factors for each predictor variable and conclude if there are any predictor variables that are collinear with each other. 
+
+3. How would you change your model based on your conclusions?  
+
+Use the code block below to code your answers! 
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+### -----------------------------------------------------
+
+```{r}
+iris <- read_delim("iris.csv")
+
+iris.mod <- lm(Sepal.Length ~ Petal.Length + Petal.Width + Sepal.Width, data = iris)
+
+vif(iris.mod)
+
+# remove one of petal length or width
+
+iris.mod.updated <- lm(Sepal.Length ~ Petal.Length + Sepal.Width, data = iris)
+vif(iris.mod.updated)
+```
+
+
+
+### **Step 6: Choose the best model and evaluate**
+
+We have covered a lot of new stuff today, so we're not going to make multiple models and choose between them. Rather, I'd like you to skip straight to: 
+
+##### **Mini Challenge #5**
+
+1. Output the model summary for our `glm.mod`. What are your conclusions about the effect of insulin and glucose on diabetes? Make sure you discuss these variables properly and include important values that influenced your conclusions.
+
+2. Visualize your major findings based on the summary of `glm.mod`. 
+
+
+Use the code block below to code your answers! 
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+### -----------------------------------------------------
+
+```{r}
+summary(glm.mod)
+```
+
+
+### Wrap up for T10 - New Additions to our Biol 3401 Framework for Statistical Success
+
+1. Understand your data set 
+
+2. Initial cleaning & processing of the data 
+
+3. Check assumptions 
+  * for modelling, our main concern is whether or not the response variable meets the assumption of normality.
+  * if not normal, continue to step 3.b)
+  * if normal, continue to step 4.
+  
+3. b) Distribution fitting!
+  * get an idea of potential distributions with `descdist()` and `goft` tests
+  * visualize fits of potential distributions with `fitdist()`
+  * create fits of your data to potential distributions with `histDist()`
+  * use automatic distribution fitting with`fitDist()` _responsibly_
+  * determine best distribution fit with `AIC()` or `GAIC()`
+
+4. Choose an appropriate modelling approach & create model(s)
+  * if normal, choose `lm()` or a variation of a general linear model (e.g., `glmer()`, which we'll get to)
+  * if not normal, determine which modelling approach supports your best distribution (`glm()`, `glmer()`, `glmmTMB()`, etc.)
+
+5. Evaluate model fit(s)
+  * simulate residuals with `DHARMa`
+
+6. Select best model & evaluate/summarize/interpret
+  * compare models with `AIC()` or `GAIC()`
+
+7. Visualize
