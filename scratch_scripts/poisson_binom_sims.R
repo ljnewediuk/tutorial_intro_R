@@ -50,41 +50,7 @@ lm_mod <- lm(pollinator_visits ~ biomass, data = poisson_data)
 # Binomial dataset
 # Embryo implantation success depending on maternal age/hormone treatment
 
-set.seed(101)
 
-n <- 150  # number of patients
-
-# Predictors
-age <- rnorm(n, mean = 34, sd = 4)
-dose <- rnorm(n, mean = 225, sd = 35)
-prev_failure <- rbinom(n, 1, 0.4)
-
-# True coefficients (logit scale)
-alpha0 <- 3.5
-alpha1 <- -0.10      # age reduces success
-alpha2 <- 0.004      # higher dose increases success
-alpha3 <- -1.2       # previous failure reduces success
-
-# Linear predictor
-logit_p <- alpha0 +
-  alpha1 * age +
-  alpha2 * dose +
-  alpha3 * prev_failure
-
-# Convert to probability
-p <- plogis(logit_p)
-
-# Simulate pregnancy outcome (0/1)
-pregnant <- rbinom(n, size = 1, prob = p)
-
-ivf_data <- data.frame(
-  pregnant,
-  age,
-  dose,
-  prev_failure
-)
-
-head(ivf_data)
 
 # Binomial versus gaussian result in different conclusions
 
@@ -118,43 +84,46 @@ p <- plogis(logit_p)
 # Simulate pregnancy outcome
 pregnant <- rbinom(n, size = 1, prob = p)
 
-ivf_mismatch <- data.frame(
+ivf_data <- data.frame(
   pregnant,
-  age,
-  dose,
+  age = floor(age),
+  dose = round(dose, 1),
   prev_failure = factor(prev_failure)
 )
 
-head(ivf_mismatch)
+head(ivf_data)
 
 # Model
-bin_glm <- glm(pregnant ~ age, data = ivf_mismatch, family = "binomial")
-bin_lm <- lm(pregnant ~ age, data = ivf_mismatch)
+bin_glm <- glm(pregnant ~ age, data = ivf_data, family = "binomial")
+bin_lm <- lm(pregnant ~ age, data = ivf_data)
 
 # Plot model predictions
 
 # New age data
-nd <- tibble(age = seq(min(ivf_mismatch$age), max(ivf_mismatch$age), length.out = 100))
+ages_new <- seq(min(ivf_data$age), max(ivf_data$age), length.out = 100)
 
 # Predictions
-preds_lm <- predict(object = bin_lm, newdata = nd, se.fit = T, type = "response")
-preds_glm <- predict(object = bin_glm, newdata = nd, se.fit = T, type = "response")
+preds_lm <- predict(object = bin_lm, newdata = data.frame(age = ages_new), se.fit = T, type = "response")
+preds_glm <- predict(object = bin_glm, newdata = data.frame(age = ages_new), se.fit = T, type = "response")
 
 # Plot glm
-bin_glm_preds <- tibble(age = seq(min(ivf_mismatch$age), max(ivf_mismatch$age), length.out = 100), pregnant = preds_glm$fit, pregnant.se = preds_glm$se.fit)
+bin_glm_preds <- tibble(age = ages_new, pregnant = preds_glm$fit, pregnant.se = preds_glm$se.fit)
 
 bin_glm_preds %>%
   ggplot(aes(x = age, y = pregnant)) +
   geom_ribbon(aes(ymin = pregnant - pregnant.se, ymax = pregnant + pregnant.se), alpha = 0.5) +
   geom_line() +
-  geom_point(data = ivf_mismatch, aes(x = age, y = pregnant))
+  geom_point(data = ivf_data, aes(x = age, y = pregnant))
 
 # Plot lm
-bin_lm_preds <- tibble(age = seq(min(ivf_mismatch$age), max(ivf_mismatch$age), length.out = 100), pregnant = preds_lm$fit, pregnant.se = preds_lm$se.fit)
+bin_lm_preds <- tibble(age = ages_new, pregnant = preds_lm$fit, pregnant.se = preds_lm$se.fit)
 
 bin_lm_preds %>%
   ggplot(aes(x = age, y = pregnant)) +
   geom_ribbon(aes(ymin = pregnant - pregnant.se, ymax = pregnant + pregnant.se), alpha = 0.5) +
   geom_line() +
-  geom_point(data = ivf_mismatch, aes(x = age, y = pregnant))
+  geom_point(data = ivf_data, aes(x = age, y = pregnant))
 
+# Model comparison
+AIC(bin_glm)
+AIC(bin_lm)
