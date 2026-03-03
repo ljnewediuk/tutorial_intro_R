@@ -56,8 +56,14 @@ Using the code block below, install the two new packages and load all four packa
 
 We have two datasets for this topic.
 
-- Embryo implantation based on hormone treatment (implanted/not) - Logistic regression
-- Number of nestlings fledged based on nest parasites - Poisson regression
+* **ivf_data.csv**: Comes from a retrospective study conducted at a fertility clinic. The researchers evaluated predictors of clinical pregnancy (age and hormone treatment) following a single in-vitro fertilization (IVF) cycle.
+  * pregnant: Whether the patient achieved a clinical pregnancy (1 = yes, 0 = no)
+  * age: The age of the patient at the time of egg retrieval (units: years)
+  * dose: The total daily dose of recombinant follicle-stimulating hormone (rFSH) administured during ovarian stimulation (IU/day)
+  * prev_failure: Whether the patient had at least one previous failed IVF cycle (1 = yes, 0 = no)
+
+
+- Pollinator visits based on plant biomass - Poisson regression
 
 (**lizard_data.csv**) comes from a study on lizard running speeds in different habitats. Each row is a measurement from a new lizard. Lizards are ectotherms, which means their physiological performance depends on the external temperature. We will be testing a number of hypotheses relating body size, temperature, age, sex, habitat, and running speed. The columns are defined as follows:
 
