@@ -14,7 +14,7 @@ fertilized <- rbinom(n, 1, 0.5)
 # Biomass (fertilized plots have higher biomass)
 biomass <- rnorm(n, 
                  mean = 300 + 80 * fertilized, 
-                 sd = 40)
+                 sd = 20)
 
 # Sampling area (slightly variable)
 area <- runif(n, 0.8, 1.2)
@@ -22,7 +22,7 @@ area <- runif(n, 0.8, 1.2)
 # True coefficients
 beta0 <- -2.5
 beta1 <- 0.4      # fertilization increases abundance
-beta2 <- 0.005    # biomass effect
+beta2 <- 0.009    # biomass effect
 
 # Linear predictor (include area as offset)
 log_mu <- beta0 + 
@@ -33,19 +33,56 @@ log_mu <- beta0 +
 mu <- exp(log_mu)
 
 # Simulate counts
-pollinator_visits <- rpois(n, lambda = mu)
+visits <- rpois(n, lambda = mu)
 
-poisson_data <- data.frame(
-  pollinator_visits,
+pollinator_data <- data.frame(
+  visits,
   fertilized = factor(fertilized),
-  biomass,
-  area
+  biomass = round(biomass, 1),
+  area = round(area, 1)
 )
 
-head(poisson_data)
+head(pollinator_data)
 
-lm_mod <- lm(pollinator_visits ~ biomass, data = poisson_data)
+# Save the data
+write.csv(pollinator_data, "datasets/pollen_data.csv", row.names = FALSE)
 
+poiss_lm <- lm(visits ~ biomass, data = pollinator_data)
+poiss_glm <- glm(visits ~ biomass, data = pollinator_data, family = "poisson")
+
+summary(poiss_lm)
+summary(poiss_glm)
+
+# Plot model predictions
+
+# New age data
+biomass_new <- seq(min(pollinator_data$biomass), max(pollinator_data$biomass), length.out = 80)
+
+# Predictions
+preds_lm <- predict(object = poiss_lm, newdata = data.frame(biomass = biomass_new), se.fit = T, type = "response")
+preds_glm <- predict(object = poiss_glm, newdata = data.frame(biomass = biomass_new), se.fit = T, type = "response")
+
+# Plot glm
+poiss_glm_preds <- tibble(biomass = biomass_new, visits = preds_glm$fit, visits.se = preds_glm$se.fit)
+
+poiss_glm_preds %>%
+  ggplot(aes(x = biomass, y = visits)) +
+  geom_ribbon(aes(ymin = visits - visits.se, ymax = visits + visits.se), alpha = 0.5) +
+  geom_line() +
+  geom_point(data = pollinator_data, aes(x = biomass, y = visits))
+
+# Plot lm
+poiss_lm_preds <- tibble(biomass = biomass_new, visits = preds_lm$fit, visits.se = preds_lm$se.fit)
+
+poiss_lm_preds %>%
+  ggplot(aes(x = biomass, y = visits)) +
+  geom_ribbon(aes(ymin = visits - visits.se, ymax = visits + visits.se), alpha = 0.5) +
+  geom_line() +
+  geom_point(data = pollinator_data, aes(x = biomass, y = visits))
+
+# Model comparison
+AIC(poiss_glm)
+AIC(poiss_lm)
 
 # Binomial dataset
 # Embryo implantation success depending on maternal age/hormone treatment
@@ -93,6 +130,9 @@ ivf_data <- data.frame(
 
 head(ivf_data)
 
+# Save the data
+write.csv(ivf_data, "datasets/ivf_data.csv", row.names = FALSE)
+
 # Model
 bin_glm <- glm(pregnant ~ age, data = ivf_data, family = "binomial")
 bin_lm <- lm(pregnant ~ age, data = ivf_data)
@@ -127,3 +167,4 @@ bin_lm_preds %>%
 # Model comparison
 AIC(bin_glm)
 AIC(bin_lm)
+
