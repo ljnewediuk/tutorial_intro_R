@@ -38,7 +38,7 @@ In many ways, GLMs are more straightforward and more versatile than simple linea
 
 Make sure we're setting our working directory!
 
-```{r, eval = FALSE}
+```{r}
 setwd()
 ```
 
@@ -70,7 +70,7 @@ We have two datasets for this topic.
 
 Load the datasets by finishing the `read_csv()` function.
 
-```{r, eval = FALSE}
+```{r}
 pollen_data <- read_csv()
 ivf_data <- read_csv()
 ```
@@ -123,7 +123,7 @@ Use the code block below for your answer!
 
 Now, we'll take a look at the model summaries, assessing goodness of fit and effect sizes.
 
-```{r, eval = FALSE}
+```{r}
 # Summarize the simple linear regression
 summary(pregnancy_lm)
 
@@ -140,7 +140,7 @@ Note that the `glm()` model *does not have an R-squared in the summary.* **(Why?
 
 Next, we'll use `plot()` to check assumptions from the simple linear regression.
 
-```{r, eval = FALSE}
+```{r}
 plot(pregnancy_lm)
 ```
 
@@ -148,7 +148,7 @@ Looks like some major violations!
 
 What about the logistic regression model? We can generate Q-Q and scatter plots of our residuals with the `simulateResiduals()` function from the `DHARMa` package, which generates the residuals from our model without assuming a distribution. The function takes the model as an argument `fittedModel = `. We can also specify the argument `plot = TRUE`, which generates the plots for our test.
 
-```{r, eval = FALSE}
+```{r}
 simulateResiduals(fittedModel = pregnancy_glm, plot = TRUE)
 ```
 
@@ -207,7 +207,7 @@ We also have values with some other information from the model.
 
 We'll add the predictions (and error) to `predict_preg_data` using the `cbind()` function.
 
-```{r, eval = FALSE}
+```{r}
 predict_preg_data <- cbind(predict_preg_data, predict_preg_lm[1:2])
 ```
 
@@ -215,7 +215,7 @@ We're going to add two new elements to our scatterplot: a line and a "ribbon", w
 
 The `geom_ribbon()` needs a `ymin = ` and `ymax = ` in the aesthetic function to specify the boundaries of the ribbon. The boundaries are fit - se.fit (lower) and fit + se.fit (upper). I've also specified "alpha = 0.5" so the ribbon is transparent and we can see the points behind it.
 
-```{r, eval = FALSE}
+```{r}
 ggplot() +
   geom_point(data = ivf_data, aes(x = age, y = pregnant)) +
   geom_ribbon(data = predict_preg_data, 
@@ -281,7 +281,7 @@ Use the code block below for your answer!
 
 Let's take a look at the models:
 
-```{r, eval = FALSE}
+```{r}
 # Summarize the simple linear regression
 summary(visits_lm)
 
@@ -347,7 +347,7 @@ We already fit models using the Poisson and Binomial link functions, so we will 
 
 Let's look at the summary of our `pregnancy_glm` model.
 
-```{r, eval = FALSE}
+```{r}
 summary(pregnancy_glm)
 ```
 
@@ -371,7 +371,7 @@ Poisson regression generally uses the *"log"* link. The *log* link adds a multip
 
 Let's look at the summary from our pollinator visits model again.
 
-```{r, eval = FALSE}
+```{r}
 summary(visits_glm)
 ```
 
@@ -391,7 +391,7 @@ First, we'll predict the log-odds from our generalized linear model across a ran
 
 We need one more argument in the `predict()` function we didn't need to include for our simple linear regression. Because this is a GLM, we need to specify that we want to predict the *"response"*, rather than the *"link"*, which would give us the translation of our response variable into a line. We can specify what we want using the `type = ` argument.
 
-```{r, eval = FALSE}
+```{r}
 # Tibble with ages
 predict_preg_glm_data <- tibble(age = seq(min(ivf_data$age), 
                                           max(ivf_data$age), by = 0.1))
@@ -403,13 +403,13 @@ predict_preg_glm <- predict(pregnancy_glm,
 
 Next, we will add the predictions and standard error to our `predict_preg_glm_data` tibble.
 
-```{r, eval = FALSE}
+```{r}
 predict_preg_glm_data <- cbind(predict_preg_glm_data, predict_preg_glm[1:2])
 ```
 
 Finally, let's plot the results, overlaying our scatterplot.
 
-```{r, eval = FALSE}
+```{r}
 ggplot() +
   geom_point(data = ivf_data, aes(x = age, y = pregnant)) +
   geom_ribbon(data = predict_preg_glm_data, 
@@ -466,7 +466,7 @@ Overdispersion is very common with count data. One of the major properties of th
 
 Let's simulate a Poisson-distributed vector and plot a histogram to show you what this distribution looks like when the variance equals the mean. We are using the `rpois()` function, which requires the arguments `n = ` (number of values) and `lambda = ` (the rate parameter).
 
-```{r, eval = FALSE}
+```{r}
 # Simulate the data
 sim_poisson <- rpois(n = 80, lambda = 3)
 
@@ -476,13 +476,13 @@ hist(sim_poisson)
 
 Now let's look at the distribution of our `visits` variable from `pollen_data`.
 
-```{r, eval = FALSE}
+```{r}
 hist(pollen_data$visits)
 ```
 
 The data in the simulated distribution has a roughly similar range of counts, but the mean is closer to the variance. Let's take a look.
 
-```{r, eval = FALSE}
+```{r}
 # Mean and variance from our simulated Poisson data
 mean(sim_poisson)
 var(sim_poisson)
@@ -495,7 +495,7 @@ The visit data mean is almost twice as large as the variance! This is creating m
 
 The `DHARMa` package has a useful function `testDispersion()` for testing for overdispersion. The argument required by this function is `simulationOutput`, which is our output from the `simulatedResiduals()` function. The test will provide the p-value from the plot we used to assess our model assumptions. It also shows us what the distribution of residuals should look like if the data matched the assumptions of our model.
 
-```{r, eval = FALSE}
+```{r}
 sim_resids <- simulateResiduals(visits_glm)
 testDispersion(sim_resids)
 ```
@@ -506,7 +506,7 @@ A natural place to start when we think we might have overdispersed count data is
 
 We need a new family function, `negative.binomial()`, which comes from the `MASS` package. We will fit a new negative binomial model, trying first with theta = 8. Note that you might have to adjust your theta to find the right fit!
 
-```{r, eval = FALSE}
+```{r}
 # Fit a negative binomial model
 visits_glm_nb <- glm(visits ~ biomass, data = pollen_data, 
                      family = negative.binomial(theta = 8, link = "log"))
