@@ -3,18 +3,18 @@ title: "Generalized Linear Models and Distributions"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 7, Winter 2026"
 output: 
-  pdf_document:
-    toc: yes
   html_document:
     df_print: kable
     toc: yes
     toc_float: yes
+  pdf_document:
+    toc: yes
 editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy=TRUE)
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy=TRUE)
 ```
 
 # **Learning Objectives**
@@ -38,13 +38,13 @@ In many ways, GLMs are more straightforward and more versatile than simple linea
 
 Make sure we're setting our working directory!
 
-```{r}
+```{r, eval = FALSE}
 setwd()
 ```
 
 ### Install and load packages
 
-We are going to need to load `tidyverse` and `car`. We are also going to install two new packages called `DHARMa` and `fitdistrplus`.
+We are going to need to load `tidyverse` and `car`. We are also going to install two new packages called `DHARMa` and `MASS`.
 
 Using the code block below, install the two new packages and load all four packages.
 
@@ -70,7 +70,7 @@ We have two datasets for this topic.
 
 Load the datasets by finishing the `read_csv()` function.
 
-```{r}
+```{r, eval = FALSE}
 pollen_data <- read_csv()
 ivf_data <- read_csv()
 ```
@@ -87,12 +87,12 @@ We are going to jump right into model-fitting to test our hypothesis. We will us
 
 * Linear regression: `gaussian(link = "identity")`
 * Logistic regression: `binomial(link = "logit")`
-* Gamma regression: `Gamma(link = "inverse")`
+* Gamma regression: `Gamma(link = "log")`
 * Poisson regression: `poisson(link = "log")`
 
 Note that the family specification *should not be in quotes*. For now, we will avoid talking about the `(link = )` components of the arguments.
 
-Maybe you recognize the term "Gaussian", which refers to our familiar normal distribution. Yes, simple linear models are just a special version of GLM! We could also fit a simple linear model using the Gaussian family and `glm()`: 
+You likely recognize the term "Gaussian", which refers to our familiar normal distribution. Simple linear models are just a special version of GLMs! We could also fit a simple linear model using the Gaussian family and `glm()`: 
 
 ```{r, eval = FALSE}
 # Simple linear model using lm()
@@ -106,11 +106,9 @@ We know that we want to test the effect of age on pregnancy. We also know that t
 
 ### **Mini Challenge 1**
 
-Let's fit some models to test our prediction that achieving pregnancy declines with age.
-
-1. Use the `lm()` function to fit a linear regression model testing for an effect of `age` on `pregnant`.
-2. Use the `glm()` function to fit a logistic regression model testing for an effect of `age` on `pregnant`.
-3. Call the models "pregnancy_lm" and "pregnancy_glm".
+1. Fit a simple linear model to test the effect of `age` on `pregant`, using the `ivf_data`.
+2. Fit a logistic regression model to test the effect of `age` on `pregant`, using the `ivf_data`, and specifying the appropriate family argument.
+3. Call the models `pregnancy_lm` and `pregnancy_glm`
 
 Use the code block below for your answer!
 
@@ -125,15 +123,397 @@ Use the code block below for your answer!
 
 Now, we'll take a look at the model summaries, assessing goodness of fit and effect sizes.
 
-* Summarize both models (looks OK)
-* Plot lm() diagnostics (does not look good)
-* Predict and plot the lm() model, showing how it doesn't fit the data well
-* Compare models using AIC
+```{r, eval = FALSE}
+# Summarize the simple linear regression
+summary(pregnancy_lm)
+
+# Summarize the logistic regression
+summary(pregnancy_glm)
+
+```
+
+Both models seem OK from their summaries. Both effect sizes for age seem to show that achieving pregnancy or the probability declines with age. The intercept in this case doesn't make much biological sense, as it tells us about pregnancy when age = 0, an impossibility.
+
+Note that the `glm()` model *does not have an R-squared in the summary.* **(Why?)**
+
+### Part 1c: Check model assumptions
+
+Next, we'll use `plot()` to check assumptions from the simple linear regression.
+
+```{r, eval = FALSE}
+plot(pregnancy_lm)
+```
+
+Looks like some major violations!
+
+What about the logistic regression model? We can generate Q-Q and scatter plots of our residuals with the `simulateResiduals()` function from the `DHARMa` package, which generates the residuals from our model without assuming a distribution. The function takes the model as an argument `fittedModel = `. We can also specify the argument `plot = TRUE`, which generates the plots for our test.
+
+```{r, eval = FALSE}
+simulateResiduals(fittedModel = pregnancy_glm, plot = TRUE)
+```
+
+What we are seeing here is the result of a Kolmogorov-Smirnov test (KS test) on our QQ plot. The Kolmogorov-Smirnov is essentially a non-parametric equivalent of a Shapiro-Wilk test, but instead of testing whether your residuals are approximately normal, you are testing if your residuals are consistent with the distribution you chose when you specified the family.
+
+If this is basically a nonparametric Shapiro-Wilks test, so a non-siginficant result suggests we chose a good family (distribution) for our response variable.
+
+You also see results from an outlier test. We interpret this p-value in the same way as Cook's distance: non-significant results mean no outliers.
+
+The other important thing to note is our "overdispersion test". We'll come back to the idea of overdispersion later, but for now you should note we interpret it in the same way as other tests (non-significant result = no overdispersion).
+
+### Part 1d: Plot the model predictions
+
+It will be easier to see why the simple linear model violates our assumptions so much if we plot what the model predicts about the relationship between age and achieving pregnancy.
+
+### **Mini Challenge 2**
+
+Fit a scatterplot of the relationship between age and achieving pregnancy.
+
+Use the `ivf_data` to create a scatterplot of `age` (dependent/explanatory variable) and `pregnant` (dependent/response variable)
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+The plot may appear strange at first, but it does represent the data well. The only options for `pregnant` are 1 or 0. There are many ages where patients *do not* achieve pregnancy (0), but also many at which they do (1). We can see that many of the unsuccessful pregnancies occur at the older ages, and successful pregnancies tend to be younger.
+
+What does our model say about the relationship? We can find out by making predictions from our model. The `predict()` function requires the arguments `object =` and `newdata =`. The *"object"* is the model we want to predict from. *"newdata"* is a data.frame or tibble, which must contain a sequence of values with *the same name* as the independendent/explanatory variable. R will use this sequence to generate a sequence of predictions for the dependent/response variable. We can make any length of sequence with any values we want, as long as they are values we could conceivably see. `se.fit =` is a optional logical argument specifying whether we want to predict the error in the response variable as well as the estimate (*TRUE* means yes, include the error).
+
+### **Mini Challenge 3**
+
+Make predictions from the `pregnancy_lm` model.
+
+1. Create a sequence of ages (independent variable) from the minimum age in `ivf_data` to the maximum, increasing by increments of 0.1.
+2. Make the sequence a column "age" in a new tibble called "predict_preg_data".
+3. Use `predict()` to predict from `pregnancy_lm`, specifiying se.fit = TRUE.
+4. Call the predictions "predict_preg_lm"
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+The output from our predictions is a list object. The first two elements of the list are vectors:
+
+* **fit**: The mean predictions, the same length as the vector we provided
+* **se.fit**: The error around the prediction
+
+We also have values with some other information from the model.
+
+We'll add the predictions (and error) to `predict_preg_data` using the `cbind()` function.
+
+```{r, eval = FALSE}
+predict_preg_data <- cbind(predict_preg_data, predict_preg_lm[1:2])
+```
+
+We're going to add two new elements to our scatterplot: a line and a "ribbon", which gives us the error around the mean prediction from the model. We know that `ggplot2` already plots the mean model predictions and error with the `geom_smooth(method = "lm")` function. However, when we start to introduce more complex relationships with `glm()`, the "lm" method will no longer be appropriate. We have to predict and plot the relationship manually.
+
+The `geom_ribbon()` needs a `ymin = ` and `ymax = ` in the aesthetic function to specify the boundaries of the ribbon. The boundaries are fit - se.fit (lower) and fit + se.fit (upper). I've also specified "alpha = 0.5" so the ribbon is transparent and we can see the points behind it.
+
+```{r, eval = FALSE}
+ggplot() +
+  geom_point(data = ivf_data, aes(x = age, y = pregnant)) +
+  geom_ribbon(data = predict_preg_data, 
+              aes(x = age,  ymin = fit - se.fit, ymax = fit + se.fit), alpha = 0.5) +
+  geom_line(data = predict_preg_data, aes(x = age, y = fit))
+```
+
+This new plot makes it clear why our model didn't fit well. Clearly there is a negative relationship, but it is not well specified by a linear relationship.
+
+### Part 1e: Compare model fits
+
+We don't get an R-squared from our `pregnancy_glm` because this assessment of goodness of model fit doesn't make sense for logistic regression. However, we can still compare model fits using AIC.
+
+### **Mini Challenge 4**
+
+Compare AIC between `pregnancy_lm` and `pregnancy_glm`.
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+Which model provides a better fit to the data?
+
+#-------------------------------------------------
 
 ## Part 2: Poisson regression
 
+Poisson regression tells us how the rate of an event changes as a function of some independent or explanatory variable(s). 
+
+Using our pollinator data, we are going to test the hypothesis that *pollinators are attracted to areas of greater plant biomass*. Our prediction is that the rate of pollinator visits increases with plant biomass.
+
+This is a case for Poisson regression because we're interested in how the number of pollinator visits (count data) changes with biomass. We'll follow the same steps we did for logistic regression, starting with:
+
+1. Fitting the model,
+2. Assessing the fit, 
+3. Checking assumptions, and
+3. Comparing the models using AIC.
+
+We'll leave plotting our predictions for later. 
+
+### Part 2a: Fit the models
+
+First, we'll fit a simple linear model and generalized linear model.
+
+### **Mini Challenge 5**
+
+1. Fit a simple linear model to test the effect of `biomass` on `visits`, using the `pollen_data`.
+2. Fit a poisson regression model to test the effect of `biomass` on `visits`, using the `pollen_data`, and specifying the appropriate family argument.
+3. Call the models `visits_lm` and `visits_glm`
+
+Use the code block below for your answer!
+
+```{r}
+
+```
 
 
+#-------------------------------------------------
+
+### Part 2b: Assess model fit
+
+Let's take a look at the models:
+
+```{r, eval = FALSE}
+# Summarize the simple linear regression
+summary(visits_lm)
+
+# Summarize the logistic regression
+summary(visits_glm)
+
+```
+
+Again, both models seem to suggest a similar positive relationship between biomass and visits.
+
+### Part 2c: Check model assumptions
+
+Next, we'll use `plot()` and `simulateResiduals()` to check our assumptions.
+
+### **Mini Challenge 6**
+
+Visually check the assumptions for both models, using the appropriate approach for each model type.
+
+Use the code block below for your answer!
+
+```{r}
+
+```
 
 
+#-------------------------------------------------
+
+The diagnostics for our Poisson regression look OK, but our p-value from our dispersion test is getting close to significant. We also see that the residuals do not follow our predictions quite as well as before. We will come back to this. For now, this model looks a lot better than the simple linear regression!
+
+### Part 2d: Compare models with AIC
+
+The Poisson regression looks better, but we have some concerns. Let's compare between models to see if the glm is better.
+
+### **Mini Challenge 7**
+
+Compare your models using AIC.
+
+Use the code block below for your answer!
+
+```{r}
+
+```
+
+
+#-------------------------------------------------
+
+## Part 3: Translating effects from link functions
+
+We know that specifying a link functions is preferable to transforming the response variable, but it also means our response is *not* normally distributed around our predictions. Link functions "translate" the relationship between the values from our explanatory/independent variable and the mean of the response/dependent variable. Because of this, the effect sizes from our models don't necessarily have the same interpretation as a simple linear model.
+
+Let's take a look at our `family` functions again:
+
+* Linear regression: `gaussian(link = "identity")`
+* Logistic regression: `binomial(link = "logit")`
+* Gamma regression: `Gamma(link = "log")`
+* Poisson regression: `poisson(link = "log")`
+
+You can see that each function includes a specified *link*. This *link* is the link function default when you specify that family.
+
+We already fit models using the Poisson and Binomial link functions, so we will examine the effect sizes from those models more closely.
+
+### Part 3a: Logit link interpretation
+
+Let's look at the summary of our `pregnancy_glm` model.
+
+```{r, eval = FALSE}
+summary(pregnancy_glm)
+```
+
+The "Estimate" from our model is -0.24. In simple linear regression, using the *"identity"* link, this would suggest that pregnancy decreases by -0.24 for every unit increase in age. However, this interpretation doesn't exactly make sense in logistic regression where we are using the *"logit"* link. Here, the effect size is *the change in the log-odds of success for each one-unit increase in the predictor*.
+
+In our example, each one unit increase in age decreases the *log-odds* of achieving pregnancy by 0.24. 
+
+Log-odds aren't the most intuitive. If we want a more real-world interpretation, we can convert the log-odds to an *odds ratio*. The *odds ratio* gives us the *increase or decrease in the odds of success for every unit increase in the predictor*. To convert to the odds ratio, we exponentiate the effect size using the `exp()` function. This function just performs math, so the only argument is our effect size.
+
+```{r}
+exp(-0.2374)
+```
+
+The odds ratio is ~ 0.79. *This means that each unit increase in age decreases the odds of achieving pregnancy by approximately 21%* (1 - odds ratio).
+
+Odds ratios < 1 are interpreted as a decrease in the odds. Ratios > 1 mean that the odds have increased. For example, if our effect size was + 0.2374, the odds ratio would be ~ 1.27, which would mean an approximate 27% *increase* in the odds of achieving pregnancy.
+
+### Part 3b: Log link interpretation
+
+Poisson regression generally uses the *"log"* link. The *log* link adds a multiplicative effect. Unlike the *logit* link, where we had to exponentiate the effect size to get the odds ratio, the Poisson effect size is essentially already an odds ratio. *We interpret it just like the odds ratio after exponentiating our effect size from the logistic regression model*.
+
+Let's look at the summary from our pollinator visits model again.
+
+```{r, eval = FALSE}
+summary(visits_glm)
+```
+
+The effect size from our model is ~ 0.01. This means that there is an approximate 1% increase in the odds of pollinator visits for each unit increase in biomass.
+
+The interpretation is the same for other models that use the log-link function (i.e., Gamma and log-linear).
+
+## Part 4: Plotting non-linear predictions
+
+We already saw that we could plot the predictions from our simple linear regression models using the `predict()` function. Plotting the predictions from our generalized linear regressions will help us visualize the non-linear (log/logit) effect sizes.
+
+### Part 4a: Plot predictions from logistic regression
+
+We will start by visualizing the predictions from our `pregnancy_glm` model.
+
+First, we'll predict the log-odds from our generalized linear model across a range of ages.
+
+We need one more argument in the `predict()` function we didn't need to include for our simple linear regression. Because this is a GLM, we need to specify that we want to predict the *"response"*, rather than the *"link"*, which would give us the translation of our response variable into a line. We can specify what we want using the `type = ` argument.
+
+```{r, eval = FALSE}
+# Tibble with ages
+predict_preg_glm_data <- tibble(age = seq(min(ivf_data$age), 
+                                          max(ivf_data$age), by = 0.1))
+# Predict the response for each age in the tibble
+predict_preg_glm <- predict(pregnancy_glm, 
+                            newdata = predict_preg_glm_data, 
+                            type = "response", se.fit = TRUE)
+```
+
+Next, we will add the predictions and standard error to our `predict_preg_glm_data` tibble.
+
+```{r, eval = FALSE}
+predict_preg_glm_data <- cbind(predict_preg_glm_data, predict_preg_glm[1:2])
+```
+
+Finally, let's plot the results, overlaying our scatterplot.
+
+```{r, eval = FALSE}
+ggplot() +
+  geom_point(data = ivf_data, aes(x = age, y = pregnant)) +
+  geom_ribbon(data = predict_preg_glm_data, 
+              aes(x = age,  ymin = fit - se.fit, ymax = fit + se.fit), alpha = 0.5) +
+  geom_line(data = predict_preg_glm_data, aes(x = age, y = fit))
+```
+
+We can see how this plot better represents the nature of the odds ratio as the probability of pregnancy changes with age.
+
+### Part 4b: Plot predictions from Poisson regression
+
+We know from our interpretation of the effect sizes that the relationship between biomass and pollinator visitation is also nonlinear in our `visits_glm` model.
+
+### **Mini Challenge 8**
+
+Plot the predictions from the `visits_glm` model.
+
+Use the code blocks below for your answer!
+
+Step 1:
+
+* Create a tibble with a sequence of biomass from the minimum to maximium in `pollen_data`, increasing by increments of 0.5.
+* Predict the response from the `visits_glm` model.
+
+```{r}
+
+```
+
+Step 2:
+
+Add the predictions and standard error to the tibble with the biomass sequence.
+
+```{r}
+
+```
+
+Step 3:
+
+Plot the relationship.
+
+```{r}
+
+```
+
+#-------------------------------------------------
+
+## Part 5: Overdispersion
+
+We need to revisit something we touched on earlier when we checked our GLM assumptions using `simulateResiduals()`. We saw that although the Poisson model fit a lot better than the linear model, our "dispersion test" was nearly significant, which suggests our response variable might be "overdispersed" for our Poisson regression model. 
+
+Overdispersion is very common with count data. One of the major properties of the Poisson distribution is that the mean of the distribution must equal the variance (rate parameter, $\lambda$). However, this is rarely the case for real data, where we often see many smaller counts and a long right tail with a few very large counts. Very often, the variance is larger than the mean.
+
+### Part 5a: Assessing overdispersion
+
+Let's simulate a Poisson-distributed vector and plot a histogram to show you what this distribution looks like when the variance equals the mean. We are using the `rpois()` function, which requires the arguments `n = ` (number of values) and `lambda = ` (the rate parameter).
+
+```{r, eval = FALSE}
+# Simulate the data
+sim_poisson <- rpois(n = 80, lambda = 3)
+
+# Plot a histogram
+hist(sim_poisson)
+```
+
+Now let's look at the distribution of our `visits` variable from `pollen_data`.
+
+```{r, eval = FALSE}
+hist(pollen_data$visits)
+```
+
+The data in the simulated distribution has a roughly similar range of counts, but the mean is closer to the variance. Let's take a look.
+
+```{r, eval = FALSE}
+# Mean and variance from our simulated Poisson data
+mean(sim_poisson)
+var(sim_poisson)
+# Mean and variance from our visit data
+mean(pollen_data$visits)
+var(pollen_data$visits)
+```
+
+The visit data mean is almost twice as large as the variance! This is creating mild overdispersion in our data.
+
+The `DHARMa` package has a useful function `testDispersion()` for testing for overdispersion. The argument required by this function is `simulationOutput`, which is our output from the `simulatedResiduals()` function. The test will provide the p-value from the plot we used to assess our model assumptions. It also shows us what the distribution of residuals should look like if the data matched the assumptions of our model.
+
+```{r, eval = FALSE}
+sim_resids <- simulateResiduals(visits_glm)
+testDispersion(sim_resids)
+```
+
+### Part 5b: Negative binomial regression
+
+A natural place to start when we think we might have overdispersed count data is to use "negative binomial" models. The negative binomial regression adds an additional parameter, $\theta$, which accounts for the increased variance relative to the mean. 
+
+We need a new family function, `negative.binomial()`, which comes from the `MASS` package. We will fit a new negative binomial model, trying first with theta = 8. Note that you might have to adjust your theta to find the right fit!
+
+```{r, eval = FALSE}
+# Fit a negative binomial model
+visits_glm_nb <- glm(visits ~ biomass, data = pollen_data, 
+                     family = negative.binomial(theta = 8, link = "log"))
+# Test for overdispersion
+sim_resids_nb <- simulateResiduals(visits_glm_nb)
+testDispersion(sim_resids_nb)
+```
+
+Much better!
 
