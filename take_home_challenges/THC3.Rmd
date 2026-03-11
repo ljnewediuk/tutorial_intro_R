@@ -1,0 +1,70 @@
+---
+title: "Take-home Challenge 2"
+author: "YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Take-home Challenge 2
+
+This challenge is due **Thursday, March 26th at 11:59 pm**. It will be graded out of 65 points (the marks distribution is outlined in each section and below). Your grade on the assignment will make up approximately 12% of your final grade in the course.
+
+You can either complete your assignment using this .Rmd document or using the TakeHomeChallengeFormatting.Rmd. If you use this document, please ensure you revise the YAML at the beginning of the document with your name and the date.
+
+Required submissions for this Take Home Challenge: 
+
+* 
+* 
+* 
+
+Your marks breakdown for this assignment:
+
+* **Task 1:** 2 points
+* **Task 2:** 5 points
+* **Task 3:** 10 points
+* **Task 4:** 10 points
+* **Task 5:** 20 points
+* **Task 6:** 12 points
+* **Annotations:** 3 points
+* **Both Rmd and knitted html (saved as pdf) submitted:** 3 points
+
+In this assignment... (Outline scenario. The students will be given a dataset and a hypothesis they need to test. They will have to come up with at least two separate predictions and test them using data. Two possible predictions will be a simple linear model (either test of difference or of relationship), and the other two will require either a Poisson, negative bionomial, or logistic regression. They will have to test the assumptions, fit the model, and interpret the results.
+
+### Task 1: Set up your environment (2 points)
+
+Use this space to load the packages and data you'll need for this assignment. You can either set your working directory and load your data from there, or load your data using the full path names. You *must* use code to load your data and packages to receive marks for this section.
+
+```{r}
+# Load packages
+library()
+
+# Set working directory (optional)
+
+# Load data
+```
+
+
+### Task 2: Generate predictions (5 points)
+
+Generate **two** predictions from the dataset that you think would test the hypothesis (what would you expect to see?) Write the predictions below.
+
+### Task 3: Fit your models (10 points)
+
+Write the code needed to model
+
+### Task 4: Test the assumptions of the models (12 points)
+
+They will need to use either Levene's & Shapiro-Wilk, K-S, or Gaussian plotting functions to decide whether their model works
+
+### Task 5: Create plots (20 points)
+
+They will have to create one plot for each predictive test that displays the results
+
+### Task 6: Interpret results (12 points)
+
+They will have to refer to BOTH their model summaries and their plots to interpret their results in the context of the hypotheses.
+
