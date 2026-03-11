@@ -70,6 +70,80 @@ XXXXX <- read_csv()
 - Show examples of each and how they can confound interpretations
 - Show how models where causal interpretation is messed up can still do an OK job at predictions
 
+```{r}
+set.seed(1)
+n <- 500
+
+temp <- rnorm(n)
+sun  <- temp + rnorm(n, sd = 0.3)   # highly correlated
+
+growth <- 2*temp + 2*sun + rnorm(n)
+
+dat <- data.frame(temp, sun, growth)
+```
+
+
+```{r}
+m1 <- lm(growth ~ temp, data = dat)
+m2 <- lm(growth ~ sun, data = dat)
+m3 <- lm(growth ~ temp + sun, data = dat)
+```
+
+```{r}
+set.seed(2)
+n <- 500
+
+fertilizer <- rnorm(n)
+
+plant_size <- 2*fertilizer + rnorm(n)
+
+fruit <- 1.5*fertilizer + 2*plant_size + rnorm(n)
+
+dat <- data.frame(fertilizer, plant_size, fruit)
+```
+
+```{r}
+m1 <- lm(fruit ~ fertilizer, data = dat)
+m2 <- lm(fruit ~ fertilizer + plant_size, data = dat)
+```
+
+```{r}
+set.seed(3)
+n <- 5000
+
+gpa <- rnorm(n)
+athletic <- rnorm(n)
+
+admission <- gpa + athletic + rnorm(n)
+
+dat <- data.frame(gpa, athletic, admission)
+```
+
+```{r}
+cor(dat$gpa, dat$athletic)
+selected <- dat[dat$admission > 1, ]
+
+cor(selected$gpa, selected$athletic)
+```
+
+```{r}
+set.seed(4)
+n <- 500
+
+temp <- rnorm(n)
+
+predators <- 2*temp + rnorm(n)
+
+prey_death <- 1.5*predators + 2*temp + rnorm(n)
+
+dat <- data.frame(predators, prey_death, temp)
+```
+
+```{r}
+m1 <- lm(prey_death ~ predators, data = dat)
+m2 <- lm(prey_death ~ predators + temp, data = dat)
+```
+
 ## Part 3: Overfitting
 
 - Show when too many variables can explain more variation but make poor predictions
