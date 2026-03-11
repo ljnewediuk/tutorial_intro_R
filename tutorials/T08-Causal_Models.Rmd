@@ -1,0 +1,82 @@
+---
+title: "Causal Models"
+author: "BIOL 3401 Mount Royal University"
+date: "Topic 8, Winter 2026"
+output: 
+  html_document:
+    df_print: kable
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy=TRUE)
+```
+
+# **Learning Objectives**
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce quis dui pulvinar, auctor lorem eu, fermentum neque. Sed semper euismod blandit. Sed elementum posuere tempus. Suspendisse potenti. Proin sit amet velit ultricies, vestibulum ex vel, tincidunt diam. Maecenas volutpat lacinia.
+
+After completing this topic, you should feel comfortable:
+
+1. 
+2. 
+3. 
+4. 
+
+## Making sense of your models
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ultrices porttitor ligula, in pellentesque velit molestie eu. Fusce porta hendrerit augue, sed efficitur leo auctor non. Pellentesque hendrerit, odio vel gravida varius, nisl ex tincidunt metus, dignissim ornare mi nunc.
+
+## Set up your R workspace for the day
+
+### Set your working directory
+
+Make sure we're setting our working directory!
+
+```{r}
+setwd()
+```
+
+### Load packages
+
+
+```{r}
+
+```
+
+### Load data
+
+* **XXXX_data.csv**: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet justo justo. Suspendisse et maximus leo. Mauris ut vestibulum.
+  * `YYYYY`: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  * `ZZZZZ`: Praesent convallis
+
+Load the dataset by finishing the `read_csv()` function.
+
+```{r}
+XXXXX <- read_csv()
+```
+
+## Part 1: Correlations
+
+- Use `cor.test()` to make correlation matrices to identify correlations between variables in data
+
+## Part 2: Multicollinearity, post-treatment bias, collider bias
+
+- Show examples of each and how they can confound interpretations
+- Show how models where causal interpretation is messed up can still do an OK job at predictions
+
+## Part 3: Overfitting
+
+- Show when too many variables can explain more variation but make poor predictions
+
+## Part 4: Standardizing
+
+- Show interpretations of models where variables are on different scales
+- Show when variables are on the same scales
+
+#

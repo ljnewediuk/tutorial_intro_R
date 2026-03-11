@@ -1,0 +1,10 @@
+---
+title: "Using gamlss to understand your data"
+output: html_document
+date: Sys.Date()
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
