@@ -94,4 +94,4 @@ dat <- data.frame(
   survived
 )
 
-write.csv(dat,"mammal_data.csv",row.names=FALSE)
+write.csv(dat,"datasets/pika_data.csv",row.names=FALSE)
