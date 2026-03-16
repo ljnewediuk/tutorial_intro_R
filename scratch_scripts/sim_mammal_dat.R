@@ -1,5 +1,5 @@
 
-# Simulate dataset of Pika (Ochotona daurica) in Waterton Lakes National Park
+# Simulate dataset of Pika (Ochotona princeps) in Waterton Lakes National Park
 # 
 # Hypothesis: Pika fitness (survival and reproductive success) is driven by health and resource availability.
 # 

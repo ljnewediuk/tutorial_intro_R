@@ -1,5 +1,5 @@
 ---
-title: "Take-home Challenge 2"
+title: "Take-home Challenge 3"
 author: "YOUR NAME HERE"
 date: "`r Sys.Date()`"
 output: html_document
@@ -11,15 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Take-home Challenge 2
 
-This challenge is due **Thursday, March 26th at 11:59 pm**. It will be graded out of 65 points (the marks distribution is outlined in each section and below). Your grade on the assignment will make up approximately 12% of your final grade in the course.
+This challenge is due **Thursday, March 26th at 11:59 pm**. It will be graded out of 65 points (the marks distribution is outlined in each section and below). Your grade on the assignment will make up **12%** of your final grade in the course (your previous two take-home challenges will be adjusted to 3% and 5% for THCs 1 & 2, respectively).
 
 You can either complete your assignment using this .Rmd document or using the TakeHomeChallengeFormatting.Rmd. If you use this document, please ensure you revise the YAML at the beginning of the document with your name and the date.
 
-Required submissions for this Take Home Challenge: 
+Required submissions for this take-home challenge: 
 
-* 
-* 
-* 
+* your .Rmd
+* your output knitted as an HTML and saved to a PDF
+* Two figures, one for each prediction, saved as .jpg, .png, or .tiff files. Please see [this helper file](https://ljnewediuk.github.io/tutorial_intro_R/tutorials/X1-Plot_Aesthetics_Helper.html) for instructions on saving your plots.
 
 Your marks breakdown for this assignment:
 
@@ -32,39 +32,94 @@ Your marks breakdown for this assignment:
 * **Annotations:** 3 points
 * **Both Rmd and knitted html (saved as pdf) submitted:** 3 points
 
-In this assignment... (Outline scenario. The students will be given a dataset and a hypothesis they need to test. They will have to come up with at least two separate predictions and test them using data. Two possible predictions will be a simple linear model (either test of difference or of relationship), and the other two will require either a Poisson, negative bionomial, or logistic regression. They will have to test the assumptions, fit the model, and interpret the results.
+In this assignment, you are studying a population of American pika (*Ochotona princeps*) in Waterton Lakes National Park. Pika are small rodents related to rabbits. They live in colonies with other pikas but defend smaller individual "territories" in the rocky patches where they make their dens. Pikas stockpile vegetation (grasses, sedges, etc.) in their dens, which they store as food for the winter. The quality of the food in their territories and their physical ability to collect and store it is thought to have a big impact on their ability to survive, grow, and ultimately produce offspring.
+
+You are testing the hypothesis that **pika fitness (i.e., survival and reproductive success) is driven by their physical condition and resource availability within their territory.** Your supervisor has given you a dataset with information from individual pika in a longitudinal study, where pika were captured, released, and followed over their lifetimes. Each row represents a different individual. The columns are:
+
+* `habitat_quality`: A general rating of the amount of resources available in the pika's territory
+* `sex`: The pika's sex
+* `age`: The pika's age at the time of capture
+* `territory_size`: The area covered by the pika's territory (square metres)
+* `body_mass`: The mass of the pika at the time of capture (grams)
+* `stress_hormone`: The average concentration of glucocorticoid metabolites in the pika's feces collected from its territory (nanograms/gram)
+* `parasite_load`: The number of ectoparasites counted on the pika at its capture (including ticks and botflies)
+* `offspring_count`: The total number of offspring the pika produced over its lifetime
+* `foraging_time`: The number of seconds the pika spent foraging, on average, during 5-minute focal observations
+* `survived`: Binary outcome indicating whether the pika survived to the end of the study (1 = survived, 0 = died prematurely)
+
+You will need to come up with *two testable predictions* from the dataset to evaluate support for the hypothesis.
+
+**IMPORTANT:** Your grade in this assignment will be based on your ability to generate appropriate predictions and test them using the appropriate models and visualizations, **NOT on whether your predictions are ultimately supported by the data**. I.e., if you appropriately test a plausible prediction, following all instructions, and find no support for the hypothesis, you will have fully met the requirements of the assignment.
 
 ### Task 1: Set up your environment (2 points)
 
 Use this space to load the packages and data you'll need for this assignment. You can either set your working directory and load your data from there, or load your data using the full path names. You *must* use code to load your data and packages to receive marks for this section.
 
 ```{r}
-# Load packages
-library()
+# Load the packages you will need to complete this assignment
 
-# Set working directory (optional)
+# Set your working directory (optional)
 
-# Load data
+# Load the THC3_data.csv data
 ```
 
 
 ### Task 2: Generate predictions (5 points)
 
-Generate **two** predictions from the dataset that you think would test the hypothesis (what would you expect to see?) Write the predictions below.
+Generate **two** predictions from the dataset that you think would test the hypothesis (i.e., what would you expect to see if the hypothesis were true?). Each of your predictions must:
+
+* Identify a response variable
+* Identify one or more predictor variables
+* State the expected direction of effect
+* Be testable with one of the generalized linear models we've discussed (Poisson, logistic, Gamma, negative binomial)
+
+Write your predictions in the space provided below.
+
+**Prediction 1:**
+
+**Prediction 2:**
 
 ### Task 3: Fit your models (10 points)
 
-Write the code needed to model
+Using the code chunk below, fit the appropriate generalized linear models (or simple linear model) for your predictions (**two models total, one for each prediction**). Remember that we discussed several types of models that are appropriate for different types of data and questions.
+
+```{r}
+
+```
 
 ### Task 4: Test the assumptions of the models (12 points)
 
-They will need to use either Levene's & Shapiro-Wilk, K-S, or Gaussian plotting functions to decide whether their model works
+In the code chunk below, use the appropriate functions to test whether your two models fit the assumption(s) of the models you chose. *You must also briefly interpret your assumptions tests after the code chunk*, explaining:
+
+* Whether your models fit the assumptions
+* What evidence from your tests of assumptions led you to this conclusion
+
+```{r}
+
+```
+
 
 ### Task 5: Create plots (20 points)
 
-They will have to create one plot for each predictive test that displays the results
+Using the code chunk below, create ggplots to visualize the results of your models (**two plots total, one for each prediction**). Include *readable axis labels* and any other aesthetic features you like.
+
+```{r}
+
+```
+
 
 ### Task 6: Interpret results (12 points)
 
-They will have to refer to BOTH their model summaries and their plots to interpret their results in the context of the hypotheses.
+Interpret the results from your models. For each model, you must report:
+
+* The *effect sizes* from the model summaries, and your interpretation of what they mean
+* Your interpretation of the patterns you see in your ggplots
+* A statement about whether your predictions were supported by the data
+* What support for (or against) your predictions tells you about the overall hypothesis you are testing
+
+Report this information below, either in a paragraph or point-form.
+
+
+
+
 
