@@ -51,28 +51,33 @@ setwd()
 
 ### Load data
 
+- Three datasets today
+
 * **XXXX_data.csv**: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet justo justo. Suspendisse et maximus leo. Mauris ut vestibulum.
   * `YYYYY`: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   * `ZZZZZ`: Praesent convallis
 
-Load the dataset by finishing the `read_csv()` function.
+Load the datasets by finishing the `read_csv()` functions.
 
 ```{r}
 XXXXX <- read_csv()
 ```
 
+- Include background information about our questions in each dataset
+- Build out the DAGs
+
 ## Part 1: Correlations
 
 - Use `cor.test()` to make correlation matrices to identify correlations between variables in data
+
+- The purpose is to show that our DAGs are correct
 
 ## Part 2: Multicollinearity, post-treatment bias, collider bias
 
 - Show examples of each and how they can confound interpretations
 - Show how models where causal interpretation is messed up can still do an OK job at predictions
 
-Conditioning on colliders means you are creating an association between two variables that is not necessarily causal. Learning about the price of a bottle of wine inherently tells you something about its quality, but not because higher-priced bottles are necessarily higher quality. Instead, a bottle must be either high-quality or high-priced in order to achieve high acclaim. This means that if a bottle is priced low, it must be high quality, and vice-versa.
-
-Unfortunately, when you decide to "control" for price in your model to test the impact of quality on acclaim, you are inadvertently testing for this non-causal association between quality and price, which leads to the conclusion that price increases quality, even though there is actually no relationship between the two.
+### Multicollinearity 
 
 ```{r}
 set.seed(1)
@@ -93,6 +98,8 @@ m2 <- lm(growth ~ sun, data = dat)
 m3 <- lm(growth ~ temp + sun, data = dat)
 ```
 
+### Post-treatment bias
+
 ```{r}
 set.seed(2)
 n <- 500
@@ -110,6 +117,12 @@ dat <- data.frame(fertilizer, plant_size, fruit)
 m1 <- lm(fruit ~ fertilizer, data = dat)
 m2 <- lm(fruit ~ fertilizer + plant_size, data = dat)
 ```
+
+### Collider bias
+
+Conditioning on colliders means you are creating an association between two variables that is not necessarily causal. Learning about the price of a bottle of wine inherently tells you something about its quality, but not because higher-priced bottles are necessarily higher quality. Instead, a bottle must be either high-quality or high-priced in order to achieve high acclaim. This means that if a bottle is priced low, it must be high quality, and vice-versa.
+
+Unfortunately, when you decide to "control" for price in your model to test the impact of quality on acclaim, you are inadvertently testing for this non-causal association between quality and price, which leads to the conclusion that price increases quality, even though there is actually no relationship between the two.
 
 ```{r}
 set.seed(3)
@@ -153,6 +166,67 @@ m2 <- lm(prey_death ~ predators + temp, data = dat)
 - Show when too many variables can explain more variation but make poor predictions
 
 This will be a simulation we run together, and I talk it through with them. We will use a different number of predictors to see how bad the overfitting gets when we add too many random variables
+
+```{r}
+set.seed(10)
+
+n <- 200
+
+x <- rnorm(n, 5, 1)
+
+# true relationship
+y <- 2*x + rnorm(n, 0, 1)
+
+dat <- data.frame(
+  y,
+  x
+)
+
+for(i in 1:80){
+  dat[[paste0("z",i)]] <- rnorm(n, 5, 1)
+}
+
+# Training and testing data 
+train_id <- sample(1:n, n/2)
+
+train <- dat[train_id, ]
+test  <- dat[-train_id, ]
+
+# Simple model
+m_simple <- lm(y ~ x, data = train)
+summary(m_simple)
+
+# Prediction error (training)
+pred_train_simple <- predict(m_simple, train)
+mean((train$y - pred_train_simple)^2)
+
+# Prediction error (testing)
+pred_test_simple <- predict(m_simple, test)
+mean((test$y - pred_test_simple)^2)
+
+# Overfit model
+m_overfit <- lm(y ~ .,
+                data = train)
+summary(m_overfit)
+
+# Training error
+pred_train_overfit <- predict(m_overfit, train)
+mean((train$y - pred_train_overfit)^2)
+
+# Testing error
+pred_test_overfit <- predict(m_overfit, test)
+mean((test$y - pred_test_overfit)^2)
+
+# Plot the predicted relationship between the simple model and the overfit model
+
+# Simple model
+plot(train$y ~ train$x)
+lines(pred_train_simple ~ train$x)
+
+# Overfit model
+plot(train$y ~ train$x)
+lines(pred_train_overfit ~ train$x)
+```
 
 ## Part 4: Standardizing
 
