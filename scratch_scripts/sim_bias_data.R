@@ -33,11 +33,11 @@ dat_multi_r <- as.data.frame(apply(dat_multi, 2, function(x) round(x, 1)))
 
 cor(dat_multi_r)
 
-# Correct model (total effect of oxygen)
+# Correct model (total effect of snow)
 m1 <- lm(yield_ba ~ snow_cm, data = dat_multi_r)
 summary(m1)
 
-# Correct model (total effect of algae)
+# Correct model (total effect of temperature)
 m2 <- lm(yield_ba ~ temp_C, data = dat_multi_r)
 summary(m2)
 
@@ -102,14 +102,12 @@ write.csv(dat_post_r, 'tomatoes.csv', row.names = F)
 # Students want to know the relationship between wine price and quality (are 
 # higher-priced bottles better quality?)
 
-# Bottle price affects critical acclaim score. Quality also affects critical
-# acclaim score. The students condition on acclaim score to test the association
-# between price and quality, which induces an association, even though their is
-# none.
+# Bottle price increases critical acclaim score. Quality also increases critical
+# acclaim score.
 
-# Students measure toxin production and want to know what affects it.
-# But they control for growth rate. Growth rate is affected by both temperature 
-# and nutrients → collider.
+# The students condition on acclaim score to test the whether
+# higher-quality bottles are higher-price, which induces an association, even 
+# though there isn't one.
 
 # DAG
 # price → acclaim ← quality
@@ -133,7 +131,7 @@ dat_coll <- data.frame(
 write.csv(dat_coll, 'wine_quality.csv', row.names = F)
 
 # Correct model (no association)
-m1 <- lm(quality_score ~ price_CAD, data = dat_coll)
+m1 <- lm(price_CAD ~ quality_score, data = dat_coll)
 
 summary(m1)
 
@@ -143,6 +141,6 @@ m2 <- lm(acclaim ~ quality_score, data = dat_coll)
 summary(m2)
 
 # Biased model (conditioned on the collider)
-m3 <- lm(quality_score ~ price_CAD + acclaim, data = dat_coll)
+m3 <- lm(price_CAD ~ quality_score + acclaim, data = dat_coll)
 
 summary(m3)
