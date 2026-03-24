@@ -3,12 +3,12 @@ title: "Causal Models"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 8, Winter 2026"
 output: 
+  pdf_document:
+    toc: yes
   html_document:
     df_print: kable
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
 editor_options:
   chunk_output_type: console
 ---
@@ -37,7 +37,7 @@ After completing this topic, you should feel comfortable:
 
 Make sure we're setting our working directory!
 
-```{r, eval=F}
+```{r}
 setwd()
 ```
 
@@ -75,7 +75,7 @@ Using the code block below, install the new package and load the packages.
 
 Load the datasets by finishing the `read_csv()` functions.
 
-```{r, eval=F}
+```{r}
 crop_yields <- read_csv()
 wine_quality <- read_csv()
 tomatoes <- read_csv()
@@ -95,7 +95,7 @@ In our fictional world of crop yields:
 
 We construct a DAG using the `dagitty()` function. The arguments are the relationships between the variables. Each suspected relationship between two variables is described with the variable names, separated by a **->**. These are each entered on a new line *without a separating comma*. Two-way relationships need to be specified on individual lines. We can then plot the object we create using `plot()`.
 
-```{r, eval=F}
+```{r}
 # Make the DAG object
 crop_DAG <- dagitty(" {
 Temp -> Yield
@@ -141,7 +141,7 @@ Now that we've visualized the relationships between our variables, we're going t
 
 The correlation matrix can tell us whether our intuitions about our model world are correct. First, let's plot our crop DAG and check the associations.
 
-```{r, eval=F}
+```{r}
 plot(crop_DAG)
 cor(crop_yields)
 ```
@@ -173,7 +173,7 @@ We just saw that snow depth is highly negatively correlated with temperature; in
 
 Yield and snow depth are both continuous variables that we might expect to meet the assumptions of a simple linear regression. Let's fit the model and quickly test our assumptions.
 
-```{r, eval=F}
+```{r}
 yield_snow_m <- lm(yield_ba ~ snow_cm, data = crop_yields)
 plot(yield_snow_m)
 ```
@@ -190,7 +190,7 @@ How would we interpret the effect of snow depth on bushels per acre of wheat?
 
 We saw that snow depth and temperature are highly correlated. We think we've constructed the correct model by including only snow depth and not temperature in the model. Let's see what happens when we include both variables in the same model, *testing the effects of both snow depth and temperature on wheat yields in multiple regression.*
 
-```{r, eval=F}
+```{r}
 yield_snow_temp_m <- lm(yield_ba ~ snow_cm + temp_C, data = crop_yields)
 summary(yield_snow_temp_m)
 ```
@@ -328,7 +328,7 @@ We are going to run a simulation to understand how overfitting works. We will wa
 
 We are going to simulate a true relationship between a response variable and predictor. To the same tibble, we will then add another set of random variables having no association with the response variable.
 
-```{r, eval=F}
+```{r}
 # Setting a random "seed" so we can all reproduce the same results
 set.seed(10)
 
@@ -357,7 +357,7 @@ for(i in 1:80){
 
 In predictive modelling (e.g., machine learning), we often split the data into separate "training" and "testing" data. This process allows us to "train" a model to make good predictions, then test its abilities on a withheld "testing" dataset.
 
-```{r, eval=F}
+```{r}
 # Sample half the data by index to reserve as "training" data
 train_id <- sample(1:n, n/2)
 
@@ -372,7 +372,7 @@ Now, we will fit the training models and use them to predict the testing data. I
 
 We can compare our predictions to the actual observations of our random variable using the residual sums of squares. This is a similar process we would use to manually calculate the R-squared, so we are essentially asking how much of the variation in our actual data our model explains.
 
-```{r, eval=F}
+```{r}
 # Fit a simple model y ~ x
 m_simple <- lm(y ~ x, data = train)
 summary(m_simple)
@@ -409,7 +409,7 @@ What does the sum of squares tell us about how well the simple versus overfit mo
 
 Here we are overlaying the predictions from our simple and overfitted models.
 
-```{r, eval=F}
+```{r}
 # Overlay the relationship predicted by the simple model on the data
 plot(train$y ~ train$x)
 lines(pred_train_simple ~ train$x)
@@ -427,7 +427,7 @@ The last thing we will do is to introduce a helpful trick for model interpretati
 
 Setting aside our collider bias for a moment, let's revisit a multiple regression model where we would like to *predict winery acclaim from bottle price and bottle quality using the wine_quality data*.
 
-```{r, eval=F}
+```{r}
 acclaim_qual_price_m <- lm(acclaim ~ price_CAD + quality_score, data = wine_quality)
 summary(acclaim_qual_price_m)
 ```
