@@ -1,0 +1,126 @@
+---
+title: "Formatting figures, tables, and references in R Markdown"
+bibliography: refs.bib
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(tidyverse)
+```
+
+## Formatting your reproducible report
+
+Your final report, put together in R Markdown, will need to include figures, tables, and properly formatted references. We have made nice figures, but we haven't discussed details like figure captions. We've printed data frames, but we haven't produced nicely formatted tables. We haven't talked about references at all. In this helper file, I will show you how to format your results and references for your final report. **Please note that you can follow along with this file online, but you will need to open the .Rmd to see the specific formatting details I reference.**
+
+### Adding figure captions
+
+Figure captions can be included in the headings of any code chunk that produces a plot. I.e., "```{r, fig.cap = ....}"
+
+For example, in the code chunk below, I am generating a scatterplot using the `iris` dataset. This data automatically comes installed with R, so you don't need to load it. Of course, in the case of your own data, you will have already loaded it and properly formatted it in preparation for making your figure. I have added a figure caption, which appears directly below and in line with the plot when knitted.
+
+```{r, fig.cap = "Figure 1. Regression showing the relationship between sepal and petal length in Iris species"}
+ggplot(iris, aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic()
+```
+
+### Making nicer tables
+
+The `kable` function (part of the `knitr` package) generates nicely-formatted tables from a data frame or tibble. You already have the `knitr` package installed. Instead of loading the package, when you generate a table, you can "call" the function from the package by typing `knitr::kable()` in your code chunk. The double colons tell R to look for a function within a package you have installed but not necessarily loaded. I've shown an example of a table with made-up model results below.
+
+A couple of other things I want you to notice about the code for this table:
+
+* I've also included `tab.cap = ` in the heading of the code chunk, which generates a table caption above and in line with the table
+* The numbers in the table all have several numbers after the decimal, so I've included the argument `digits = 2` in the `kable()` function to tell R to only print two digits (you can also give this argument a vector with the same number of columns in your table if you want each column to contain a different number of digits)
+
+Finally, note that I've installed a new package called `kableExtra`. This package allows us to adjust additional features of the table to make it look a bit nicer. In the `kable_styling()` function from this package, I've increased the font size. I've also changed the font. Finally, I've used a prefab theme from the package by setting the argument `htmltable_class = "lightable-classic"`. There are several options for you to explore. Please see the `kableExtra` help files and view the `kable_styling()` function for more options to adjust your table aesthetics.
+
+```{r, tab.cap= "Table 1. Results from a model testing the effects of island characteristics on colonization by new species"}
+# Generating a data frame
+example_df <- data.frame(Covariate = c("Distance from mainland", "Island area", "Species Richness", "Soil type: Loam", "Soil type: Sand"),
+                         `Effect size` = c(1.52820, 0.02348, 0.8023, -2.237014, 0.32481),
+                         `Standard error` = c(0.23497, 0.005193, 0.719562, 1.80833, 0.058742),
+                         `p-value` = c(0.000325, 0.00247, 0.7382, 0.042885, 0.0045162))
+
+# Generate a table using kable()
+knitr::kable(example_df, digits = 2) %>%
+  kableExtra::kable_styling(font_size = 18,
+                            html_font = "Times New Roman",
+                            htmltable_class = "lightable-classic")
+```
+
+### Managing references in R Markdown 
+
+You have two options for adding your references to your final report:
+
+* First, you can copy and paste your reference table and add all of your references manually
+* As another option, you can use *BibTex*, which works in conjunction with R Markdown to manage and automatically format your references
+
+Using BibTex requires a bit more work and learning up front, but in the long run it's much faster, and a great skill to learn! 
+
+Here is what you'll need to do:
+
+1. In R, go to File >> New File >> Text File
+2. Name the file `filenameX.bib`, *including* the .bib extension. Replace `filenameX` with any name you like. E.g., "refs.bib". 
+3. Edit the .bib file to include your references. See the details below.
+
+#### Journal article references
+
+For a basic journal article you need to provide a "short name" in addition to other pieces of information about the article. See the example below. You can include as much information about the article as you have, and R will format your reference based on the information you provide.
+
+**Remember that all of the references go in your .bib file, not in your R Markdown. Also note that you must include the curly braces around all pieces of information (author name, title, etc.).**
+
+```{bash, eval = F} 
+@article{@shortnameforarticle,
+author = {Author name},
+title = {Title of article},
+journal = {Name of journal},
+volume = {XX},
+number = {XX},
+pages = {XXXX-XXXX},
+year = {XXXX},
+doi = {XXXX.XXXX.XX}
+}
+```
+
+#### References to books
+
+```{bash, eval = F}
+@book{@shortnameforbook,
+title = {Book title},
+author = {Book author},
+year = {XXXX}
+publisher = {Book publisher}
+}
+```
+
+The "shortname" is a tag for R to add the in-text citation. I've included some made-up references in a .bib file linked to this R Markdown file. You can cite a reference anywhere you insert the shortname for the article, preceded by "@". For example, here is a reference to a made-up book @williams2023. Here is a made-up journal article @johnson2025. 
+
+#### Linking the .bib file
+
+You need to link your .bib file to your R Markdown for R to pull the references for you. To do this, you need to add the line "bibliography: refs.bib" to your YAML at the beginning of the Rmd. For example:
+
+```{r, eval = FALSE}
+---
+title: "Formatting figures, tables, and references in R Markdown"
+output: html_document
+date: Sys.Date()
+bibliography: refs.bib
+---
+```
+
+**Make sure your .bib file is in the same folder as your R Markdown file when you knit**.
+
+#### Formatting your reference list
+
+As a final step in formatting your references, you'll also want R to make you a reference list. This is the easiest part of the process. At the end of your document, simply type a new heading, "References". See below.
+
+### References
+
+*Your properly formatted references appear in your reference list!*
