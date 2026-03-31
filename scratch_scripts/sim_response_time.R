@@ -62,6 +62,7 @@ ggplot(dat, aes(x = temp, y = response_time, colour = animal)) +
   geom_smooth(method = 'lm')
 
 # Try some models
+lm_s <- lm(response_time ~ temp, data = dat)
 i_mm <- lmer(response_time ~ temp + (1 | animal), data = dat)
 is_mm <- lmer(response_time ~ temp + (temp | animal), data = dat)
 
@@ -69,3 +70,18 @@ is_mm <- lmer(response_time ~ temp + (temp | animal), data = dat)
 write.csv(dat, 
           "/Users/levi/Documents/R-Projects/tutorial_intro_R/datasets/response_times.csv", 
           row.names = F)
+
+
+# Tasks: 
+# 
+# 1 - Get them to plot the indivdual effects in ggplot (they have to figure out
+#     how to colour by individual)
+#     
+# 2 - Fit simple lm
+# 
+# 3 - Fit mixed models (random intercept/slopes)
+#     Show fixed effects and variance of random intercepts/slopes across models
+#     Extract the random intercepts/slopes and visualize them relative to the main effect
+#     Look at correlation slope/intercept in intercept/slope model
+# 
+# 4 - Calculate marginal/conditional r2
