@@ -5,7 +5,7 @@ library(lmerTest)
 library(performance)
 # Simulate group-level data to explore random effects
 
-set.seed(42)
+set.seed(40)
 
 # design
 n_animals <- 20
@@ -18,10 +18,10 @@ temp <- rnorm(n_animals * n_obs, mean = 20, sd = 5)
 
 # random effects
 # intercept variation (baseline neural speed)
-b0 <- rnorm(n_animals, 0, 2)
+b0 <- rnorm(n_animals, 0, 5)
 
 # slope variation (temperature sensitivity)
-b1 <- rnorm(n_animals, 0, 0.5)
+b1 <- rnorm(n_animals, -2.5, 12)
 
 # fixed effects
 beta0 <- 100   # baseline response time (ms)
@@ -32,7 +32,7 @@ response_time <- beta0 +
   beta1 * temp + 
   b0[animal] + 
   b1[animal] * temp + 
-  rnorm(n_animals * n_obs, 0, 2)
+  rnorm(n_animals * n_obs, 0, 30)
 
 # Scale the response
 rescale_variable <- function(x, r_min, r_max) {
@@ -66,10 +66,12 @@ lm_s <- lm(response_time ~ temp, data = dat)
 i_mm <- lmer(response_time ~ temp + (1 | animal), data = dat)
 is_mm <- lmer(response_time ~ temp + (temp | animal), data = dat)
 
+summary(lm_s)
+summary(i_mm)
+summary(is_mm)
+
 # Save data
-write.csv(dat, 
-          "/Users/levi/Documents/R-Projects/tutorial_intro_R/datasets/response_times.csv", 
-          row.names = F)
+write.csv(dat, "datasets/response_times.csv", row.names = F)
 
 
 # Tasks: 
