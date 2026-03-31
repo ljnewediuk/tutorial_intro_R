@@ -20,6 +20,9 @@ temp_mean_animal <- rnorm(n_animals, mean = 20, sd = 4)
 temp <- rep(temp_mean_animal, each = n_obs) + 
   rnorm(n_animals * n_obs, 0, 2)
 
+# add condition variable
+condition <- rnorm(n_animals * n_obs, mean = 0, sd = 1)
+
 # random intercepts (baseline performance)
 # IMPORTANT: correlate intercept with mean temp (confounding!)
 b0 <- 0.8 * temp_mean_animal + rnorm(n_animals, 0, 2)
@@ -48,27 +51,49 @@ rescale_variable <- function(x, r_min, r_max) {
 # Rescale 
 response_time_fgd_ms <- rescale_variable(x = response_time, r_min = 12, r_max = 28)
 
+# Add poisson response data (number of trials required to complete a maze;
+# decreases with temperature and condition)
+eta <- 1.8 +
+  b0[animal] +
+  (-0.5 + b1[animal]) * temp +
+  (-0.15) * condition
+
+# convert to probability
+lambda <- exp(eta + 10)
+
+# generate outcome
+trials_raw <- rpois(n_animals * n_obs, lambda)
+
+# constrain to no more than 25 trials and greater than zero
+trials <- pmin(trials_raw, 25) + 1
+
 # Generate the data
 # animal = individual animal ID
 # temp = ambient temperature in degrees C
 # response_time = response time delay before force generation delay in milliseconds
 dat <- data.frame(animal = paste0("CX", animal), 
                   temp = round(temp, 1), 
-                  response_time = round(response_time_fgd_ms, 2))
+                  response_time = round(response_time_fgd_ms, 2),
+                  trials)
 
 # Plot
-ggplot(dat, aes(x = temp, y = response_time, colour = animal)) +
-  geom_point() + 
-  geom_smooth(method = 'lm')
+ggplot(dat, aes(x = temp, y = response_time)) +
+  geom_point(aes(colour = animal)) + 
+  geom_smooth(method = 'lm', aes(colour = animal)) +
+  geom_smooth(method = 'lm', colour = 'black')
 
 # Try some models
 lm_s <- lm(response_time ~ temp, data = dat)
 i_mm <- lmer(response_time ~ temp + (1 | animal), data = dat)
-is_mm <- lmer(response_time ~ temp + (temp | animal), data = dat)
+is_mm <- lmer(response_time ~ temp + (1 + temp | animal), data = dat)
 
 summary(lm_s)
 summary(i_mm)
 summary(is_mm)
+
+AIC(lm_s)
+AIC(i_mm)
+AIC(is_mm)
 
 # Save data
 write.csv(dat, "datasets/response_times.csv", row.names = F)
