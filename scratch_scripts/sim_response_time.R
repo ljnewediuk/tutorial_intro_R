@@ -5,34 +5,34 @@ library(lmerTest)
 library(performance)
 # Simulate group-level data to explore random effects
 
-set.seed(40)
+set.seed(123)
 
 # design
-n_animals <- 20
-n_obs <- 15
+n_animals <- 25
+n_obs <- 20
 
 animal <- factor(rep(1:n_animals, each = n_obs))
 
-# predictor: temperature (°C)
-temp <- rnorm(n_animals * n_obs, mean = 20, sd = 5)
+# animal-level "preferred" temperature (drives confounding)
+temp_mean_animal <- rnorm(n_animals, mean = 20, sd = 4)
 
-# random effects
-# intercept variation (baseline neural speed)
-b0 <- rnorm(n_animals, 0, 5)
+# generate temp with within-animal variation
+temp <- rep(temp_mean_animal, each = n_obs) + 
+  rnorm(n_animals * n_obs, 0, 2)
 
-# slope variation (temperature sensitivity)
-b1 <- rnorm(n_animals, -2.5, 12)
+# random intercepts (baseline performance)
+# IMPORTANT: correlate intercept with mean temp (confounding!)
+b0 <- 0.8 * temp_mean_animal + rnorm(n_animals, 0, 2)
 
-# fixed effects
-beta0 <- 100   # baseline response time (ms)
-beta1 <- -1.3 # faster responses at higher temp
+# random slopes (individual sensitivity)
+b1 <- rnorm(n_animals, mean = -1.5, sd = 0.5)
 
 # generate response
-response_time <- beta0 + 
-  beta1 * temp + 
-  b0[animal] + 
-  b1[animal] * temp + 
-  rnorm(n_animals * n_obs, 0, 30)
+response_time <- 60 +
+  b0[animal] +                  # intercept differences
+  b1[animal] * temp +          # slope differences
+  rnorm(n_animals * n_obs, 0, 2)
+
 
 # Scale the response
 rescale_variable <- function(x, r_min, r_max) {
