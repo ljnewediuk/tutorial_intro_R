@@ -1612,9 +1612,9 @@ models:</p>
 <ul>
 <li><em>formula + (1 | group)</em> specifies a random intercept model.
 The “group” is the name of the grouping variable from your data.</li>
-<li><em>formula + (1 + response variable | group)</em> specifies a
-random slope and intercept model. The response variable(s) is the
-response variable from your formula over which you expect the group
+<li><em>formula + (1 + predictor variable | group)</em> specifies a
+random slope and intercept model. The predictor variable(s) is the
+predictor variable from your formula over which you expect the group
 slopes to vary.</li>
 </ul>
 <p>All the other formatting details for fitting <code>lmer()</code>
@@ -1680,9 +1680,9 @@ differ in terms of the effect of temperature on response times.</li>
 <li>The <em>residual variance</em> tells us how much variance remains
 unexplained by either the random or fixed effects. If this value is
 large relative to the random effects variance, it suggests most of the
-variation is <em>within</em> the groups rather than between them.
-Conversely, a relatively large random effects variance tells us most of
-the variation exists <em>between</em> groups.</li>
+variation in our response is <em>within</em> the groups rather than
+between them. Conversely, a relatively large random effects variance
+tells us most of the variation exists <em>between</em> groups.</li>
 </ul>
 <p>Remember, in mixed-effects models we are interested in the variation
 among groups, so a larger number in the intercept and slope variances

@@ -3,12 +3,12 @@ title: "Mixed-effects Models"
 author: "BIOL 3401 Mount Royal University"
 date: "Topic 9, Winter 2026"
 output: 
+  pdf_document:
+    toc: yes
   html_document:
     df_print: kable
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
 editor_options:
   chunk_output_type: console
 ---
@@ -105,7 +105,7 @@ We discussed two main types of random effects we can specify in mixed-effects mo
 We are going to use the `lme4` package to fit mixed-effects models using random slopes and intercepts. This package has two main functions: the `lmer()` function fits linear mixed-effects models, and the `glmer()` function fits generalized linear mixed-effects models. We won't explore GLMMs in this tutorial, but you can fit them by building on the `lmer()` function with the `family` argument just as you would with a generalized linear model. We are going to specify our mixed-effects by adding them on to the formula we would normally include in our models:
 
 * *formula + (1 | group)* specifies a random intercept model. The "group" is the name of the grouping variable from your data.
-* *formula + (1 + response variable | group)* specifies a random slope and intercept model. The response variable(s) is the response variable from your formula over which you expect the group slopes to vary.
+* *formula + (1 + predictor variable | group)* specifies a random slope and intercept model. The predictor variable(s) is the predictor variable from your formula over which you expect the group slopes to vary.
 
 All the other formatting details for fitting `lmer()` models are the same as `lm()` models.
 
@@ -150,7 +150,7 @@ At the top of your model summary, you'll see the heading "Random effects". This 
 
 * The *intercept variance* tells us how much our groups differ in terms of their baselines or intercepts. 
 * The *temp (slopes) variance* tells us how much our groups differ in terms of the effect of temperature on response times.
-* The *residual variance* tells us how much variance remains unexplained by either the random or fixed effects. If this value is large relative to the random effects variance, it suggests most of the variation is *within* the groups rather than between them. Conversely, a relatively large random effects variance tells us most of the variation exists *between* groups.
+* The *residual variance* tells us how much variance remains unexplained by either the random or fixed effects. If this value is large relative to the random effects variance, it suggests most of the variation in our response is *within* the groups rather than between them. Conversely, a relatively large random effects variance tells us most of the variation exists *between* groups.
 
 Remember, in mixed-effects models we are interested in the variation among groups, so a larger number in the intercept and slope variances relative to the residual variance indicates that our random effects are doing some work. 
 
